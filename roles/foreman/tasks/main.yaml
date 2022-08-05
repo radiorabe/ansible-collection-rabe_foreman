@@ -1,5 +1,5 @@
 ---
-- name: Configure Foreman Organizations
+- name: 'radiorabe.rabe_foreman.foreman : Configure Organizations'
   ansible.builtin.include_role:
     name: theforeman.foreman.organizations
   vars:
@@ -8,7 +8,7 @@
         state: present
         description: Radio Bern RaBe
 
-- name: Configure Foreman Locations
+- name: 'radiorabe.rabe_foreman.foreman : Configure Locations'
   ansible.builtin.include_role:
     name: radiorabe.foreman.locations
   vars:
@@ -17,7 +17,7 @@
         organizations:
           - RaBe
 
-- name: Configure Foreman Settings
+- name: 'radiorabe.rabe_foreman.foreman : Configure Settings'
   ansible.builtin.include_role:
     name: theforeman.foreman.settings
   vars:
@@ -35,7 +35,7 @@
       - name: lab_features
         value: false
 
-- name: Configure Foreman Global Parameters
+- name: 'radiorabe.rabe_foreman.foreman : Configure Global Parameters'
   ansible.builtin.include_role:
     name: radiorabe.foreman.global_parameters
   vars:
