@@ -4,7 +4,9 @@ GitOps our Foreman. This is where most of our Foreman configuration lives.
 
 ## Roles
 
-* [`foreman`](https://github.com/radiorabe/ansible-collection-rabe_foreman/tree/main/roles/foreman)
+* [`content`](https://github.com/radiorabe/ansible-collection-rabe_foreman/tree/main/roles/content) Put Content into Foreman
+* [`foreman`](https://github.com/radiorabe/ansible-collection-rabe_foreman/tree/main/roles/foreman) Administer and Configure Foreman
+* [`hosts`](https://github.com/radiorabe/ansible-collection-rabe_foreman/tree/main/roles/hosts) Provisioning Setup and Templates
 
 ## License
 
