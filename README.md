@@ -4,7 +4,7 @@ GitOps our Foreman. This is where most of our Foreman configuration lives.
 
 ## Roles
 
-* [`foreman`](https://github.com/radiorabe/ansible-collection-rabe_foreman/tree/main/roles/foreman) (
+* [`foreman`](https://github.com/radiorabe/ansible-collection-rabe_foreman/tree/main/roles/foreman)
 
 ## License
 
