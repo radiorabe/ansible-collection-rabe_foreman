@@ -1,0 +1,16 @@
+namespace: radiorabe
+name: rabe_foreman
+version: 0.0.0
+readme: README.md
+authors:
+  - Lucas Bickel <@hairmare>
+description: GitOps our Foreman
+license_file: LICENSE
+tags:
+  - radiorabe
+  - foreman
+dependencies: {}
+repository: https://github.com/radiorabe/ansible-collection-rabe_foreman
+documentation: https://github.com/radiorabe/ansible-collection-rabe_foreman/blob/main/README.md
+homepage: hhttps://github.com/radiorabe/ansible-collection-rabe_foreman
+issues: https://github.com/radiorabe/ansible-collection-rabe_foreman/issues

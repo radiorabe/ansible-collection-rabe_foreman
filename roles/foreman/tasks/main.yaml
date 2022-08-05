@@ -1,0 +1,35 @@
+---
+- name: Configure Foreman Organizations
+  ansible.builtin.include_role:
+    name: theforeman.foreman.organizations
+  vars:
+    foreman_organizations:
+      - name: RaBe
+        state: present
+        description: Radio Bern RaBe
+
+- name: Configure Foreman Locations
+  ansible.builtin.include_role:
+    name: radiorabe.foreman.locations
+  vars:
+    foreman_locations:
+      - name: Randweg
+        organizations:
+          - RaBe
+
+- name: Configure Global Parameters
+  ansible.builtin.include_role:
+    name: radiorabe.foreman.global_parameters
+  vars:
+    global_parameters:
+      - name: ansible_roles_check_mode
+        parameter_type: boolean
+        value: false
+      - name: host_packages
+        value: ""
+      - name: host_registration_insights
+        parameter_type: boolean
+        value: false
+      - name: host_registration_remote_execution
+        parameter_type: boolean
+        value: true

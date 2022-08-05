@@ -1,0 +1,13 @@
+name: Lint and Test
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  call-workflow:
+    uses: radiorabe/actions/.github/workflows/test-ansible-collection.yaml@main
+    with:
+      targets: |
+       roles/foreman

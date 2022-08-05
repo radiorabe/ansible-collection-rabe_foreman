@@ -1,0 +1,12 @@
+name: Release
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  call-workflow:
+    uses: radiorabe/actions/.github/workflows/release-ansible-collection.yaml@main
+    secrets:
+      GALAXY_API_KEY: ${{ secrets.GALAXY_API_KEY }}
