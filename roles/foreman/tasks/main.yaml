@@ -35,6 +35,23 @@
       - name: lab_features
         value: false
 
+- name: 'radiorabe.rabe_foreman.foreman : Configure Roles'
+  ansible.builtin.include_role:
+    name: radiorabe.foreman.roles
+  vars:
+    foreman_roles:
+      - name: Default role
+        description: Role that is automatically assigned to every user in the system. Adding
+          a permission grants it to everybody
+        state: present
+        filters:
+          - permissions:
+              - view_foreman_tasks
+            search: owner.id = current_user
+          - permissions:
+              - view_job_invocations
+            search: user = current_user
+
 - name: 'radiorabe.rabe_foreman.foreman : Configure Global Parameters'
   ansible.builtin.include_role:
     name: radiorabe.foreman.global_parameters
@@ -63,7 +80,7 @@
         organization: RaBe
         location: Randweg
         ansible_roles:
-        - radiorabe.common.core
+          - radiorabe.common.core
       - name: RaBe Base
         description: RaBe Core configures the bare minimum of non OS specific things.
         parent: RaBe Core
@@ -80,9 +97,9 @@
         organization: RaBe
         location: Randweg
         ansible_roles:
-        - theforeman.foreman_scap_client
-        - redhat.rhel_system_roles.kdump
-        - redhat.rhel_system_roles.crypto_policies
+          - theforeman.foreman_scap_client
+          - redhat.rhel_system_roles.kdump
+          - redhat.rhel_system_roles.crypto_policies
       - name: Foreman
         description: Foreman configures standalone Foreman servers.
         parent: RaBe Core/RaBe Base/EL8/CentOS 8 Stream
