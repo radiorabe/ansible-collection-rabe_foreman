@@ -1,0 +1,160 @@
+---
+- name: 'radiorabe.rabe_foreman.content : Configure Products'
+  ansible.builtin.include_role:
+    name: theforeman.foreman.repositories
+  vars:
+    foreman_products:
+      - name: AlmaLinux 9
+        label: alma9
+        repositories:
+          - name: AlmaLinux 9 BaseOS x86_64
+            content_type: yum
+            label: alma9_baseos
+            url: https://repo.almalinux.org/almalinux/9/BaseOS/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 9 AppStream x86_64
+            content_type: yum
+            label: alma9_appstream
+            url: https://repo.almalinux.org/almalinux/9/AppStream/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 9 CRB x86_64
+            content_type: yum
+            label: alma9_crb
+            url: https://repo.almalinux.org/almalinux/9/CRB/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 9 Extras x86_64
+            content_type: yum
+            label: alma9_extras
+            url: https://repo.almalinux.org/almalinux/9/extras/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 9 HighAvailability x86_64
+            content_type: yum
+            label: alma9_ha
+            url: https://repo.almalinux.org/almalinux/9/HighAvailability/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 9 NFV x86_64
+            content_type: yum
+            label: alma9_nfv
+            url: https://repo.almalinux.org/almalinux/9/NFV/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 9 Plus x86_64
+            content_type: yum
+            label: alma9_plus
+            url: https://repo.almalinux.org/almalinux/9/plus/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 9 ResilientStorage x86_64
+            content_type: yum
+            label: alma9_resilientstorage
+            url: https://repo.almalinux.org/almalinux/9/ResilientStorage/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 9 RT x86_64
+            content_type: yum
+            label: alma9_rt
+            url: https://repo.almalinux.org/almalinux/9/RT/x86_64/os/
+            download_policy: on_demand
+      - name: CentOS 8 Stream
+        label: cs8s
+        repositories:
+          - name: CentOS Stream 8 BaseOS x86_64
+            content_type: yum
+            label: cs8s_baseos
+            url: http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/
+            download_policy: on_demand
+          - name: CentOS Stream 8 AppStream x86_64
+            content_type: yum
+            label: cs8s_appstream
+            url: http://mirror.centos.org/centos/8-stream/AppStream/x86_64/os/
+            download_policy: on_demand
+          - name: CentOS Stream 8 Extras x86_64
+            content_type: yum
+            label: cs8s_extras
+            url: http://mirror.centos.org/centos/8-stream/extras/x86_64/os/
+            download_policy: on_demand
+          - name: CentOS Stream 8 PowerTools x86_64
+            content_type: yum
+            label: cs8s_powertools
+            url: http://mirror.centos.org/centos/8-stream/PowerTools/x86_64/os/
+            download_policy: on_demand
+          - name: CentOS Stream 8 RealTime x86_64
+            content_type: yum
+            label: cs8s_rt
+            url: http://mirror.centos.org/centos/8-stream/RT/x86_64/os/
+            download_policy: on_demand
+          - name: CentOS Stream 8 HighAvailability x86_64
+            content_type: yum
+            label: cs8s_ha
+            url: http://mirror.centos.org/centos/8-stream/HighAvailability/x86_64/os/
+            download_policy: on_demand
+          - name: CentOS Stream 8 ResilientStorage x86_64
+            content_type: yum
+            label: cs8s_resilientstorage
+            url: http://mirror.centos.org/centos/8-stream/ResilientStorage/x86_64/os/
+            download_policy: on_demand
+          - name: CentOS Stream 8 NFV x86_64
+            content_type: yum
+            label: cs8s_nfv
+            url: http://mirror.centos.org/centos/8-stream/NFV/x86_64/os/
+            download_policy: on_demand
+          - name: CentOS Stream 8 Foreman client 3.3 x86_64
+            content_type: yum
+            label: cs8s_foreman33_client
+            url: https://yum.theforeman.org/client/3.3/el8/x86_64/
+            download_policy: on_demand
+      - name: Foreman
+        label: theforeman
+        repositories:
+          - name: CentOS Configmanagement SIG - ansible-29
+            label: centos-ansible-29
+            content_type: yum
+            download_policy: on_demand
+            url: http://mirror.centos.org/centos/8/configmanagement/x86_64/ansible-29/
+          - name: Ansible runner
+            label: ansible-runner
+            content_type: yum
+            download_policy: on_demand
+            url: https://releases.ansible.com/ansible-runner/rpm/epel-8-x86_64/
+          - name: Foreman 3.3
+            label: foreman33
+            content_type: yum
+            download_policy: on_demand
+            url: https://yum.theforeman.org/releases/3.3/el8/x86_64/
+          - name: Foreman plugins 3.3
+            label: foreman33-plugins
+            content_type: yum
+            download_policy: on_demand
+            url: https://yum.theforeman.org/plugins/3.3/el8/x86_64/
+          - name: Katello 4.5
+            label: katello45
+            content_type: yum
+            download_policy: on_demand
+            url: https://yum.theforeman.org/katello/4.5/katello/el8/x86_64/
+          - name: 'Candlepin: an open source entitlement management system.'
+            label: katello45-candlepin
+            content_type: yum
+            download_policy: on_demand
+            url: https://yum.theforeman.org/katello/4.5/candlepin/el8/x86_64/
+          - name: 'pulpcore: Fetch, Upload, Organize, and Distribute Software Packages.'
+            label: pulpcore
+            content_type: yum
+            download_policy: on_demand
+            url: https://yum.theforeman.org/pulpcore/3.18/el8/x86_64/
+          - name: Puppet 7 Repository el 8 - x86_64
+            label: puppet7
+            content_type: yum
+            download_policy: on_demand
+            url: http://yum.puppetlabs.com/puppet7/el/8/x86_64/
+      - name: RaBe Ansible
+        label: rabe_ansible
+        repositories:
+          - name: Galaxy
+            content_type: ansible_collection
+            label: rabe_ansible_collections
+            url: https://galaxy.ansible.com/
+            ansible_collection_requirements: |-
+              collections:
+              - src: radiorabe.common
+                name: radiorabe.common
+              - src: radiorabe.foreman
+                name: radiorabe.foreman
+              - src: radiorabe.rabe_foreman
+                name: radiorabe.rabe_foreman

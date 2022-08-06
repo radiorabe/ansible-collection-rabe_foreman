@@ -1,0 +1,9 @@
+---
+- name: 'radiorabe.rabe_foreman.foreman : Configure Locations'
+  ansible.builtin.include_role:
+    name: radiorabe.foreman.locations
+  vars:
+    foreman_locations:
+      - name: Randweg
+        organizations:
+          - RaBe

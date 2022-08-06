@@ -1,0 +1,9 @@
+---
+- name: 'radiorabe.rabe_foreman.foreman : Configure Organizations'
+  ansible.builtin.include_role:
+    name: theforeman.foreman.organizations
+  vars:
+    foreman_organizations:
+      - name: RaBe
+        state: present
+        description: Radio Bern RaBe

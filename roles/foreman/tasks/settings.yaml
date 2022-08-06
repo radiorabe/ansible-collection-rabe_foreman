@@ -1,0 +1,18 @@
+---
+- name: 'radiorabe.rabe_foreman.foreman : Configure Settings'
+  ansible.builtin.include_role:
+    name: theforeman.foreman.settings
+  vars:
+    foreman_settings:
+      - name: rss_enable
+        value: false
+      - name: administrator
+        value: it@rabe.ch
+      - name: email_reply_address
+        value: noreply@rabe.ch
+      - name: ansible_roles_to_ignore
+        value:
+          - linux-system-roles.*
+          - rhel-system-roles.*
+      - name: lab_features
+        value: false

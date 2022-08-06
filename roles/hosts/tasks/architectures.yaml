@@ -1,0 +1,13 @@
+---
+- name: 'radiorabe.rabe_foreman.hosts : Configure Architectures'
+  ansible.builtin.include_role:
+    name: radiorabe.foreman.architectures
+  vars:
+    foreman_architectures:
+      - name: i386
+        state: absent
+      - name: x86_64
+        operatingsystems:
+          - AlmaLinux 9
+          - CentOS Stream 8
+          - CentOS Stream 9
