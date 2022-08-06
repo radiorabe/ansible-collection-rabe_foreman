@@ -1,0 +1,14 @@
+---
+- name: 'radiorabe.rabe_foreman.content : Configure Sync Plans'
+  ansible.builtin.include_role:
+    name: theforeman.foreman.sync_plans
+  vars:
+    foreman_sync_plans:
+      - name: Weekly Sync
+        interval: weekly
+        sync_date: 2020-11-07 00:00:00 UTC
+        products:
+          - AlmaLinux 9
+          - CentOS 8 Stream
+          - Foreman
+          - RaBe Ansible

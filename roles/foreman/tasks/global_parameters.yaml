@@ -1,0 +1,17 @@
+---
+- name: 'radiorabe.rabe_foreman.foreman : Configure Global Parameters'
+  ansible.builtin.include_role:
+    name: radiorabe.foreman.global_parameters
+  vars:
+    foreman_global_parameters:
+      - name: ansible_roles_check_mode
+        parameter_type: boolean
+        value: false
+      - name: host_packages
+        value: ""
+      - name: host_registration_insights
+        parameter_type: boolean
+        value: false
+      - name: host_registration_remote_execution
+        parameter_type: boolean
+        value: true

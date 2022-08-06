@@ -1,0 +1,47 @@
+---
+- name: 'radiorabe.rabe_foreman.foreman : Configure Host Groups'
+  ansible.builtin.include_role:
+    name: theforeman.foreman.hostgroups
+  vars:
+    foreman_hostgroups:
+      - name: RaBe Core
+        description: RaBe Core contains roles that set facts and sets settings that don't
+          rely on anything and are not OS specific.
+        organization: RaBe
+        location: Randweg
+        ansible_roles:
+          - radiorabe.common.core
+      - name: RaBe Base
+        description: RaBe Core configures the bare minimum of non OS specific things.
+        parent: RaBe Core
+        organization: RaBe
+        location: Randweg
+      - name: EL8
+        description: EL8 configures our EL8 baseline
+        parent: RaBe Core/RaBe Base
+        organization: RaBe
+        location: Randweg
+      - name: CentOS 8 Stream
+        description: CentOS 8 Stream configures the RaBe CentOS 8 Stream baseline
+        parent: RaBe Core/RaBe Base/EL8
+        organization: RaBe
+        location: Randweg
+        ansible_roles:
+          - theforeman.foreman_scap_client
+          - redhat.rhel_system_roles.kdump
+          - redhat.rhel_system_roles.crypto_policies
+      - name: Foreman
+        description: Foreman configures standalone Foreman servers.
+        parent: RaBe Core/RaBe Base/EL8/CentOS 8 Stream
+        organization: RaBe
+        location: Randweg
+      - name: EL9
+        description: EL9 configures our EL9 baseline
+        parent: RaBe Core/RaBe Base
+        organization: RaBe
+        location: Randweg
+      - name: AlmaLinux 9
+        description: AlmaLinux 9.
+        parent: RaBe Core/RaBe Base/EL9
+        organization: RaBe
+        location: Randweg
