@@ -1,0 +1,20 @@
+---
+- hosts: all
+  tasks:
+    - name: Install convert2rhel
+      ansible.builtin.package:
+        name: convert2rhel
+        state: present
+    - name: Prepopulate katello-ca-consumer
+      get_url:
+        url: <%= subscription_manager_configuration_url(@host) %>
+        dest: /usr/share/convert2rhel/subscription-manager/katello-ca-consumer-latest.noarch.rpm
+    - name: Start convert2rhel
+      command: convert2rhel -y --activationkey "<%= input_resource('Activation Key').name %>" --org "<%= @host.organization.label %>" --keep-rhsm
+<%- if input('Restart') == "yes" -%>
+    - name: Reboot the machine
+      reboot:
+        reboot_timeout: 1800
+<%- end -%>
+    - name: Update system facts
+      command: subscription-manager facts --update
