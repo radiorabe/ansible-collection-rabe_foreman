@@ -16,7 +16,6 @@
 # - [Foreman Ansible Jobs](https://github.com/theforeman/foreman_ansible/tree/master/app/views/foreman_ansible/job_templates)
 # - [Katello Jobs](https://github.com/Katello/katello/tree/master/app/views/foreman/job_templates)
 # - [OpenSCAP](https://github.com/theforeman/foreman_openscap/tree/master/app/views/job_templates)
-# - [RH Cloud Connector](https://github.com/theforeman/foreman_rh_cloud/tree/master/app/views/job_templates)
 #
 # Please add more links as you find them.
 #
@@ -258,43 +257,13 @@
             snippet: false
             # TODO: get rid of ugly hack
             file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/check_update__script_default.erb
+
+          # cloud connector was originally in ansible_foreman but moved to foreman_rh_cloud at some point:
+          # - https://github.com/theforeman/foreman_ansible/pull/526
+          # - https://github.com/theforeman/foreman_rh_cloud/tree/master/app/views/job_templates
+          # We absent it and keep this here to ensure it doesn't get re-added.
           - name: Configure Cloud Connector
             state: absent
-            description_format: '%{template_name}'
-            job_category: Maintenance Operations
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: satellite_user
-                required: true
-                input_type: user
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: satellite_password
-                required: true
-                input_type: user
-                advanced: false
-                value_type: plain
-                hidden_value: true
-              - name: http_proxy
-                required: false
-                input_type: user
-                description: You can specify a HTTP proxy address that should be used for Cloud
-                  Connector connection to the cloud.redhat.com. Note that it must be HTTP proxy,
-                  not HTTPS. The tunelling of SSL (secured web socket connection) in SSL (HTTPS
-                  proxy) is currently unsupported.
-                advanced: true
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/configure_cloud_connector.erb
           - name: Convert to RHEL
             state: absent
             job_category: Convert 2 RHEL
