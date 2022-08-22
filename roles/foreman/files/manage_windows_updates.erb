@@ -1,0 +1,62 @@
+- hosts: all
+  vars:
+    updates: []
+    <% if input('state').blank? %>
+    state: searched
+    <% else %>
+    state: <%= input('state') %>
+    <% end %>
+
+  tasks:
+    - name: "{{ state | replace('ed','') | capitalize }} Windows Updates"
+      win_updates:
+        <% unless input('reject_list').blank? %>
+        blacklist: <%= input('reject_list') %>
+        <% end -%>
+        <% if input('category_names').blank? %>
+        category_names: ["CriticalUpdates", "SecurityUpdates", "UpdateRollups"]
+        <% else %>
+        category_names: <%= input('category_names') %>
+        <% end %>
+        <% unless input('log_path').blank? %>
+        log_path: <%= input('log_path') %>
+        <% end -%>
+        <% if input('reboot').blank? %>
+        reboot: false
+        <% else %>
+        reboot: <%= input('reboot') %>
+        <% end %>
+        <% if input('reboot_timeout').blank? %>
+        reboot_timeout: 1200
+        <% else %>
+        reboot_timeout: <%= input('reboot_timeout') %>
+        <% end -%>
+        <% if input('server_selection').blank? %>
+        server_selection: default
+        <% else %>
+        server_selection: <%= input('server_selection') %>
+        <% end %>
+        state: "{{ state }}"
+        <% if input('use_scheduled_task').blank? %>
+        use_scheduled_task: false
+        <% else %>
+        use_scheduled_task: <%= input('use_scheduled_task') %>
+        <% end %>
+        <% if !input('whitelist').blank? %>
+        whitelist: <%= input('whitelist') %>
+        <% end -%>
+
+      register: found_updates
+
+    - name: "Get all {{ state }} updates"
+      set_fact:
+        updates: "{{ updates + [ current_update ] }}"
+      vars:
+        current_update: "{{ item.value.title  }}"
+      loop: "{{ found_updates.updates | dict2items }}"
+      no_log: true
+
+    - name: "List {{ state }} Windows Updates"
+      debug:
+        msg: "{{ item }}"
+      loop: "{{ updates }}"
