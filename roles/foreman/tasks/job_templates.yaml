@@ -1,0 +1,2069 @@
+---
+# These tasks manage "Hosts" > "Templates" > "Job Templates".
+#
+# They unlock all the templates during operation and re-lock them all when it's done.
+# This isn't idempotent which is fine for now. At some point we'll want to refactor
+# it to check if any changes are needed before unlocking and relocking all the tempaltes.
+#
+# Most scripts in here were originally exported from foreman and are here to document
+# which one of them we keep and which we update. We expect to add some RaBe specific
+# scripts once the default set is tweaked. As a rule of thumb, we deactivate built-in
+# templates and replace them with copies of our own where possible.
+#
+# The canonical sources for the templates we don't maintain ourselves are in various
+# difference repos:
+#
+# - [Foreman Ansible Jobs](https://github.com/theforeman/foreman_ansible/tree/master/app/views/foreman_ansible/job_templates)
+# - [Katello Jobs](https://github.com/Katello/katello/tree/master/app/views/foreman/job_templates)
+# - [OpenSCAP](https://github.com/theforeman/foreman_openscap/tree/master/app/views/job_templates)
+#
+# Please add more links as you find them.
+#
+
+- name: 'radiorabe.rabe_foreman.foreman : Job Templates'
+  block:
+    - name: 'radiorabe.rabe_foreman.foreman : Unlock All Job Templates'
+      ansible.builtin.include_role:
+        name: radiorabe.foreman.job_templates
+      vars:
+        foreman_job_templates:
+          - name: "*"
+            locked: false
+      when: not ansible_check_mode
+      diff: false
+
+    - name: 'radiorabe.rabe_foreman.foreman : Configure Job Templates'
+      ansible.builtin.include_role:
+        name: radiorabe.foreman.job_templates
+      vars:
+        foreman_job_templates:
+          - name: Ansible Collection - Install from Galaxy
+            state: present
+            description_format: 'Install collections ''%{ansible_collections_list}'' from Galaxy'
+            job_category: Ansible Galaxy
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: ansible_collections_list
+                required: true
+                input_type: user
+                description: "List of collections in Ansible Galaxy to install, separated by commas,
+                  e.g: mysql,nginx\r\n\r\nThe default collections_paths is configured in /etc/ansible/ansible.cfg,
+                  you may override it by filling the 'collections_path' input. Click on \"Advanced\"
+                  to see it."
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: collections_path
+                required: false
+                input_type: user
+                description: A particular directory where you want the downloaded collections to
+                  be placed.
+                advanced: true
+                value_type: plain
+                hidden_value: false
+            template: |
+             ---
+              - hosts: all
+                tasks:
+                  - command: ansible-galaxy collection install <%= input('ansible_collections_list').split(",").join(' ') %> -p <%= input('collections_path').present? ? input('collections_path') : '/etc/ansible/collections' %>
+          - name: Ansible Roles - Ansible Default
+            state: present
+            description_format: Run Ansible roles
+            job_category: Ansible Playbook
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template: |
+              ---
+              - hosts: all
+                pre_tasks:
+                  - name: Display all parameters known for the Foreman host
+                    debug:
+                      var: foreman
+                    tags:
+                      - always
+                tasks:
+                  - name: Apply roles
+                    include_role:
+                      name: "{{ role }}"
+                    tags:
+                      - always
+                    loop: "{{ foreman_ansible_roles }}"
+                    loop_control:
+                      loop_var: role
+          - name: Ansible Roles - Install from Galaxy
+            state: present
+            description_format: 'Install roles ''%{ansible_roles_list}'' from Galaxy'
+            job_category: Ansible Galaxy
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: ansible_roles_list
+                required: true
+                input_type: user
+                description: "List of roles in Ansible Galaxy to install, separated by commas, e.g:
+                  \"mysql, nginx\"\r\n\r\nThe default location is the 'roles_path' configured on
+                  /etc/ansible/ansible.cfg, you may override it by filling the 'location' input.
+                  Click on \"Advanced\" to see it."
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: location
+                required: false
+                input_type: user
+                description: A particular directory where you want the downloaded roles to be placed.
+                advanced: true
+                value_type: plain
+                hidden_value: false
+            template: |
+              ---
+              - hosts: all
+                tasks:
+                  - command: ansible-galaxy install {{ item }} -p <%= input('location').present? ? input('location') : '/etc/ansible/roles' %>
+                    register: out
+                    with_items:
+                      - <%= input('ansible_roles_list') %>
+                  - debug: var=out
+          - name: Ansible Roles - Install from git
+            state: present
+            description_format: 'Clone roles from git repository to %{location}'
+            job_category: Ansible Roles Installation
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: git_repository
+                required: true
+                input_type: user
+                description: "URL to the git repository containing the roles, e.g:\r\nhttps://github.com/theforeman/foreman_role_1"
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: location
+                required: true
+                input_type: user
+                description: For example, '/etc/ansible/roles/foobar' . Look at '/etc/ansible/ansible.cfg'
+                  roles_path option to find what is your roles_path
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              ---
+              - hosts: all
+                tasks:
+                  - command: git clone <%= input('git_repository') %> <%= input('location') %>
+                    register: out
+                  - debug: var=out
+          - name: Ansible - Run insights maintenance plan
+            state: present
+            description_format: Insights maintenance plan for host
+            job_category: Ansible Playbook
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: plan_id
+                required: true
+                input_type: user
+                description: The playbook for the rule coming from insights.
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: organization_id
+                required: true
+                input_type: user
+                description: The Foreman organization associated with the Insights account
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <%= insights_remediation(input(:plan_id), input(:organization_id)) %>
+          - name: Ansible - Run playbook
+            state: present
+            job_category: Ansible Playbook
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: playbook
+                required: true
+                input_type: user
+                description: The playbook to run against given hosts
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <%= input('playbook') %>
+          - name: Capsule Upgrade Playbook
+            state: present
+            description_format: '%{template_name}'
+            job_category: Maintenance Operations
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: target_version
+                required: true
+                input_type: user
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: whitelist_options
+                required: false
+                input_type: user
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              ---
+              - hosts: all
+                tasks:
+                  - name: Gather the rpm package facts
+                    package_facts:
+                      manager: auto
+
+                  - name: Fail if the target server is a Satellite server
+                    fail:
+                      msg: "This playbook cannot be executed on a Satellite server. Use only on a Capsule server."
+                    when: "'satellite' in ansible_facts.packages"
+
+                  - name: Install|Update satellite-maintain if not present
+                    package:
+                      name: rubygem-foreman_maintain
+                      state: latest
+
+                  - block:
+                    <%- whitelist_option = if input('whitelist_options').present?
+                                             "--whitelist=#{input('whitelist_options')}"
+                                           end -%>
+                    - name: Upgrade Capsule server using satellite-maintain
+                      shell: satellite-maintain upgrade run --assumeyes --target-version=<%= input('target_version') %> <%= whitelist_option %>
+                      register: result
+
+                    - name: Re-Gather the rpm package facts after the upgrade
+                      package_facts:
+                        manager: auto
+
+                    - name: satellite-maintain upgrade return code is zero
+                      debug:
+                        msg: "Success! Capsule server upgrade completed. Current version of Capsule server server is {{ ansible_facts.packages['satellite-capsule'][0]['version'] }}."
+
+                    rescue:
+                      - name: Print satellite-maintain output
+                        debug:
+                          var: result
+
+                      - name: Grep top 10 Error messages from /var/log/foreman-installer/capsule.log
+                        shell: grep '^\[ERROR' /var/log/foreman-installer/capsule.log | head -n10
+                        register: output_grep
+
+                      - name: Print grepped Error messages
+                        debug:
+                          var: output_grep.stdout_lines
+
+                      - name: satellite-maintain upgrade return code is non-zero
+                        fail:
+                          msg: "Failed! Capsule server upgrade failed. See /var/log/foreman-installer/capsule.log in the Capsule server for more information"
+          - name: Change content source
+            state: present
+            description_format: Configure subscription manager to new content source
+            job_category: Katello
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template: |
+              #!/bin/sh
+
+              <%= change_content_source(@host, foreman_server_ca_cert) %>
+          - name: Check Update - Script Default
+            state: present
+            description_format: Check for package updates
+            job_category: Packages
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template: |
+              <%
+                supported_families = ['Redhat', 'Debian', 'Suse']
+                render_error(N_('Unsupported or no operating system found for this host.')) unless @host.operatingsystem && supported_families.include?(@host.operatingsystem.family)
+
+                command = case @host.operatingsystem.family
+                          when 'Redhat'
+                            'yum check-update'
+                          when 'Debian'
+                            'apt list --upgradable'
+                          when 'Suse'
+                            'zypper list-updates'
+                          end
+              -%>
+
+              <%= command %>
+              <% if command.start_with? 'yum' %>
+              rc=$?
+              # yum check-update returns 100 when there are updates available
+              if [ $rc -eq 100 ]; then
+                  # In this case, we override the exit code to 0 so Remote Execution
+                  # can consider this run as successful
+                  (exit 0)
+              else
+                  # For any other exit code, we don't modify it
+                  (exit $rc)
+              fi
+              <% end %>
+          - name: Configure Cloud Connector
+            state: present
+            description_format: '%{template_name}'
+            job_category: Maintenance Operations
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: satellite_user
+                required: true
+                input_type: user
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: satellite_password
+                required: true
+                input_type: user
+                advanced: false
+                value_type: plain
+                hidden_value: true
+              - name: http_proxy
+                required: false
+                input_type: user
+                description: You can specify a HTTP proxy address that should be used for Cloud
+                  Connector connection to the cloud.redhat.com. Note that it must be HTTP proxy,
+                  not HTTPS. The tunelling of SSL (secured web socket connection) in SSL (HTTPS
+                  proxy) is currently unsupported.
+                advanced: true
+                value_type: plain
+                hidden_value: false
+            template: |
+              ---
+              - hosts: all
+                vars:
+                  satellite_url: "<%= foreman_server_url %>"
+                roles:
+                  - project-receptor.satellite_receptor_installer
+          - name: Convert to RHEL
+            state: present
+            job_category: Convert 2 RHEL
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: Activation Key
+                required: true
+                input_type: user
+                description: Set the activation key to assign the desired RHEL subscription and
+                  life cycle environment to the converted machine at the registration step.
+                advanced: false
+                value_type: resource
+                resource_type: Katello::ActivationKey
+                hidden_value: false
+              - name: Restart
+                required: true
+                input_type: user
+                description: Restart the system when it is successfully converted to RHEL to boot
+                  the new RHEL kernel.
+                options: "yes\r\nno"
+                advanced: false
+                value_type: plain
+                resource_type: Katello::ActivationKey
+                hidden_value: false
+            template: |
+              ---
+              - hosts: all
+                tasks:
+                  - name: Install convert2rhel
+                    ansible.builtin.package:
+                      name: convert2rhel
+                      state: present
+                  - name: Prepopulate katello-ca-consumer
+                    get_url:
+                      url: <%= subscription_manager_configuration_url(@host) %>
+                      dest: /usr/share/convert2rhel/subscription-manager/katello-ca-consumer-latest.noarch.rpm
+                  - name: Start convert2rhel
+                    command: convert2rhel -y --activationkey "<%= input_resource('Activation Key').name %>" --org "<%= @host.organization.label %>" --keep-rhsm
+              <%- if input('Restart') == "yes" -%>
+                  - name: Reboot the machine
+                    reboot:
+                      reboot_timeout: 1800
+              <%- end -%>
+                  - name: Update system facts
+                    command: subscription-manager facts --update
+          - name: Install errata by search query - Katello Script Default
+            state: present
+            description_format: 'Install errata %{Errata search query}'
+            foreign_input_sets:
+              - exclude: action,package
+                include_all: true
+                template: Package Action - Script Default
+            job_category: Katello
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template_inputs:
+              - name: Errata search query
+                required: false
+                input_type: user
+                description: Filter criteria for errata to be installed.
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <% advisory_ids = @host.advisory_ids(search: input("Errata search query")) %>
+              # RESOLVED_ERRATA_IDS=<%= advisory_ids.join(',') %>
+
+              <% if @host.operatingsystem.family == 'Suse' -%>
+                  <%= render_template('Package Action - Script Default', :action => 'install -n -t patch', :package => advisory_ids.join(' ')) %>
+              <% else %>
+                  <% raise "No errata matching given search query" if !input("Errata search query").blank? && advisory_ids.empty? %>
+
+                  <% advisories = advisory_ids.map { |e| "--advisory=#{e}" }.join(' ') %>
+                  <%= render_template('Package Action - Script Default', :action => 'update-minimal', :package => advisories) %>
+              <% end %>
+          - name: Install Errata - Katello Ansible Default
+            state: present
+            description_format: 'Install errata %{errata}'
+            job_category: Katello via Ansible
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: errata
+                required: true
+                input_type: user
+                description: A comma separated list of errata to install
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <% if @host.operatingsystem.family == 'Suse' -%>
+              <% advisories = input(:errata).split(',').join(' ') -%>
+              <%= render_template('Run Command - Ansible Default', :command => "zypper -n install -t patch #{advisories}") -%>
+              <% elsif @host.operatingsystem.family == 'Debian' -%>
+              <% advisories = input(:errata).split(',').map { |e| @host.debs_for_erratum(e) }.join(' ') -%>
+              <%= render_template('Run Command - Ansible Default', :command => "apt-get -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" -y --only-upgrade install -y #{advisories}") %>
+              <% else -%>
+              <% advisories = input(:errata).split(',').map { |e| "--advisory=#{e}" }.join(' ') -%>
+              <%= render_template('Run Command - Ansible Default', :command => "yum -y update-minimal #{advisories}") -%>
+              <% end -%>
+          - name: Install Errata - Katello Script Default
+            state: present
+            description_format: 'Install errata %{errata}'
+            foreign_input_sets:
+              - exclude: action,package
+                include_all: true
+                template: Package Action - Script Default
+            job_category: Katello
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template_inputs:
+              - name: errata
+                required: true
+                input_type: user
+                description: A comma-separated list of errata to install
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <% if @host.operatingsystem.family == 'Suse' -%>
+                  <% advisories = input(:errata).split(',').join(' ') %>
+                  <%= render_template('Package Action - Script Default', :action => 'install -n -t patch', :package => advisories) %>
+              <% else %>
+                  <% advisories = input(:errata).split(',').map { |e| "--advisory=#{e}" }.join(' ') %>
+                  <%= render_template('Package Action - Script Default', :action => 'update-minimal', :package => advisories) %>
+              <% end %>
+          - name: Install Group - Katello Ansible Default
+            state: present
+            description_format: 'Install package group(s) %{package}'
+            job_category: Katello via Ansible
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: package
+                required: true
+                input_type: user
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <%= render_template('Run Command - Ansible Default', :command => "yum -y group install #{input('package')}") %>
+          - name: Install Group - Katello Script Default
+            state: present
+            description_format: 'Install package group(s) %{package}'
+            foreign_input_sets:
+              - exclude: action
+                include_all: true
+                template: Package Action - Script Default
+            job_category: Katello
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template: |
+              <%= render_template('Package Action - Script Default', :action => 'group install') %>
+          - name: Install Package - Katello Ansible Default
+            state: present
+            description_format: 'Install package(s) %{package}'
+            job_category: Katello via Ansible
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: package
+                required: true
+                input_type: user
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <%= render_template('Package Action - Ansible Default', :state => 'latest', :name => input('package')) %>
+          - name: Install Package - Katello Script Default
+            state: present
+            description_format: 'Install package(s) %{package}'
+            foreign_input_sets:
+              - exclude: action
+                include_all: true
+                template: Package Action - Script Default
+            job_category: Katello
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template: |
+              <%= render_template('Package Action - Script Default', :action => 'install') %>
+          - name: Install packages by search query - Katello Script Default
+            state: present
+            description_format: 'Install package(s) %{Package search query}'
+            job_category: Katello
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template_inputs:
+              - name: Package search query
+                required: false
+                input_type: user
+                description: Filter criteria for packages to be installed. IMPORTANT- If left blank,
+                  the job will attempt to install all possible packages.
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <% package_names = @host.package_names_for_job_template(
+                action: 'install',
+                search: input('Package search query')
+              ) -%>
+
+              <%= render_template('Package Action - Script Default', :action => 'install', :package => package_names.join(' ')) %>
+          - name: Manage Windows Updates - Ansible Default
+            state: present
+            job_category: Ansible Playbook
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: reject_list
+                required: false
+                input_type: user
+                description: "A list of update titles or KB numbers that can be used to specify
+                  which updates are to be excluded from installation.\r\nIf an available update
+                  does match one of the entries, then it is skipped and not installed.\r\nEach entry
+                  can either be the KB article or Update title as a regex according to the PowerShell
+                  regex rules."
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: category_names
+                required: false
+                input_type: user
+                description: "A scalar or list of categories to install updates from. To get the
+                  list of categories, run the module with state=searched. The category must be the
+                  full category string, but is case insensitive.\r\nSome possible categories are
+                  Application, Connectors, Critical Updates, Definition Updates, Developer Kits,
+                  Feature Packs, Guidance, Security Updates, Service Packs, Tools, Update Rollups
+                  and Updates.\r\n\r\nDefault is '[\"CriticalUpdates\", \"SecurityUpdates\", \"UpdateRollups\"]'"
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: log_path
+                required: false
+                input_type: user
+                description: If set, win_updates will append update progress to the specified file.
+                  The directory must already exist.
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: reboot
+                required: false
+                input_type: user
+                description: "Ansible will automatically reboot the remote host if it is required
+                  and continue to install updates after the reboot.\r\nThis can be used instead
+                  of using a win_reboot task after this one and ensures all updates for that category
+                  is installed in one go.\r\nAsync does not work when reboot=true.\r\n\r\nDefault
+                  is 'false'"
+                options: "false\r\ntrue"
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: reboot_timeout
+                required: false
+                input_type: user
+                description: "The time in seconds to wait until the host is back online from a reboot.\r\nThis
+                  is only used if reboot=true and a reboot is required.\r\n\r\nDefault is '1200'"
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: server_selection
+                required: false
+                input_type: user
+                description: "Defines the Windows Update source catalog.\r\ndefault Use the default
+                  search source. For many systems default is set to the Microsoft Windows Update
+                  catalog. Systems participating in Windows Server Update Services (WSUS), Systems
+                  Center Configuration Manager (SCCM), or similar corporate update server environments
+                  may default to those managed update sources instead of the Windows Update catalog.\r\nmanaged_server
+                  Use a managed server catalog. For environments utilizing Windows Server Update
+                  Services (WSUS), Systems Center Configuration Manager (SCCM), or similar corporate
+                  update servers, this option selects the defined corporate update source.\r\nwindows_update
+                  Use the Microsoft Windows Update catalog.\r\n\r\nDefault is 'default'"
+                options: "default\r\nmanaged_server\r\nwindows_update"
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: state
+                required: false
+                input_type: user
+                description: "Controls whether found updates are downloaded or installed or listed\r\nThis
+                  module also supports Ansible check mode, which has the same effect as setting
+                  state=searched\r\n\r\nDefault is 'searched'"
+                options: "installed\r\nsearched\r\ndownloaded"
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: use_scheduled_task
+                required: false
+                input_type: user
+                description: "Will not auto elevate the remote process with become and use a scheduled
+                  task instead.\r\nSet this to true when using this module with async on Server
+                  2008, 2008 R2, or Windows 7, or on Server 2008 that is not authenticated with
+                  basic or credssp.\r\nCan also be set to true on newer hosts where become does
+                  not work due to further privilege restrictions from the OS defaults."
+                options: "false\r\ntrue"
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: whitelist
+                required: false
+                input_type: user
+                description: "A list of update titles or KB numbers that can be used to specify
+                  which updates are to be searched or installed.\r\nIf an available update does
+                  not match one of the entries, then it is skipped and not installed.\r\nEach entry
+                  can either be the KB article or Update title as a regex according to the PowerShell
+                  regex rules.\r\nThe whitelist is only validated on updates that were found based
+                  on category_names. It will not force the module to install an update if it was
+                  not in the category specified."
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              - hosts: all
+                vars:
+                  updates: []
+                  <% if input('state').blank? %>
+                  state: searched
+                  <% else %>
+                  state: <%= input('state') %>
+                  <% end %>
+
+                tasks:
+                  - name: "{{ state | replace('ed','') | capitalize }} Windows Updates"
+                    win_updates:
+                      <% unless input('reject_list').blank? %>
+                      blacklist: <%= input('reject_list') %>
+                      <% end -%>
+                      <% if input('category_names').blank? %>
+                      category_names: ["CriticalUpdates", "SecurityUpdates", "UpdateRollups"]
+                      <% else %>
+                      category_names: <%= input('category_names') %>
+                      <% end %>
+                      <% unless input('log_path').blank? %>
+                      log_path: <%= input('log_path') %>
+                      <% end -%>
+                      <% if input('reboot').blank? %>
+                      reboot: false
+                      <% else %>
+                      reboot: <%= input('reboot') %>
+                      <% end %>
+                      <% if input('reboot_timeout').blank? %>
+                      reboot_timeout: 1200
+                      <% else %>
+                      reboot_timeout: <%= input('reboot_timeout') %>
+                      <% end -%>
+                      <% if input('server_selection').blank? %>
+                      server_selection: default
+                      <% else %>
+                      server_selection: <%= input('server_selection') %>
+                      <% end %>
+                      state: "{{ state }}"
+                      <% if input('use_scheduled_task').blank? %>
+                      use_scheduled_task: false
+                      <% else %>
+                      use_scheduled_task: <%= input('use_scheduled_task') %>
+                      <% end %>
+                      <% if !input('whitelist').blank? %>
+                      whitelist: <%= input('whitelist') %>
+                      <% end -%>
+
+                    register: found_updates
+
+                  - name: "Get all {{ state }} updates"
+                    set_fact:
+                      updates: "{{ updates + [ current_update ] }}"
+                    vars:
+                      current_update: "{{ item.value.title  }}"
+                    loop: "{{ found_updates.updates | dict2items }}"
+                    no_log: true
+
+                  - name: "List {{ state }} Windows Updates"
+                    debug:
+                      msg: "{{ item }}"
+                    loop: "{{ updates }}"
+          - name: Module Action - Ansible Default
+            state: present
+            description_format: 'Module %{action} %{module_spec}'
+            job_category: Ansible Modules
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: pre_script
+                required: false
+                input_type: user
+                description: A script to run prior to the module action
+                advanced: true
+                value_type: plain
+                hidden_value: false
+              - name: action
+                required: true
+                input_type: user
+                description: The module action enable, install etc
+                options: |-
+                  list
+                  info
+                  enable
+                  disable
+                  install
+                  update
+                  remove
+                  provides
+                  reset
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: module_spec
+                required: false
+                input_type: user
+                description: The module specification. module:stream/profile
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: options
+                required: false
+                input_type: user
+                description: Other optional flags for the action
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: post_script
+                required: false
+                input_type: user
+                description: A script to run after the module action
+                advanced: true
+                value_type: plain
+                hidden_value: false
+            template: |
+              <% command = "dnf -y module #{input(:action)} #{input(:module_spec)} #{input(:options)}" %>
+
+              ---
+              - hosts: all
+                <%- if input('pre_script').present? -%>
+                pre_tasks:
+                  - shell: "<%= input('pre_script') %>"
+                <%- end -%>
+                tasks:
+                  - shell: |
+              <%=     indent(8) { command } %>
+                    register: out
+                    args:
+                      warn: false
+                  - debug: var=out
+                <%- if input('post_script').present? -%>
+                post_tasks:
+                  - shell: "<%= input('post_script') %>"
+                <%- end -%>
+          - name: Module Action - Script Default
+            state: present
+            description_format: 'Module %{action} %{module_spec}'
+            job_category: Modules
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template_inputs:
+              - name: pre_script
+                required: false
+                input_type: user
+                description: A script to run prior to the module action
+                advanced: true
+                value_type: plain
+                hidden_value: false
+              - name: action
+                required: true
+                input_type: user
+                description: The module action enable, install etc.
+                options: |-
+                  list
+                  info
+                  enable
+                  disable
+                  install
+                  update
+                  remove
+                  provides
+                  reset
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: module_spec
+                required: false
+                input_type: user
+                description: The module specification. module:stream/profile
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: options
+                required: false
+                input_type: user
+                description: Other optional flags for the action
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: post_script
+                required: false
+                input_type: user
+                description: A script to run after the module action
+                advanced: true
+                value_type: plain
+                hidden_value: false
+            template: |
+              <%
+                supported_families = ['Redhat']
+                render_error(N_('Unsupported or no operating system found for this host.')) unless @host.operatingsystem && supported_families.include?(@host.operatingsystem.family)
+              -%>
+              #!/bin/bash
+
+              # Helper function that exits with a particular message and code.
+              #
+              # Usage:
+              #   exit_with_message "Could not do a thing" 2
+              #
+              function exit_with_message {
+                echo "${1}, exiting..."
+                exit $2
+              }
+
+              <% unless input("pre_script").blank? -%>
+                # Pre Script
+                <%= input("pre_script") %>
+                RETVAL=$?
+                [ $RETVAL -eq 0 ] || exit_with_message "Pre script failed" $RETVAL
+              <% end -%>
+
+              # Action
+              dnf -y module <%= input("action") %> <%= input("module_spec") %> <%= input("options") %>
+              RETVAL=$?
+              [ $RETVAL -eq 0 ] || exit_with_message " module action failed" $RETVAL
+
+              <% unless input("post_script").blank? -%>
+                # Post Script
+                <%= input("post_script") %>
+                RETVAL=$?
+                [ $RETVAL -eq 0 ] || exit_with_message "Post script failed" $RETVAL
+              <% end -%>
+          - name: Package Action - Ansible Default
+            state: present
+            description_format: 'Package %{name}: %{state}'
+            job_category: Ansible Packages
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: state
+                required: true
+                input_type: user
+                description: Whether to install (present, latest), or remove (absent) a package.
+                options: "present\r\nabsent\r\nlatest"
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: name
+                required: true
+                input_type: user
+                description: "Package name, or package specifier with version, like name-1.0.\r\nBe
+                  aware that packages are not always named the same and this module will not 'translate'
+                  them per distro."
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: pre_script
+                required: false
+                input_type: user
+                description: A script to run prior to the package action
+                advanced: true
+                value_type: plain
+                hidden_value: false
+              - name: post_script
+                required: false
+                input_type: user
+                description: A script to run after the package action
+                advanced: true
+                value_type: plain
+                hidden_value: false
+            template: |
+              # For Windows targets use the win_package module instead.
+              ---
+              - hosts: all
+                <%- if input('pre_script').present? -%>
+                pre_tasks:
+                  - shell: "<%= input('pre_script') %>"
+                <%- end -%>
+                tasks:
+                  - package:
+                      name: <%= input('name') %>
+                      state: <%= input('state') %>
+                <%- if input('post_script').present? -%>
+                post_tasks:
+                  - shell: "<%= input('post_script') %>"
+                <%- end -%>
+          - name: Package Action - Script Default
+            state: present
+            description_format: '%{action} package(s) %{package}'
+            job_category: Packages
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template_inputs:
+              - name: pre_script
+                required: false
+                input_type: user
+                description: A script to run prior to the package action
+                advanced: true
+                value_type: plain
+                hidden_value: false
+              - name: action
+                required: true
+                input_type: user
+                description: 'The package action: install, update, or remove'
+                options: |-
+                  install
+                  update
+                  remove
+                  group install
+                  group remove
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: package
+                required: false
+                input_type: user
+                description: The name of the package, if any
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: post_script
+                required: false
+                input_type: user
+                description: A script to run after the package action
+                advanced: true
+                value_type: plain
+                hidden_value: false
+            template: |
+              <%
+                supported_families = ['Redhat', 'Debian', 'Suse']
+                render_error(N_('Unsupported or no operating system found for this host.')) unless @host.operatingsystem && supported_families.include?(@host.operatingsystem.family)
+                action = input("action")
+
+                if @host.operatingsystem.family == 'Redhat'
+                  package_manager = 'yum'
+                elsif @host.operatingsystem.family == 'Debian'
+                  package_manager = 'apt'
+                elsif @host.operatingsystem.family == 'Suse'
+                  package_manager = 'zypper'
+                end
+              -%>
+              #!/bin/bash
+
+              # Helper function that exits with a particular message and code.
+              #
+              # Usage:
+              #   exit_with_message "Could not do a thing" 2
+              #
+              exit_with_message () {
+                echo "${1}, exiting..."
+                exit $2
+              }
+
+              <% if package_manager == 'zypper' -%>
+              handle_zypp_res_codes () {
+                RETVAL=$1
+
+                # See https://github.com/openSUSE/zypper/blob/master/src/main.h
+                declare -A ZYPP_RES_CODES
+                ZYPP_RES_CODES[100]='Updates are needed'
+                ZYPP_RES_CODES[101]='Security updates are needed'
+                ZYPP_RES_CODES[102]='Reboot needed after install/upgrade'
+                ZYPP_RES_CODES[103]='Restart of package manager itself needed'
+                ZYPP_RES_CODES[104]='given capability not found'
+                ZYPP_RES_CODES[105]='SIGINT or SIGTERM received'
+                ZYPP_RES_CODES[106]='Some repos have been skipped due to refresh errors'
+                ZYPP_RES_CODES[107]='Some rpm %post configuration script failed'
+
+                if [ "${ZYPP_RES_CODES[$RETVAL]}" != "" ]; then
+                  echo ${ZYPP_RES_CODES[$RETVAL]}
+                fi
+                if [[ $RETVAL -ge 100 && $RETVAL -le 103 ]]; then
+                  RETVAL=0
+                fi
+
+                return $RETVAL
+              }
+              <% end -%>
+
+              <% unless input("pre_script").blank? -%>
+                # Pre Script
+                <%= input("pre_script") %>
+                RETVAL=$?
+                [ $RETVAL -eq 0 ] || exit_with_message "Pre script failed" $RETVAL
+              <% end -%>
+
+              # Action
+              <% if package_manager == 'yum' -%>
+                yum -y <%= action %> <%= input("package") %>
+              <% elsif package_manager == 'apt' -%>
+                <%-
+                  action = 'install' if action == 'group install'
+                  action = 'remove' if action == 'group remove'
+                  if action == 'group update' || action == 'update'
+                    if input('package').blank?
+                      action = 'upgrade'
+                    else
+                      action = '--only-upgrade install'
+                    end
+                  end
+                -%>
+                [ -x "$(command -v subscription-manager)" ] && subscription-manager refresh
+                export DEBIAN_FRONTEND=noninteractive
+                apt-get -y update
+                apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y <%= action %> <%= input("package") %>
+              <% elsif package_manager == 'zypper' -%>
+                <%-
+                  if action == "group install"
+                    action = "install -t pattern"
+                  elsif action == "group remove"
+                    action = "remove -t pattern"
+                  end
+                -%>
+                zypper refresh
+                zypper -n <%= action %> <%= input("package") %>
+                handle_zypp_res_codes $?
+              <% end -%>
+              RETVAL=$?
+              [ $RETVAL -eq 0 ] || exit_with_message "Package action failed" $RETVAL
+
+              <% unless input("post_script").blank? -%>
+                # Post Script
+                <%= input("post_script") %>
+                RETVAL=$?
+                [ $RETVAL -eq 0 ] || exit_with_message "Post script failed" $RETVAL
+              <% end -%>
+          - name: Power Action - Ansible Default
+            state: present
+            description_format: '%{action} host'
+            job_category: Ansible Power
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: action
+                required: true
+                input_type: user
+                description: Action to perform on the service
+                options: "restart\r\nshutdown"
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              ---
+              - hosts: all
+                tasks:
+                  - shell: |
+                      echo <%= input('action') %> host && sleep 3
+                      <%= case input('action')
+                        when 'restart'
+                          'shutdown -r +1'
+                        else
+                          'shutdown -h +1'
+                        end %>
+          - name: Power Action - Script Default
+            state: present
+            description_format: '%{action} host'
+            job_category: Power
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template_inputs:
+              - name: action
+                required: true
+                input_type: user
+                description: Action to perform on the service
+                options: |-
+                  restart
+                  shutdown
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              PATH="$PATH:/usr/sbin:/sbin"
+
+              echo <%= input('action') %> host && sleep 3
+              <%= case input('action')
+                    when 'restart'
+                      'shutdown -r +1'
+                    else
+                      'shutdown -h now'
+                    end %>
+          - name: Puppet Agent Disable - Script Default
+            state: present
+            description_format: Disable Puppet agent
+            job_category: Puppet
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template_inputs:
+              - name: comment
+                required: false
+                input_type: user
+                description: Reason for disabling the Puppet agent
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <% if @host.operatingsystem.family == 'Debian' -%>
+              export PATH=/opt/puppetlabs/bin:$PATH
+              <% end -%>
+              puppet agent --disable "<%= input("comment").present? ? input("comment") : "Disabled using Foreman Remote Execution"  %> - <%= current_user %> - $(date "+%d/%m/%Y %H:%M")"
+          - name: Puppet Agent Enable - Script Default
+            state: present
+            description_format: Enable Puppet agent
+            job_category: Puppet
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template: |
+              <% if @host.operatingsystem.family == 'Debian' -%>
+              export PATH=/opt/puppetlabs/bin:$PATH
+              <% end -%>
+              puppet agent --enable
+          - name: Puppet Module - Install from forge - Script Default
+            state: present
+            description_format: 'Install Puppet Module "%{puppet_module}" from forge'
+            job_category: Puppet
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template_inputs:
+              - name: puppet_module
+                required: true
+                input_type: user
+                description: Full name of the module, e.g. "puppetlabs-stdlib".
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: target_dir
+                required: false
+                input_type: user
+                description: The directory into which modules are installed, defaults to production
+                  environment.
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: version
+                required: false
+                input_type: user
+                description: Module version to install.
+                advanced: true
+                value_type: plain
+                hidden_value: false
+              - name: force
+                required: false
+                input_type: user
+                description: Force overwrite of existing module, if any. Type "true" to force.
+                advanced: true
+                value_type: plain
+                hidden_value: false
+              - name: ignore_dependencies
+                required: false
+                input_type: user
+                description: Do not attempt to install dependencies. Type "true" to ignore dependencies.
+                advanced: true
+                value_type: plain
+                hidden_value: false
+            template: |
+              <% if @host.operatingsystem.family == 'Debian' -%>
+              export PATH=/opt/puppetlabs/bin:$PATH
+              <% end -%>
+              puppet module install <%= input('puppet_module') %> <%= "--target-dir #{input('target_dir')}" if input('target_dir').present? %> <%= "--version #{input('version')}" if input('version').present? %> <%= "--force" if input('force') == "true" %> <%= "--ignore-dependencies" if input('ignore_dependencies') == "true" %>
+          - name: Puppet Module - Install from git - Script Default
+            state: present
+            description_format: 'Install Puppet Module "%{puppet_module}" from git'
+            job_category: Puppet
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template_inputs:
+              - name: git_repository
+                required: true
+                input_type: user
+                description: "URL to the git repository containing the module, e.g:\r\nhttps://github.com/theforeman/puppet-puppet"
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: target_dir
+                required: true
+                input_type: user
+                description: For example, '/etc/puppetlabs/code/environments/production/modules/puppet'.
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              git clone <%= input('git_repository') %> <%= input('target_dir') %>
+          - name: Puppet Run Once - Ansible Default
+            state: present
+            description_format: 'Run Puppet once with "%{puppet_options}"'
+            job_category: Ansible Puppet
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: puppet_options
+                required: false
+                input_type: user
+                description: Additional options to pass to Puppet
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              ---
+              - hosts: all
+                tasks:
+                  - command: |
+                      puppet agent --onetime --no-usecacheonfailure --no-daemonize <%= input("puppet_options") -%>
+              <% if @host.operatingsystem.family == 'Debian' -%>
+                    environment:
+                      PATH: "/opt/puppetlabs/bin:{{ (ansible_env|default({})).PATH|default('') }}"
+              <% end -%>
+          - name: Puppet Run Once - Script Default
+            state: present
+            description_format: 'Run Puppet once with "%{puppet_options}"'
+            job_category: Puppet
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template_inputs:
+              - name: puppet_options
+                required: false
+                input_type: user
+                description: Additional options to pass to puppet
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <% if @host.operatingsystem.family == 'Debian' -%>
+              export PATH=/opt/puppetlabs/bin:$PATH
+              <% end -%>
+              puppet agent --onetime --no-usecacheonfailure --no-daemonize <%= input("puppet_options") %>
+          - name: Remove Group - Katello Ansible Default
+            state: present
+            description_format: 'Remove package group(s) %{package}'
+            job_category: Katello via Ansible
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: package
+                required: true
+                input_type: user
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <%= render_template('Run Command - Ansible Default', :command => "yum -y group remove #{input('package')}") %>
+          - name: Remove Group - Katello Script Default
+            state: present
+            description_format: 'Remove package group(s) %{package}'
+            foreign_input_sets:
+              - exclude: action
+                include_all: true
+                template: Package Action - Script Default
+            job_category: Katello
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template: |
+              <%= render_template('Package Action - Script Default', :action => 'group remove') %>
+          - name: Remove Package - Katello Ansible Default
+            state: present
+            description_format: 'Remove package(s) %{package}'
+            job_category: Katello via Ansible
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: package
+                required: true
+                input_type: user
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <%= render_template('Package Action - Ansible Default', :state => 'absent', :name => input('package')) %>
+          - name: Remove Package - Katello Script Default
+            state: present
+            description_format: 'Remove package(s) %{package}'
+            foreign_input_sets:
+              - exclude: action
+                include_all: true
+                template: Package Action - Script Default
+            job_category: Katello
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template: |
+              <%= render_template('Package Action - Script Default', :action => 'remove') %>
+          - name: Remove Packages by search query - Katello Script Default
+            state: present
+            description_format: 'Remove packages %{Packages search query}'
+            job_category: Katello
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template_inputs:
+              - name: Packages search query
+                required: true
+                input_type: user
+                description: Filter criteria for packages to be removed.
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <% package_names = @host.package_names_for_job_template(
+                action: 'remove',
+                search: input('Packages search query')
+              ) -%>
+
+              <%= render_template('Package Action - Script Default', :action => 'remove', :package => package_names.join(' ')) %>
+          - name: Resolve Traces - Katello Ansible Default
+            state: present
+            description_format: Resolve Traces
+            job_category: Katello via Ansible
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: Traces search query
+                required: true
+                input_type: user
+                description: Search query to provide traces to resolve
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <%
+              commands = @host.traces_helpers(search: input('Traces search query'))
+              reboot = commands.delete('reboot')
+              -%>
+              <%= render_template(
+                  'Run Command - Ansible Default',
+                  :command => (commands.push('katello-tracer-upload')).join("\n")
+              ) %>
+              <% if reboot %>
+                  - reboot:
+              <% end %>
+          - name: Resolve Traces - Katello Script Default
+            state: present
+            description_format: Resolve Traces
+            job_category: Katello
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template_inputs:
+              - name: Traces search query
+                required: false
+                input_type: user
+                description: Search query to provide traces to resolve
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <%
+              commands = @host.traces_helpers(search: input('Traces search query'))
+              reboot = commands.delete('reboot')
+              -%>
+              <% if reboot -%>
+              shutdown -r +1
+              <% else -%>
+              <%= commands.join("\n") %>
+              katello-tracer-upload
+              <% end %>
+          - name: Restart Services - Katello Ansible Default
+            state: present
+            description_format: Restart Services
+            job_category: Katello via Ansible
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: helper
+                required: true
+                input_type: user
+                description: A comma separated list of commands to run to restart services
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <%
+              commands = input(:helper).split(',').map { |split| split.strip }
+              reboot = commands.delete('reboot')
+              -%>
+              <%= render_template(
+                  'Run Command - Ansible Default',
+                  :command => (commands.push('katello-tracer-upload')).join("\n")
+              ) %>
+              <% if reboot %>
+                  - reboot:
+              <% end %>
+          - name: Restart Services - Katello Script Default
+            state: present
+            description_format: Restart Services
+            job_category: Katello
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template_inputs:
+              - name: helper
+                required: true
+                input_type: user
+                description: A comma separated list of commands to run to restart services
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <%
+              commands = input(:helper).split(',').map { |split| split.strip }
+              reboot = commands.delete('reboot')
+              -%>
+              <%= commands.join("\n") %>
+              katello-tracer-upload
+              <% if reboot -%>
+              <%= render_template('Power Action - Script Default', action: 'restart') %>
+              <% end %>
+          - name: Run Command - Ansible Default
+            state: present
+            description_format: 'Run %{command}'
+            job_category: Ansible Commands
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: command
+                required: true
+                input_type: user
+                description: "Command to run on the host, e.g: \r\n\r\nmkdir helloworld"
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              ---
+              - hosts: all
+                tasks:
+                  - shell:
+                      cmd: |
+              <%=       indent(10) { input('command') } %>
+                    register: out
+                  - debug: var=out
+          - name: Run Command - Script Default
+            state: present
+            description_format: 'Run %{command}'
+            job_category: Commands
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template_inputs:
+              - name: command
+                required: true
+                input_type: user
+                description: Command to run on the host
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <%= input("command") %>
+          - name: Run OpenSCAP scans - Ansible Default
+            state: present
+            description_format: Run scan for all OpenSCAP policies on given hosts
+            job_category: OpenSCAP Ansible Commands
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template: |
+              <% raise "Create and assign a policy to this host before proceeding" if @host.policies_enc_raw.empty? -%>
+              ---
+              - hosts: all
+                tasks:
+              <% @host.policies_enc_raw.each do |policy| -%>
+                  - shell: /usr/bin/foreman_scap_client <%= policy['id'] %>
+                    register: out
+                  - debug: var=out
+              <% end -%>
+          - name: Run OpenSCAP scans
+            state: present
+            description_format: Run scan for all OpenSCAP policies on host
+            job_category: OpenSCAP
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: SSH
+            snippet: false
+            template: |
+              <% raise "Create and assign a policy to this host before proceeding" if @host.policies_enc_raw.empty? %>
+
+              <% @host.policies_enc_raw.map do |policy| -%>
+              /usr/bin/foreman_scap_client <%= policy['id'] %>
+              <% end -%>
+          - name: Run OVAL scans
+            state: present
+            description_format: Run scan for specified OVAL Policies
+            job_category: OpenSCAP
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: SSH
+            snippet: false
+            template_inputs:
+              - name: oval_policies
+                required: false
+                input_type: user
+                description: Comma separated OVAL Policy Ids to run
+                advanced: true
+                value_type: plain
+                hidden_value: false
+            template: |
+              <% unless input('oval_policies').blank? -%>
+                <% input('oval_policies').split(',').map do |id| -%>
+                  /usr/bin/foreman_scap_client oval <%= id %>
+                <% end -%>
+              <% else -%>
+                <% @host.oval_policies_enc_raw.map do |policy| -%>
+                  /usr/bin/foreman_scap_client oval <%= policy['id'] %>
+                <% end -%>
+              <% end -%>
+          - name: Service Action - Ansible Default
+            state: present
+            description_format: '%{state} service %{name}'
+            job_category: Ansible Services
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: state
+                required: true
+                input_type: user
+                description: started/stopped are idempotent actions that will not run commands unless
+                  necessary. restarted will always bounce the service. reloaded will always reload.
+                  At least one of state and enabled are required. Note that reloaded will start
+                  the service if it is not already started, even if your chosen init system wouldn't
+                  normally.
+                options: "started\r\nstopped\r\nrestarted\r\nreloaded"
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: name
+                required: true
+                input_type: user
+                description: Name of the service.
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: pattern
+                required: false
+                input_type: user
+                description: If the service does not respond to the status command, name a substring
+                  to look for as would be found in the output of the ps command as a stand-in for
+                  a status result. If the string is found, the service will be assumed to be running.
+                advanced: true
+                value_type: plain
+                hidden_value: false
+              - name: sleep
+                required: false
+                input_type: user
+                description: If the service is being restarted then sleep this many seconds between
+                  the stop and start command. This helps to workaround badly behaving init scripts
+                  that exit immediately after signaling a process to stop.
+                advanced: true
+                value_type: plain
+                hidden_value: false
+              - name: enabled
+                required: false
+                input_type: user
+                description: Whether the service should start on boot.
+                advanced: true
+                value_type: plain
+                hidden_value: false
+              - name: args
+                required: false
+                input_type: user
+                description: Additional arguments provided on the command line
+                advanced: true
+                value_type: plain
+                hidden_value: false
+            template: |
+              # For Windows targets, we should use win_service
+              ---
+              - hosts: all
+                tasks:
+                - service:
+                    name: <%= input('name') %>
+                    state: <%= input('state') %>
+                    <%= "enabled: #{input('enabled')}" if input('enabled').present? %>
+                    <%= "args: #{input('args')}" if input('args').present? %>
+                    <%= "pattern: #{input('pattern')}" if input('pattern').present? %>
+                    <%= "sleep: #{input('sleep')}" if input('sleep').present? %>
+          - name: Service Action - Enable Web Console
+            state: present
+            job_category: Ansible Services
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template: |
+              ---
+              - hosts: all
+                tasks:
+                - name: ensure cockpit is installed
+                  package:
+                    name: "cockpit-system"
+                    state: present
+          - name: Service Action - Script Default
+            state: present
+            description_format: '%{action} service %{service}'
+            job_category: Services
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template_inputs:
+              - name: action
+                required: true
+                input_type: user
+                description: Action to perform on the service
+                options: |-
+                  restart
+                  start
+                  stop
+                  status
+                  reload
+                  enable
+                  disable
+                advanced: false
+                value_type: plain
+                hidden_value: false
+              - name: service
+                required: true
+                input_type: user
+                description: Name of the service
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <% if @host.operatingsystem.family == "Redhat" && @host.operatingsystem.major.to_i > 6 %>
+              systemctl <%= input("action") %> <%= input("service") %>
+              <% else %>
+                <% case input("action")
+                when 'enable' %>
+              chkconfig --add <%= input("service") %>
+                <% when 'disable' %>
+              chkconfig --del <%= input("service") %>
+                <% else %>
+              service <%= input("service") %> <%= input("action") %>
+                <% end %>
+              <% end -%>
+          - name: Update Group - Katello Ansible Default
+            state: present
+            description_format: 'Install package group(s) %{package}'
+            job_category: Katello via Ansible
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: package
+                required: true
+                input_type: user
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <%= render_template('Run Command - Ansible Default', :command => "yum -y group update #{input('package')}") %>
+          - name: Update Group - Katello Script Default
+            state: present
+            description_format: 'Install package group(s) %{package}'
+            foreign_input_sets:
+              - exclude: action
+                include_all: true
+                template: Package Action - Script Default
+            job_category: Katello
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template: |
+              <%= render_template('Package Action - Script Default', :action => 'group update') %>
+          - name: Update Package - Katello Ansible Default
+            state: present
+            description_format: 'Update package(s) %{package}'
+            job_category: Katello via Ansible
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: Ansible
+            snippet: false
+            template_inputs:
+              - name: package
+                required: true
+                input_type: user
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <%= render_template('Run Command - Ansible Default', :command => "yum -y update #{input('package')}") %>
+          - name: Update Package - Katello Script Default
+            state: present
+            description_format: 'Update package(s) %{package}'
+            foreign_input_sets:
+              - exclude: action
+                include_all: true
+                template: Package Action - Script Default
+            job_category: Katello
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template: |
+              <%= render_template('Package Action - Script Default', :action => 'update') %>
+          - name: Update Packages by search query - Katello Script Default
+            state: present
+            description_format: 'Update package(s) %{Packages search query}'
+            job_category: Katello
+            kind: job_template
+            locations:
+              - Randweg
+            model: JobTemplate
+            organizations:
+              - RaBe
+            provider_type: script
+            snippet: false
+            template_inputs:
+              - name: Packages search query
+                required: false
+                input_type: user
+                description: Filter criteria for packages to be updated.
+                advanced: false
+                value_type: plain
+                hidden_value: false
+            template: |
+              <% package_names = @host.package_names_for_job_template(
+                action: 'update',
+                search: input('Packages search query')
+              ) -%>
+
+              <%= render_template('Package Action - Script Default', :action => 'update', :package => package_names.join(' ')) %>
+
+  always:
+    - name: 'radiorabe.rabe_foreman.foreman : Lock All Job Templates'
+      ansible.builtin.include_role:
+        name: radiorabe.foreman.job_templates
+      vars:
+        foreman_job_templates:
+          - name: "*"
+            locked: true
+      when: not ansible_check_mode
+      diff: false
