@@ -16,6 +16,7 @@
 # - [Foreman Ansible Jobs](https://github.com/theforeman/foreman_ansible/tree/master/app/views/foreman_ansible/job_templates)
 # - [Katello Jobs](https://github.com/Katello/katello/tree/master/app/views/foreman/job_templates)
 # - [OpenSCAP](https://github.com/theforeman/foreman_openscap/tree/master/app/views/job_templates)
+# - [RH Cloud Connector](https://github.com/theforeman/foreman_rh_cloud/tree/master/app/views/job_templates)
 #
 # Please add more links as you find them.
 #
@@ -310,7 +311,7 @@
               fi
               <% end %>
           - name: Configure Cloud Connector
-            state: present
+            state: absent
             description_format: '%{template_name}'
             job_category: Maintenance Operations
             kind: job_template
@@ -352,7 +353,7 @@
                 roles:
                   - project-receptor.satellite_receptor_installer
           - name: Convert to RHEL
-            state: present
+            state: absent
             job_category: Convert 2 RHEL
             kind: job_template
             locations:
@@ -609,7 +610,7 @@
 
               <%= render_template('Package Action - Script Default', :action => 'install', :package => package_names.join(' ')) %>
           - name: Manage Windows Updates - Ansible Default
-            state: present
+            state: absent
             job_category: Ansible Playbook
             kind: job_template
             locations:
@@ -1168,7 +1169,7 @@
                       'shutdown -h now'
                     end %>
           - name: Puppet Agent Disable - Script Default
-            state: present
+            state: absent
             description_format: Disable Puppet agent
             job_category: Puppet
             kind: job_template
@@ -1193,7 +1194,7 @@
               <% end -%>
               puppet agent --disable "<%= input("comment").present? ? input("comment") : "Disabled using Foreman Remote Execution"  %> - <%= current_user %> - $(date "+%d/%m/%Y %H:%M")"
           - name: Puppet Agent Enable - Script Default
-            state: present
+            state: absent
             description_format: Enable Puppet agent
             job_category: Puppet
             kind: job_template
@@ -1210,7 +1211,7 @@
               <% end -%>
               puppet agent --enable
           - name: Puppet Module - Install from forge - Script Default
-            state: present
+            state: absent
             description_format: 'Install Puppet Module "%{puppet_module}" from forge'
             job_category: Puppet
             kind: job_template
@@ -1264,7 +1265,7 @@
               <% end -%>
               puppet module install <%= input('puppet_module') %> <%= "--target-dir #{input('target_dir')}" if input('target_dir').present? %> <%= "--version #{input('version')}" if input('version').present? %> <%= "--force" if input('force') == "true" %> <%= "--ignore-dependencies" if input('ignore_dependencies') == "true" %>
           - name: Puppet Module - Install from git - Script Default
-            state: present
+            state: absent
             description_format: 'Install Puppet Module "%{puppet_module}" from git'
             job_category: Puppet
             kind: job_template
@@ -1293,7 +1294,7 @@
             template: |
               git clone <%= input('git_repository') %> <%= input('target_dir') %>
           - name: Puppet Run Once - Ansible Default
-            state: present
+            state: absent
             description_format: 'Run Puppet once with "%{puppet_options}"'
             job_category: Ansible Puppet
             kind: job_template
@@ -1323,7 +1324,7 @@
                       PATH: "/opt/puppetlabs/bin:{{ (ansible_env|default({})).PATH|default('') }}"
               <% end -%>
           - name: Puppet Run Once - Script Default
-            state: present
+            state: absent
             description_format: 'Run Puppet once with "%{puppet_options}"'
             job_category: Puppet
             kind: job_template
