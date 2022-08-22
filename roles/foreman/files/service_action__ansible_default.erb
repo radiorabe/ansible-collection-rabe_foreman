@@ -1,0 +1,11 @@
+# For Windows targets, we should use win_service
+---
+- hosts: all
+  tasks:
+  - service:
+      name: <%= input('name') %>
+      state: <%= input('state') %>
+      <%= "enabled: #{input('enabled')}" if input('enabled').present? %>
+      <%= "args: #{input('args')}" if input('args').present? %>
+      <%= "pattern: #{input('pattern')}" if input('pattern').present? %>
+      <%= "sleep: #{input('sleep')}" if input('sleep').present? %>

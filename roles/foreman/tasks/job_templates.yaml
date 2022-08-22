@@ -68,11 +68,15 @@
                 advanced: true
                 value_type: plain
                 hidden_value: false
-            template: |
-             ---
-              - hosts: all
-                tasks:
-                  - command: ansible-galaxy collection install <%= input('ansible_collections_list').split(",").join(' ') %> -p <%= input('collections_path').present? ? input('collections_path') : '/etc/ansible/collections' %>
+            #
+            # This is a hack because i am too lazy to look up how to use /files/ properly.
+            # I'm only doing it for the affected templates and not all of them.
+            #
+            # All of these templates are somewhat an artifact of bootstrapping foreman and will
+            # we removed when we're closer to v1.
+            #
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/ansible_collection__install_from_galaxy.erb
           - name: Ansible Roles - Ansible Default
             state: present
             description_format: Run Ansible roles
@@ -85,24 +89,8 @@
               - RaBe
             provider_type: Ansible
             snippet: false
-            template: |
-              ---
-              - hosts: all
-                pre_tasks:
-                  - name: Display all parameters known for the Foreman host
-                    debug:
-                      var: foreman
-                    tags:
-                      - always
-                tasks:
-                  - name: Apply roles
-                    include_role:
-                      name: "{{ role }}"
-                    tags:
-                      - always
-                    loop: "{{ foreman_ansible_roles }}"
-                    loop_control:
-                      loop_var: role
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/ansible_roles__ansible_default.erb
           - name: Ansible Roles - Install from Galaxy
             state: present
             description_format: 'Install roles ''%{ansible_roles_list}'' from Galaxy'
@@ -133,13 +121,6 @@
                 advanced: true
                 value_type: plain
                 hidden_value: false
-            #
-            # This is a hack because i am too lazy to look up how to use /files/ properly.
-            # I'm only doing it for the affected templates and not all of them.
-            #
-            # All of these templates are somewhat an artifact of bootstrapping foreman and will
-            # we removed when we're closer to v1.
-            #
             # TODO: get rid of ugly hack
             file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/ansible_roles__install_from_galay.erb
           - name: Ansible Roles - Install from git
@@ -170,13 +151,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              ---
-              - hosts: all
-                tasks:
-                  - command: git clone <%= input('git_repository') %> <%= input('location') %>
-                    register: out
-                  - debug: var=out
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/ansible_roles__install_from_git.erb
           - name: Ansible - Run insights maintenance plan
             state: present
             description_format: Insights maintenance plan for host
@@ -204,8 +180,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              <%= insights_remediation(input(:plan_id), input(:organization_id)) %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/run_insights_maintenance_plan.erb
           - name: Ansible - Run playbook
             state: present
             job_category: Ansible Playbook
@@ -225,8 +201,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              <%= input('playbook') %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/run_playbook.erb
           - name: Capsule Upgrade Playbook
             state: present
             description_format: '%{template_name}'
@@ -266,10 +242,8 @@
               - RaBe
             provider_type: script
             snippet: false
-            template: |
-              #!/bin/sh
-
-              <%= change_content_source(@host, foreman_server_ca_cert) %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/change_content_source.erb
           - name: Check Update - Script Default
             state: present
             description_format: Check for package updates
@@ -282,34 +256,8 @@
               - RaBe
             provider_type: script
             snippet: false
-            template: |
-              <%
-                supported_families = ['Redhat', 'Debian', 'Suse']
-                render_error(N_('Unsupported or no operating system found for this host.')) unless @host.operatingsystem && supported_families.include?(@host.operatingsystem.family)
-
-                command = case @host.operatingsystem.family
-                          when 'Redhat'
-                            'yum check-update'
-                          when 'Debian'
-                            'apt list --upgradable'
-                          when 'Suse'
-                            'zypper list-updates'
-                          end
-              -%>
-
-              <%= command %>
-              <% if command.start_with? 'yum' %>
-              rc=$?
-              # yum check-update returns 100 when there are updates available
-              if [ $rc -eq 100 ]; then
-                  # In this case, we override the exit code to 0 so Remote Execution
-                  # can consider this run as successful
-                  (exit 0)
-              else
-                  # For any other exit code, we don't modify it
-                  (exit $rc)
-              fi
-              <% end %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/check_update__script_default.erb
           - name: Configure Cloud Connector
             state: absent
             description_format: '%{template_name}'
@@ -345,13 +293,8 @@
                 advanced: true
                 value_type: plain
                 hidden_value: false
-            template: |
-              ---
-              - hosts: all
-                vars:
-                  satellite_url: "<%= foreman_server_url %>"
-                roles:
-                  - project-receptor.satellite_receptor_installer
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/configure_cloud_connector.erb
           - name: Convert to RHEL
             state: absent
             job_category: Convert 2 RHEL
@@ -383,27 +326,8 @@
                 value_type: plain
                 resource_type: Katello::ActivationKey
                 hidden_value: false
-            template: |
-              ---
-              - hosts: all
-                tasks:
-                  - name: Install convert2rhel
-                    ansible.builtin.package:
-                      name: convert2rhel
-                      state: present
-                  - name: Prepopulate katello-ca-consumer
-                    get_url:
-                      url: <%= subscription_manager_configuration_url(@host) %>
-                      dest: /usr/share/convert2rhel/subscription-manager/katello-ca-consumer-latest.noarch.rpm
-                  - name: Start convert2rhel
-                    command: convert2rhel -y --activationkey "<%= input_resource('Activation Key').name %>" --org "<%= @host.organization.label %>" --keep-rhsm
-              <%- if input('Restart') == "yes" -%>
-                  - name: Reboot the machine
-                    reboot:
-                      reboot_timeout: 1800
-              <%- end -%>
-                  - name: Update system facts
-                    command: subscription-manager facts --update
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/convert_to_rhel.erb
           - name: Install errata by search query - Katello Script Default
             state: present
             description_format: 'Install errata %{Errata search query}'
@@ -428,18 +352,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              <% advisory_ids = @host.advisory_ids(search: input("Errata search query")) %>
-              # RESOLVED_ERRATA_IDS=<%= advisory_ids.join(',') %>
-
-              <% if @host.operatingsystem.family == 'Suse' -%>
-                  <%= render_template('Package Action - Script Default', :action => 'install -n -t patch', :package => advisory_ids.join(' ')) %>
-              <% else %>
-                  <% raise "No errata matching given search query" if !input("Errata search query").blank? && advisory_ids.empty? %>
-
-                  <% advisories = advisory_ids.map { |e| "--advisory=#{e}" }.join(' ') %>
-                  <%= render_template('Package Action - Script Default', :action => 'update-minimal', :package => advisories) %>
-              <% end %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/install_errata_by_search_query__katello_script_default.erb
           - name: Install Errata - Katello Ansible Default
             state: present
             description_format: 'Install errata %{errata}'
@@ -460,17 +374,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              <% if @host.operatingsystem.family == 'Suse' -%>
-              <% advisories = input(:errata).split(',').join(' ') -%>
-              <%= render_template('Run Command - Ansible Default', :command => "zypper -n install -t patch #{advisories}") -%>
-              <% elsif @host.operatingsystem.family == 'Debian' -%>
-              <% advisories = input(:errata).split(',').map { |e| @host.debs_for_erratum(e) }.join(' ') -%>
-              <%= render_template('Run Command - Ansible Default', :command => "apt-get -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" -y --only-upgrade install -y #{advisories}") %>
-              <% else -%>
-              <% advisories = input(:errata).split(',').map { |e| "--advisory=#{e}" }.join(' ') -%>
-              <%= render_template('Run Command - Ansible Default', :command => "yum -y update-minimal #{advisories}") -%>
-              <% end -%>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/install_errata__katello_ansible_default.erb
           - name: Install Errata - Katello Script Default
             state: present
             description_format: 'Install errata %{errata}'
@@ -495,14 +400,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              <% if @host.operatingsystem.family == 'Suse' -%>
-                  <% advisories = input(:errata).split(',').join(' ') %>
-                  <%= render_template('Package Action - Script Default', :action => 'install -n -t patch', :package => advisories) %>
-              <% else %>
-                  <% advisories = input(:errata).split(',').map { |e| "--advisory=#{e}" }.join(' ') %>
-                  <%= render_template('Package Action - Script Default', :action => 'update-minimal', :package => advisories) %>
-              <% end %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/install_errata__katello_script_default.erb
           - name: Install Group - Katello Ansible Default
             state: present
             description_format: 'Install package group(s) %{package}'
@@ -522,8 +421,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              <%= render_template('Run Command - Ansible Default', :command => "yum -y group install #{input('package')}") %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/install_group__katello_ansible_default.erb
           - name: Install Group - Katello Script Default
             state: present
             description_format: 'Install package group(s) %{package}'
@@ -540,8 +439,8 @@
               - RaBe
             provider_type: script
             snippet: false
-            template: |
-              <%= render_template('Package Action - Script Default', :action => 'group install') %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/install_group__katello_script_default.erb
           - name: Install Package - Katello Ansible Default
             state: present
             description_format: 'Install package(s) %{package}'
@@ -561,8 +460,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              <%= render_template('Package Action - Ansible Default', :state => 'latest', :name => input('package')) %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/install_package__katello_ansible_default.erb
           - name: Install Package - Katello Script Default
             state: present
             description_format: 'Install package(s) %{package}'
@@ -579,8 +478,8 @@
               - RaBe
             provider_type: script
             snippet: false
-            template: |
-              <%= render_template('Package Action - Script Default', :action => 'install') %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/install_package__katello_script_default.erb
           - name: Install packages by search query - Katello Script Default
             state: present
             description_format: 'Install package(s) %{Package search query}'
@@ -602,13 +501,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              <% package_names = @host.package_names_for_job_template(
-                action: 'install',
-                search: input('Package search query')
-              ) -%>
-
-              <%= render_template('Package Action - Script Default', :action => 'install', :package => package_names.join(' ')) %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/install_package_by_search_query__katello_script_default.erb
           - name: Manage Windows Updates - Ansible Default
             state: absent
             job_category: Ansible Playbook
@@ -783,26 +677,8 @@
                 advanced: true
                 value_type: plain
                 hidden_value: false
-            template: |
-              <% command = "dnf -y module #{input(:action)} #{input(:module_spec)} #{input(:options)}" %>
-
-              ---
-              - hosts: all
-                <%- if input('pre_script').present? -%>
-                pre_tasks:
-                  - shell: "<%= input('pre_script') %>"
-                <%- end -%>
-                tasks:
-                  - shell: |
-              <%=     indent(8) { command } %>
-                    register: out
-                    args:
-                      warn: false
-                  - debug: var=out
-                <%- if input('post_script').present? -%>
-                post_tasks:
-                  - shell: "<%= input('post_script') %>"
-                <%- end -%>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/module_action__ansible_default.erb
           - name: Module Action - Script Default
             state: present
             description_format: 'Module %{action} %{module_spec}'
@@ -861,41 +737,8 @@
                 advanced: true
                 value_type: plain
                 hidden_value: false
-            template: |
-              <%
-                supported_families = ['Redhat']
-                render_error(N_('Unsupported or no operating system found for this host.')) unless @host.operatingsystem && supported_families.include?(@host.operatingsystem.family)
-              -%>
-              #!/bin/bash
-
-              # Helper function that exits with a particular message and code.
-              #
-              # Usage:
-              #   exit_with_message "Could not do a thing" 2
-              #
-              function exit_with_message {
-                echo "${1}, exiting..."
-                exit $2
-              }
-
-              <% unless input("pre_script").blank? -%>
-                # Pre Script
-                <%= input("pre_script") %>
-                RETVAL=$?
-                [ $RETVAL -eq 0 ] || exit_with_message "Pre script failed" $RETVAL
-              <% end -%>
-
-              # Action
-              dnf -y module <%= input("action") %> <%= input("module_spec") %> <%= input("options") %>
-              RETVAL=$?
-              [ $RETVAL -eq 0 ] || exit_with_message " module action failed" $RETVAL
-
-              <% unless input("post_script").blank? -%>
-                # Post Script
-                <%= input("post_script") %>
-                RETVAL=$?
-                [ $RETVAL -eq 0 ] || exit_with_message "Post script failed" $RETVAL
-              <% end -%>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/module_action__script_default.erb
           - name: Package Action - Ansible Default
             state: present
             description_format: 'Package %{name}: %{state}'
@@ -940,22 +783,8 @@
                 advanced: true
                 value_type: plain
                 hidden_value: false
-            template: |
-              # For Windows targets use the win_package module instead.
-              ---
-              - hosts: all
-                <%- if input('pre_script').present? -%>
-                pre_tasks:
-                  - shell: "<%= input('pre_script') %>"
-                <%- end -%>
-                tasks:
-                  - package:
-                      name: <%= input('name') %>
-                      state: <%= input('state') %>
-                <%- if input('post_script').present? -%>
-                post_tasks:
-                  - shell: "<%= input('post_script') %>"
-                <%- end -%>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/package_action__ansible_default.erb
           - name: Package Action - Script Default
             state: present
             description_format: '%{action} package(s) %{package}'
@@ -1003,105 +832,8 @@
                 advanced: true
                 value_type: plain
                 hidden_value: false
-            template: |
-              <%
-                supported_families = ['Redhat', 'Debian', 'Suse']
-                render_error(N_('Unsupported or no operating system found for this host.')) unless @host.operatingsystem && supported_families.include?(@host.operatingsystem.family)
-                action = input("action")
-
-                if @host.operatingsystem.family == 'Redhat'
-                  package_manager = 'yum'
-                elsif @host.operatingsystem.family == 'Debian'
-                  package_manager = 'apt'
-                elsif @host.operatingsystem.family == 'Suse'
-                  package_manager = 'zypper'
-                end
-              -%>
-              #!/bin/bash
-
-              # Helper function that exits with a particular message and code.
-              #
-              # Usage:
-              #   exit_with_message "Could not do a thing" 2
-              #
-              exit_with_message () {
-                echo "${1}, exiting..."
-                exit $2
-              }
-
-              <% if package_manager == 'zypper' -%>
-              handle_zypp_res_codes () {
-                RETVAL=$1
-
-                # See https://github.com/openSUSE/zypper/blob/master/src/main.h
-                declare -A ZYPP_RES_CODES
-                ZYPP_RES_CODES[100]='Updates are needed'
-                ZYPP_RES_CODES[101]='Security updates are needed'
-                ZYPP_RES_CODES[102]='Reboot needed after install/upgrade'
-                ZYPP_RES_CODES[103]='Restart of package manager itself needed'
-                ZYPP_RES_CODES[104]='given capability not found'
-                ZYPP_RES_CODES[105]='SIGINT or SIGTERM received'
-                ZYPP_RES_CODES[106]='Some repos have been skipped due to refresh errors'
-                ZYPP_RES_CODES[107]='Some rpm %post configuration script failed'
-
-                if [ "${ZYPP_RES_CODES[$RETVAL]}" != "" ]; then
-                  echo ${ZYPP_RES_CODES[$RETVAL]}
-                fi
-                if [[ $RETVAL -ge 100 && $RETVAL -le 103 ]]; then
-                  RETVAL=0
-                fi
-
-                return $RETVAL
-              }
-              <% end -%>
-
-              <% unless input("pre_script").blank? -%>
-                # Pre Script
-                <%= input("pre_script") %>
-                RETVAL=$?
-                [ $RETVAL -eq 0 ] || exit_with_message "Pre script failed" $RETVAL
-              <% end -%>
-
-              # Action
-              <% if package_manager == 'yum' -%>
-                yum -y <%= action %> <%= input("package") %>
-              <% elsif package_manager == 'apt' -%>
-                <%-
-                  action = 'install' if action == 'group install'
-                  action = 'remove' if action == 'group remove'
-                  if action == 'group update' || action == 'update'
-                    if input('package').blank?
-                      action = 'upgrade'
-                    else
-                      action = '--only-upgrade install'
-                    end
-                  end
-                -%>
-                [ -x "$(command -v subscription-manager)" ] && subscription-manager refresh
-                export DEBIAN_FRONTEND=noninteractive
-                apt-get -y update
-                apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y <%= action %> <%= input("package") %>
-              <% elsif package_manager == 'zypper' -%>
-                <%-
-                  if action == "group install"
-                    action = "install -t pattern"
-                  elsif action == "group remove"
-                    action = "remove -t pattern"
-                  end
-                -%>
-                zypper refresh
-                zypper -n <%= action %> <%= input("package") %>
-                handle_zypp_res_codes $?
-              <% end -%>
-              RETVAL=$?
-              [ $RETVAL -eq 0 ] || exit_with_message "Package action failed" $RETVAL
-
-              <% unless input("post_script").blank? -%>
-                # Post Script
-                <%= input("post_script") %>
-                RETVAL=$?
-                [ $RETVAL -eq 0 ] || exit_with_message "Post script failed" $RETVAL
-              <% end -%>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/package_action__script_default.erb
           - name: Power Action - Ansible Default
             state: present
             description_format: '%{action} host'
@@ -1123,18 +855,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              ---
-              - hosts: all
-                tasks:
-                  - shell: |
-                      echo <%= input('action') %> host && sleep 3
-                      <%= case input('action')
-                        when 'restart'
-                          'shutdown -r +1'
-                        else
-                          'shutdown -h +1'
-                        end %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/power_action__ansible_default.erb
           - name: Power Action - Script Default
             state: present
             description_format: '%{action} host'
@@ -1158,16 +880,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              PATH="$PATH:/usr/sbin:/sbin"
-
-              echo <%= input('action') %> host && sleep 3
-              <%= case input('action')
-                    when 'restart'
-                      'shutdown -r +1'
-                    else
-                      'shutdown -h now'
-                    end %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/power_action__script_default.erb
           - name: Puppet Agent Disable - Script Default
             state: absent
             description_format: Disable Puppet agent
@@ -1367,8 +1081,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              <%= render_template('Run Command - Ansible Default', :command => "yum -y group remove #{input('package')}") %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/remove_group__katello_ansible_default.erb
           - name: Remove Group - Katello Script Default
             state: present
             description_format: 'Remove package group(s) %{package}'
@@ -1385,8 +1099,8 @@
               - RaBe
             provider_type: script
             snippet: false
-            template: |
-              <%= render_template('Package Action - Script Default', :action => 'group remove') %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/remove_group__katello_script_default.erb
           - name: Remove Package - Katello Ansible Default
             state: present
             description_format: 'Remove package(s) %{package}'
@@ -1406,8 +1120,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              <%= render_template('Package Action - Ansible Default', :state => 'absent', :name => input('package')) %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/remove_package__katello_ansible_default.erb
           - name: Remove Package - Katello Script Default
             state: present
             description_format: 'Remove package(s) %{package}'
@@ -1424,8 +1138,8 @@
               - RaBe
             provider_type: script
             snippet: false
-            template: |
-              <%= render_template('Package Action - Script Default', :action => 'remove') %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/remove_package__katello_script_default.erb
           - name: Remove Packages by search query - Katello Script Default
             state: present
             description_format: 'Remove packages %{Packages search query}'
@@ -1446,13 +1160,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              <% package_names = @host.package_names_for_job_template(
-                action: 'remove',
-                search: input('Packages search query')
-              ) -%>
-
-              <%= render_template('Package Action - Script Default', :action => 'remove', :package => package_names.join(' ')) %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/remove_package_by_search_query__katello_script_default.erb
           - name: Resolve Traces - Katello Ansible Default
             state: present
             description_format: Resolve Traces
@@ -1473,18 +1182,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              <%
-              commands = @host.traces_helpers(search: input('Traces search query'))
-              reboot = commands.delete('reboot')
-              -%>
-              <%= render_template(
-                  'Run Command - Ansible Default',
-                  :command => (commands.push('katello-tracer-upload')).join("\n")
-              ) %>
-              <% if reboot %>
-                  - reboot:
-              <% end %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/resolve_traces__katello_ansible_default.erb
           - name: Resolve Traces - Katello Script Default
             state: present
             description_format: Resolve Traces
@@ -1505,17 +1204,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              <%
-              commands = @host.traces_helpers(search: input('Traces search query'))
-              reboot = commands.delete('reboot')
-              -%>
-              <% if reboot -%>
-              shutdown -r +1
-              <% else -%>
-              <%= commands.join("\n") %>
-              katello-tracer-upload
-              <% end %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/resolve_traces__katello_script_default.erb
           - name: Restart Services - Katello Ansible Default
             state: present
             description_format: Restart Services
@@ -1536,18 +1226,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              <%
-              commands = input(:helper).split(',').map { |split| split.strip }
-              reboot = commands.delete('reboot')
-              -%>
-              <%= render_template(
-                  'Run Command - Ansible Default',
-                  :command => (commands.push('katello-tracer-upload')).join("\n")
-              ) %>
-              <% if reboot %>
-                  - reboot:
-              <% end %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/restart_services__katello_ansible_default.erb
           - name: Restart Services - Katello Script Default
             state: present
             description_format: Restart Services
@@ -1568,16 +1248,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              <%
-              commands = input(:helper).split(',').map { |split| split.strip }
-              reboot = commands.delete('reboot')
-              -%>
-              <%= commands.join("\n") %>
-              katello-tracer-upload
-              <% if reboot -%>
-              <%= render_template('Power Action - Script Default', action: 'restart') %>
-              <% end %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/restart_services__katello_script_default.erb
           - name: Run Command - Ansible Default
             state: present
             description_format: 'Run %{command}'
@@ -1598,15 +1270,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              ---
-              - hosts: all
-                tasks:
-                  - shell:
-                      cmd: |
-              <%=       indent(10) { input('command') } %>
-                    register: out
-                  - debug: var=out
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/run_command__katello_ansible_default.erb
           - name: Run Command - Script Default
             state: present
             description_format: 'Run %{command}'
@@ -1627,8 +1292,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              <%= input("command") %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/run_command__katello_script_default.erb
           - name: Run OpenSCAP scans - Ansible Default
             state: present
             description_format: Run scan for all OpenSCAP policies on given hosts
@@ -1641,16 +1306,8 @@
               - RaBe
             provider_type: Ansible
             snippet: false
-            template: |
-              <% raise "Create and assign a policy to this host before proceeding" if @host.policies_enc_raw.empty? -%>
-              ---
-              - hosts: all
-                tasks:
-              <% @host.policies_enc_raw.each do |policy| -%>
-                  - shell: /usr/bin/foreman_scap_client <%= policy['id'] %>
-                    register: out
-                  - debug: var=out
-              <% end -%>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/run_openscap_scans__ansible_default.erb
           - name: Run OpenSCAP scans
             state: present
             description_format: Run scan for all OpenSCAP policies on host
@@ -1663,12 +1320,8 @@
               - RaBe
             provider_type: SSH
             snippet: false
-            template: |
-              <% raise "Create and assign a policy to this host before proceeding" if @host.policies_enc_raw.empty? %>
-
-              <% @host.policies_enc_raw.map do |policy| -%>
-              /usr/bin/foreman_scap_client <%= policy['id'] %>
-              <% end -%>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/run_openscap_scans.erb
           - name: Run OVAL scans
             state: present
             description_format: Run scan for specified OVAL Policies
@@ -1689,16 +1342,8 @@
                 advanced: true
                 value_type: plain
                 hidden_value: false
-            template: |
-              <% unless input('oval_policies').blank? -%>
-                <% input('oval_policies').split(',').map do |id| -%>
-                  /usr/bin/foreman_scap_client oval <%= id %>
-                <% end -%>
-              <% else -%>
-                <% @host.oval_policies_enc_raw.map do |policy| -%>
-                  /usr/bin/foreman_scap_client oval <%= policy['id'] %>
-                <% end -%>
-              <% end -%>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/run_oval_scans.erb
           - name: Service Action - Ansible Default
             state: present
             description_format: '%{state} service %{name}'
@@ -1763,18 +1408,8 @@
                 advanced: true
                 value_type: plain
                 hidden_value: false
-            template: |
-              # For Windows targets, we should use win_service
-              ---
-              - hosts: all
-                tasks:
-                - service:
-                    name: <%= input('name') %>
-                    state: <%= input('state') %>
-                    <%= "enabled: #{input('enabled')}" if input('enabled').present? %>
-                    <%= "args: #{input('args')}" if input('args').present? %>
-                    <%= "pattern: #{input('pattern')}" if input('pattern').present? %>
-                    <%= "sleep: #{input('sleep')}" if input('sleep').present? %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/service_action__ansible_default.erb
           - name: Service Action - Enable Web Console
             state: present
             job_category: Ansible Services
@@ -1829,19 +1464,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              <% if @host.operatingsystem.family == "Redhat" && @host.operatingsystem.major.to_i > 6 %>
-              systemctl <%= input("action") %> <%= input("service") %>
-              <% else %>
-                <% case input("action")
-                when 'enable' %>
-              chkconfig --add <%= input("service") %>
-                <% when 'disable' %>
-              chkconfig --del <%= input("service") %>
-                <% else %>
-              service <%= input("service") %> <%= input("action") %>
-                <% end %>
-              <% end -%>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/service_action__script_default.erb
           - name: Update Group - Katello Ansible Default
             state: present
             description_format: 'Install package group(s) %{package}'
@@ -1861,8 +1485,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              <%= render_template('Run Command - Ansible Default', :command => "yum -y group update #{input('package')}") %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/update_group__katello_ansible_default.erb
           - name: Update Group - Katello Script Default
             state: present
             description_format: 'Install package group(s) %{package}'
@@ -1879,8 +1503,8 @@
               - RaBe
             provider_type: script
             snippet: false
-            template: |
-              <%= render_template('Package Action - Script Default', :action => 'group update') %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/update_group__katello_script_default.erb
           - name: Update Package - Katello Ansible Default
             state: present
             description_format: 'Update package(s) %{package}'
@@ -1900,8 +1524,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              <%= render_template('Run Command - Ansible Default', :command => "yum -y update #{input('package')}") %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/update_package__katello_ansible_default.erb
           - name: Update Package - Katello Script Default
             state: present
             description_format: 'Update package(s) %{package}'
@@ -1918,8 +1542,8 @@
               - RaBe
             provider_type: script
             snippet: false
-            template: |
-              <%= render_template('Package Action - Script Default', :action => 'update') %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/update_package__katello_script_default.erb
           - name: Update Packages by search query - Katello Script Default
             state: present
             description_format: 'Update package(s) %{Packages search query}'
@@ -1940,13 +1564,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              <% package_names = @host.package_names_for_job_template(
-                action: 'update',
-                search: input('Packages search query')
-              ) -%>
-
-              <%= render_template('Package Action - Script Default', :action => 'update', :package => package_names.join(' ')) %>
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/update_package_by_search_query__katello_ansible_default.erb
 
   always:
     - name: 'radiorabe.rabe_foreman.foreman : Lock All Job Templates'

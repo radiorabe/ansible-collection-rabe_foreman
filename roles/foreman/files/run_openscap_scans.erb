@@ -1,0 +1,5 @@
+<% raise "Create and assign a policy to this host before proceeding" if @host.policies_enc_raw.empty? %>
+
+<% @host.policies_enc_raw.map do |policy| -%>
+/usr/bin/foreman_scap_client <%= policy['id'] %>
+<% end -%>

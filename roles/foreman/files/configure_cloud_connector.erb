@@ -1,0 +1,6 @@
+---
+- hosts: all
+  vars:
+    satellite_url: "<%= foreman_server_url %>"
+  roles:
+    - project-receptor.satellite_receptor_installer

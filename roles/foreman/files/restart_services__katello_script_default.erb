@@ -1,0 +1,9 @@
+<%
+commands = input(:helper).split(',').map { |split| split.strip }
+reboot = commands.delete('reboot')
+-%>
+<%= commands.join("\n") %>
+katello-tracer-upload
+<% if reboot -%>
+<%= render_template('Power Action - Script Default', action: 'restart') %>
+<% end %>

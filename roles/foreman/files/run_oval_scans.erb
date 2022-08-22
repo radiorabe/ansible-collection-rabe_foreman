@@ -1,0 +1,9 @@
+<% unless input('oval_policies').blank? -%>
+  <% input('oval_policies').split(',').map do |id| -%>
+    /usr/bin/foreman_scap_client oval <%= id %>
+  <% end -%>
+<% else -%>
+  <% @host.oval_policies_enc_raw.map do |policy| -%>
+    /usr/bin/foreman_scap_client oval <%= policy['id'] %>
+  <% end -%>
+<% end -%>
