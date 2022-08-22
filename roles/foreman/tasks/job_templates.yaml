@@ -132,15 +132,15 @@
                 advanced: true
                 value_type: plain
                 hidden_value: false
-            template: |
-              ---
-              - hosts: all
-                tasks:
-                  - command: ansible-galaxy install {{ item }} -p <%= input('location').present? ? input('location') : '/etc/ansible/roles' %>
-                    register: out
-                    with_items:
-                      - <%= input('ansible_roles_list') %>
-                  - debug: var=out
+            #
+            # This is a hack because i am too lazy to look up how to use /files/ properly.
+            # I'm only doing it for the affected templates and not all of them.
+            #
+            # All of these templates are somewhat an artifact of bootstrapping foreman and will
+            # we removed when we're closer to v1.
+            #
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/ansible_roles__install_from_galay.erb
           - name: Ansible Roles - Install from git
             state: present
             description_format: 'Clone roles from git repository to %{location}'
@@ -251,56 +251,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              ---
-              - hosts: all
-                tasks:
-                  - name: Gather the rpm package facts
-                    package_facts:
-                      manager: auto
-
-                  - name: Fail if the target server is a Satellite server
-                    fail:
-                      msg: "This playbook cannot be executed on a Satellite server. Use only on a Capsule server."
-                    when: "'satellite' in ansible_facts.packages"
-
-                  - name: Install|Update satellite-maintain if not present
-                    package:
-                      name: rubygem-foreman_maintain
-                      state: latest
-
-                  - block:
-                    <%- whitelist_option = if input('whitelist_options').present?
-                                             "--whitelist=#{input('whitelist_options')}"
-                                           end -%>
-                    - name: Upgrade Capsule server using satellite-maintain
-                      shell: satellite-maintain upgrade run --assumeyes --target-version=<%= input('target_version') %> <%= whitelist_option %>
-                      register: result
-
-                    - name: Re-Gather the rpm package facts after the upgrade
-                      package_facts:
-                        manager: auto
-
-                    - name: satellite-maintain upgrade return code is zero
-                      debug:
-                        msg: "Success! Capsule server upgrade completed. Current version of Capsule server server is {{ ansible_facts.packages['satellite-capsule'][0]['version'] }}."
-
-                    rescue:
-                      - name: Print satellite-maintain output
-                        debug:
-                          var: result
-
-                      - name: Grep top 10 Error messages from /var/log/foreman-installer/capsule.log
-                        shell: grep '^\[ERROR' /var/log/foreman-installer/capsule.log | head -n10
-                        register: output_grep
-
-                      - name: Print grepped Error messages
-                        debug:
-                          var: output_grep.stdout_lines
-
-                      - name: satellite-maintain upgrade return code is non-zero
-                        fail:
-                          msg: "Failed! Capsule server upgrade failed. See /var/log/foreman-installer/capsule.log in the Capsule server for more information"
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/capsule_upgrade_playbook.erb
           - name: Change content source
             state: present
             description_format: Configure subscription manager to new content source
@@ -770,69 +722,8 @@
                 advanced: false
                 value_type: plain
                 hidden_value: false
-            template: |
-              - hosts: all
-                vars:
-                  updates: []
-                  <% if input('state').blank? %>
-                  state: searched
-                  <% else %>
-                  state: <%= input('state') %>
-                  <% end %>
-
-                tasks:
-                  - name: "{{ state | replace('ed','') | capitalize }} Windows Updates"
-                    win_updates:
-                      <% unless input('reject_list').blank? %>
-                      blacklist: <%= input('reject_list') %>
-                      <% end -%>
-                      <% if input('category_names').blank? %>
-                      category_names: ["CriticalUpdates", "SecurityUpdates", "UpdateRollups"]
-                      <% else %>
-                      category_names: <%= input('category_names') %>
-                      <% end %>
-                      <% unless input('log_path').blank? %>
-                      log_path: <%= input('log_path') %>
-                      <% end -%>
-                      <% if input('reboot').blank? %>
-                      reboot: false
-                      <% else %>
-                      reboot: <%= input('reboot') %>
-                      <% end %>
-                      <% if input('reboot_timeout').blank? %>
-                      reboot_timeout: 1200
-                      <% else %>
-                      reboot_timeout: <%= input('reboot_timeout') %>
-                      <% end -%>
-                      <% if input('server_selection').blank? %>
-                      server_selection: default
-                      <% else %>
-                      server_selection: <%= input('server_selection') %>
-                      <% end %>
-                      state: "{{ state }}"
-                      <% if input('use_scheduled_task').blank? %>
-                      use_scheduled_task: false
-                      <% else %>
-                      use_scheduled_task: <%= input('use_scheduled_task') %>
-                      <% end %>
-                      <% if !input('whitelist').blank? %>
-                      whitelist: <%= input('whitelist') %>
-                      <% end -%>
-
-                    register: found_updates
-
-                  - name: "Get all {{ state }} updates"
-                    set_fact:
-                      updates: "{{ updates + [ current_update ] }}"
-                    vars:
-                      current_update: "{{ item.value.title  }}"
-                    loop: "{{ found_updates.updates | dict2items }}"
-                    no_log: true
-
-                  - name: "List {{ state }} Windows Updates"
-                    debug:
-                      msg: "{{ item }}"
-                    loop: "{{ updates }}"
+            # TODO: get rid of ugly hack
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/manage_windows_updates.erb
           - name: Module Action - Ansible Default
             state: present
             description_format: 'Module %{action} %{module_spec}'
