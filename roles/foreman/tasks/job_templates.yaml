@@ -202,7 +202,7 @@
                 value_type: plain
                 hidden_value: false
             # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/run_playbook.erb
+            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/ansible__run_playbook.erb
           - name: Capsule Upgrade Playbook
             state: present
             description_format: '%{template_name}'
