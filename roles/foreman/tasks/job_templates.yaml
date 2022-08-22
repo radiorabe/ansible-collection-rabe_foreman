@@ -30,7 +30,6 @@
           - name: "*"
             locked: false
       when: not ansible_check_mode
-      diff: false
 
     - name: 'radiorabe.rabe_foreman.foreman : Configure Job Templates'
       ansible.builtin.include_role:
@@ -2066,4 +2065,3 @@
           - name: "*"
             locked: true
       when: not ansible_check_mode
-      diff: false
