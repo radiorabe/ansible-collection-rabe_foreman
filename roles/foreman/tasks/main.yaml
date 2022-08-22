@@ -1,7 +1,29 @@
 ---
 - import_tasks: organizations.yaml
+  tags:
+    - role::rabe_foreman.foreman
+    - role::rabe_foreman.foreman:organizations
 - import_tasks: locations.yaml
+  tags:
+    - role::rabe_foreman.foreman
+    - role::rabe_foreman.foreman:locations
 - import_tasks: settings.yaml
+  tags:
+    - role::rabe_foreman.foreman
+    - role::rabe_foreman.foreman:settings
 - import_tasks: roles.yaml
+  tags:
+    - role::rabe_foreman.foreman
+    - role::rabe_foreman.foreman:roles
 - import_tasks: global_parameters.yaml
+  tags:
+    - role::rabe_foreman.foreman
+    - role::rabe_foreman.foreman:global_parameters
 - import_tasks: host_groups.yaml
+  tags:
+    - role::rabe_foreman.foreman
+    - role::rabe_foreman.foreman:host_groups
+- import_tasks: job_templates.yaml
+  tags:
+    - role::rabe_foreman.foreman
+    - role::rabe_foreman.foreman:job_templates
