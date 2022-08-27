@@ -1,3 +1,4 @@
 ---
 - import_tasks: products.yaml
 - import_tasks: sync_plans.yaml
+- import_tasks: lifecycle_environments.yaml
