@@ -1,0 +1,12 @@
+---
+- name: 'radiorabe.rabe_foreman.content : Lifecycle Environments'
+  ansible.builtin.include_role:
+    name: theforeman.foreman.lifecycle_environments
+  vars:
+    foreman_lifecycle_environments:
+      - name: 'Dev'
+        prior: 'Library'
+      - name: 'Test'
+        prior: 'Dev'
+      - name: 'Prod'
+        prior: 'Test'
