@@ -1,0 +1,13 @@
+---
+- name: 'radiorabe.rabe_foreman.infrastructure : Configure Domains'
+  ansible.builtin.include_role:
+    name: theforeman.foreman.domains
+  vars:
+    foreman_domains:
+      - name: admin.int.rabe.ch
+      - name: audio.int.rabe.ch
+      - name: dmz.int.rabe.ch
+      - name: guest.int.rabe.ch
+      - name: office.int.rabe.ch
+      - name: service.int.rabe.ch
+      - name: storage.int.rabe.ch
