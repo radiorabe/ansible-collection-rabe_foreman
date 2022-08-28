@@ -11,3 +11,4 @@
       - name: office.int.rabe.ch
       - name: service.int.rabe.ch
       - name: storage.int.rabe.ch
+      - name: vm-admin.int.rabe.ch
