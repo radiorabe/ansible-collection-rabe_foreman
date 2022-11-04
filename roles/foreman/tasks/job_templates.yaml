@@ -24,7 +24,7 @@
       foreman_job_templates:
       - description_format: Install collections '%{ansible_collections_list}' from
           Galaxy
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/ansible_collections_-_install_from_galaxy.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/ansible_collections_-_install_from_galaxy.erb'
         job_category: Ansible Galaxy
         kind: job_template
         model: JobTemplate
@@ -49,7 +49,7 @@
           required: false
       - description_format: Run Ansible roles
         feature: ansible_run_host
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/ansible_roles_-_ansible_default.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/ansible_roles_-_ansible_default.erb'
         job_category: Ansible Playbook
         kind: job_template
         model: JobTemplate
@@ -58,7 +58,7 @@
         snippet: false
         state: present
       - description_format: Install roles '%{ansible_roles_list}' from Galaxy
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/ansible_roles_-_install_from_galaxy.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/ansible_roles_-_install_from_galaxy.erb'
         job_category: Ansible Galaxy
         kind: job_template
         model: JobTemplate
@@ -82,7 +82,7 @@
           name: location
           required: false
       - description_format: Clone roles from git repository to %{location}
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/ansible_roles_-_install_from_git.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/ansible_roles_-_install_from_git.erb'
         job_category: Ansible Roles Installation
         kind: job_template
         model: JobTemplate
@@ -102,7 +102,7 @@
           input_type: user
           name: location
           required: true
-      - file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/ansible_windows_updates.erb'
+      - file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/ansible_windows_updates.erb'
         job_category: Ansible Playbook
         kind: job_template
         locations:
@@ -207,7 +207,7 @@
           required: false
       - description_format: '%{template_name}'
         feature: ansible_run_capsule_upgrade
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/capsule_upgrade_-_ansible_default.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/capsule_upgrade_-_ansible_default.erb'
         job_category: Maintenance Operations
         kind: job_template
         model: JobTemplate
@@ -228,7 +228,7 @@
           name: whitelist_options
           required: false
           value_type: plain
-      - file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/convert_to_rhel.erb'
+      - file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/convert_to_rhel.erb'
         job_category: Convert 2 RHEL
         kind: job_template
         model: JobTemplate
@@ -259,7 +259,7 @@
           value_type: plain
       - description_format: Insights maintenance plan for host
         feature: ansible_run_insights_plan
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/maintenance_plan.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/maintenance_plan.erb'
         job_category: Ansible Playbook
         kind: job_template
         name: Ansible - Run insights maintenance plan
@@ -275,7 +275,7 @@
           name: organization_id
           required: true
       - description_format: Module %{action} %{module_spec}
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/module_action_-_ansible_default.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/module_action_-_ansible_default.erb'
         job_category: Ansible Modules
         kind: job_template
         model: JobTemplate
@@ -325,7 +325,7 @@
           name: post_script
           required: false
       - description_format: 'Package %{name}: %{state}'
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/package_action_-_ansible_default.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/package_action_-_ansible_default.erb'
         job_category: Ansible Packages
         kind: job_template
         model: JobTemplate
@@ -359,7 +359,7 @@
           name: post_script
           required: false
       - description_format: '%{action} host'
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/power_action_-_ansible_default.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/power_action_-_ansible_default.erb'
         job_category: Ansible Power
         kind: job_template
         model: JobTemplate
@@ -375,7 +375,7 @@
           options: "restart\r\nshutdown"
           required: true
       - description_format: Run Puppet once with "%{puppet_options}"
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/puppet_run_once_-_ansible_default.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/puppet_run_once_-_ansible_default.erb'
         job_category: Ansible Puppet
         kind: job_template
         model: JobTemplate
@@ -390,7 +390,7 @@
           name: puppet_options
           required: false
       - description_format: Run %{command}
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/run_command_-_ansible_default.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/run_command_-_ansible_default.erb'
         job_category: Ansible Commands
         kind: job_template
         model: JobTemplate
@@ -405,7 +405,7 @@
           name: command
           required: true
       - description_format: Run scan for all OpenSCAP policies on given hosts
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/run_openscap_scans_-_ansible_default.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/run_openscap_scans_-_ansible_default.erb'
         job_category: OpenSCAP Ansible Commands
         kind: job_template
         model: JobTemplate
@@ -414,7 +414,7 @@
         snippet: false
         state: present
       - feature: ansible_run_playbook
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/run_playbook-ansible_default.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/run_playbook-ansible_default.erb'
         job_category: Ansible Playbook
         kind: job_template
         name: Ansible - Run playbook
@@ -429,7 +429,7 @@
           required: true
           value_type: plain
       - description_format: '%{state} service %{name}'
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/service_action_-_ansible_default.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/service_action_-_ansible_default.erb'
         job_category: Ansible Services
         kind: job_template
         model: JobTemplate
@@ -479,7 +479,7 @@
           name: args
           required: false
       - feature: ansible_enable_web_console
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/service_action_-_enable_web_console.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/service_action_-_enable_web_console.erb'
         job_category: Ansible Services
         kind: job_template
         model: JobTemplate
@@ -489,7 +489,7 @@
         state: present
       - description_format: Configure subscription manager to new content source
         feature: katello_change_content_source
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/change_content_source.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/change_content_source.erb'
         job_category: Katello
         kind: job_template
         model: JobTemplate
@@ -498,7 +498,7 @@
         state: present
       - description_format: Install errata %{errata}
         feature: katello_errata_install
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/install_errata.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/install_errata.erb'
         foreign_input_sets:
         - exclude: action,package
           template: Package Action - Script Default
@@ -513,7 +513,7 @@
           name: errata
           required: true
       - description_format: Install errata %{errata}
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/install_errata_-_katello_ansible_default.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/install_errata_-_katello_ansible_default.erb'
         job_category: Katello via Ansible
         kind: job_template
         model: JobTemplate
@@ -529,7 +529,7 @@
           required: true
       - description_format: Install errata %{Errata search query}
         feature: katello_errata_install_by_search
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/install_errata_by_search_query.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/install_errata_by_search_query.erb'
         foreign_input_sets:
         - exclude: action,package
           template: Package Action - Script Default
@@ -545,7 +545,7 @@
           required: false
       - description_format: Install package group(s) %{package}
         feature: katello_group_install
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/install_group.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/install_group.erb'
         foreign_input_sets:
         - exclude: action
           template: Package Action - Script Default
@@ -555,7 +555,7 @@
         provider_type: script
         state: present
       - description_format: Install package group(s) %{package}
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/install_group_-_katello_ansible_default.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/install_group_-_katello_ansible_default.erb'
         job_category: Katello via Ansible
         kind: job_template
         model: JobTemplate
@@ -570,7 +570,7 @@
           required: true
       - description_format: Install package(s) %{package}
         feature: katello_package_install
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/install_package.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/install_package.erb'
         foreign_input_sets:
         - exclude: action
           template: Package Action - Script Default
@@ -580,7 +580,7 @@
         provider_type: script
         state: present
       - description_format: Install package(s) %{package}
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/install_package_-_katello_ansible_default.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/install_package_-_katello_ansible_default.erb'
         job_category: Katello via Ansible
         kind: job_template
         model: JobTemplate
@@ -595,7 +595,7 @@
           required: true
       - description_format: Install package(s) %{Package search query}
         feature: katello_package_install_by_search
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/install_packages_by_search_query.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/install_packages_by_search_query.erb'
         job_category: Katello
         kind: job_template
         name: Install packages by search query - Katello Script Default
@@ -609,7 +609,7 @@
           required: false
       - description_format: Remove package group(s) %{package}
         feature: katello_group_remove
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/remove_group.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/remove_group.erb'
         foreign_input_sets:
         - exclude: action
           template: Package Action - Script Default
@@ -619,7 +619,7 @@
         provider_type: script
         state: present
       - description_format: Remove package group(s) %{package}
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/remove_group_-_katello_ansible_default.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/remove_group_-_katello_ansible_default.erb'
         job_category: Katello via Ansible
         kind: job_template
         model: JobTemplate
@@ -634,7 +634,7 @@
           required: true
       - description_format: Remove package(s) %{package}
         feature: katello_package_remove
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/remove_package.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/remove_package.erb'
         foreign_input_sets:
         - exclude: action
           template: Package Action - Script Default
@@ -644,7 +644,7 @@
         provider_type: script
         state: present
       - description_format: Remove package(s) %{package}
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/remove_package_-_katello_ansible_default.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/remove_package_-_katello_ansible_default.erb'
         job_category: Katello via Ansible
         kind: job_template
         model: JobTemplate
@@ -659,7 +659,7 @@
           required: true
       - description_format: Remove packages %{Packages search query}
         feature: katello_packages_remove_by_search
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/remove_packages_by_search_query.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/remove_packages_by_search_query.erb'
         job_category: Katello
         kind: job_template
         name: Remove Packages by search query - Katello Script Default
@@ -672,7 +672,7 @@
           required: true
       - description_format: Resolve Traces
         feature: katello_host_tracer_resolve
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/resolve_traces.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/resolve_traces.erb'
         job_category: Katello
         kind: job_template
         name: Resolve Traces - Katello Script Default
@@ -684,7 +684,7 @@
           name: Traces search query
           required: false
       - description_format: Resolve Traces
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/resolve_traces_-_katello_ansible_default.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/resolve_traces_-_katello_ansible_default.erb'
         job_category: Katello via Ansible
         kind: job_template
         model: JobTemplate
@@ -699,7 +699,7 @@
           required: true
       - description_format: Restart Services
         feature: katello_service_restart
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/restart_services.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/restart_services.erb'
         job_category: Katello
         kind: job_template
         name: Restart Services - Katello Script Default
@@ -711,7 +711,7 @@
           name: helper
           required: true
       - description_format: Restart Services
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/restart_services_-_katello_ansible_default.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/restart_services_-_katello_ansible_default.erb'
         job_category: Katello via Ansible
         kind: job_template
         model: JobTemplate
@@ -727,7 +727,7 @@
           required: true
       - description_format: Install package group(s) %{package}
         feature: katello_group_update
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/update_group.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/update_group.erb'
         foreign_input_sets:
         - exclude: action
           template: Package Action - Script Default
@@ -737,7 +737,7 @@
         provider_type: script
         state: present
       - description_format: Install package group(s) %{package}
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/update_group_-_katello_ansible_default.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/update_group_-_katello_ansible_default.erb'
         job_category: Katello via Ansible
         kind: job_template
         model: JobTemplate
@@ -752,7 +752,7 @@
           required: true
       - description_format: Update package(s) %{package}
         feature: katello_package_update
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/update_package.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/update_package.erb'
         foreign_input_sets:
         - exclude: action
           template: Package Action - Script Default
@@ -762,7 +762,7 @@
         provider_type: script
         state: present
       - description_format: Update package(s) %{package}
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/update_package_-_katello_ansible_default.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/update_package_-_katello_ansible_default.erb'
         job_category: Katello via Ansible
         kind: job_template
         model: JobTemplate
@@ -777,7 +777,7 @@
           required: true
       - description_format: Update package(s) %{Packages search query}
         feature: katello_packages_update_by_search
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/update_packages_by_search_query.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/update_packages_by_search_query.erb'
         job_category: Katello
         kind: job_template
         name: Update Packages by search query - Katello Script Default
@@ -790,7 +790,7 @@
           required: false
       - description_format: Run scan for all OpenSCAP policies on host
         feature: foreman_openscap_run_scans
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/run_openscap_scans.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/run_openscap_scans.erb'
         job_category: OpenSCAP
         kind: job_template
         name: Run OpenSCAP scans
@@ -799,7 +799,7 @@
         state: present
       - description_format: Run scan for specified OVAL Policies
         feature: foreman_openscap_run_oval_scans
-        file_name: '{{ role_path }}/../../../rabe_foreman/files/job_templates/run_oval_scans.erb'
+        file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/run_oval_scans.erb'
         job_category: OpenSCAP
         kind: job_template
         name: Run OVAL scans
