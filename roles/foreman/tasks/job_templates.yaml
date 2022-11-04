@@ -1,1547 +1,831 @@
 ---
-# These tasks manage "Hosts" > "Templates" > "Job Templates".
-#
-# They unlock all the templates during operation and re-lock them all when it's done.
-# This isn't idempotent which is fine for now. At some point we'll want to refactor
-# it to check if any changes are needed before unlocking and relocking all the tempaltes.
-#
-# Most scripts in here were originally exported from foreman and are here to document
-# which one of them we keep and which we update. We expect to add some RaBe specific
-# scripts once the default set is tweaked. As a rule of thumb, we deactivate built-in
-# templates and replace them with copies of our own where possible.
-#
-# The canonical sources for the templates we don't maintain ourselves are in various
-# difference repos:
-#
-# - [Foreman Ansible Jobs](https://github.com/theforeman/foreman_ansible/tree/master/app/views/foreman_ansible/job_templates)
-# - [Katello Jobs](https://github.com/Katello/katello/tree/master/app/views/foreman/job_templates)
-# - [OpenSCAP](https://github.com/theforeman/foreman_openscap/tree/master/app/views/job_templates)
-#
-# Please add more links as you find them.
-#
-
-- name: 'radiorabe.rabe_foreman.foreman : Job Templates'
+- always:
+  - ansible.builtin.include_role:
+      name: radiorabe.foreman.job_templates
+    name: 'radiorabe.rabe_foreman.foreman : Lock All Job Templates'
+    vars:
+      foreman_job_templates:
+      - locked: true
+        name: '*'
+    when: not ansible_check_mode
   block:
-    - name: 'radiorabe.rabe_foreman.foreman : Unlock All Job Templates'
-      ansible.builtin.include_role:
-        name: radiorabe.foreman.job_templates
-      vars:
-        foreman_job_templates:
-          - name: "*"
-            locked: false
-      when: not ansible_check_mode
+  - ansible.builtin.include_role:
+      name: radiorabe.foreman.job_templates
+    name: 'radiorabe.rabe_foreman.foreman : Unlock All Job Templates'
+    vars:
+      foreman_job_templates:
+      - locked: false
+        name: '*'
+    when: not ansible_check_mode
+  - ansible.builtin.include_role:
+      name: radiorabe.foreman.job_templates
+    name: 'radiorabe.rabe_foreman.foreman : Configure Job Templates'
+    vars:
+      foreman_job_templates:
+      - description_format: Install collections '%{ansible_collections_list}' from
+          Galaxy
+        file_name: '{{ role_path }}/job_templates/files/ansible_collections_-_install_from_galaxy.erb'
+        job_category: Ansible Galaxy
+        kind: job_template
+        model: JobTemplate
+        name: Ansible Collection - Install from Galaxy
+        provider_type: Ansible
+        snippet: false
+        state: present
+        template_inputs:
+        - advanced: false
+          description: "List of collections in Ansible Galaxy to install, separated\
+            \ by commas, e.g: mysql,nginx\r\n\r\nThe default collections_paths is\
+            \ configured in /etc/ansible/ansible.cfg, you may override it by filling\
+            \ the 'collections_path' input. Click on \"Advanced\" to see it."
+          input_type: user
+          name: ansible_collections_list
+          required: true
+        - advanced: true
+          description: A particular directory where you want the downloaded collections
+            to be placed.
+          input_type: user
+          name: collections_path
+          required: false
+      - description_format: Run Ansible roles
+        feature: ansible_run_host
+        file_name: '{{ role_path }}/job_templates/files/ansible_roles_-_ansible_default.erb'
+        job_category: Ansible Playbook
+        kind: job_template
+        model: JobTemplate
+        name: Ansible Roles - Ansible Default
+        provider_type: Ansible
+        snippet: false
+        state: present
+      - description_format: Install roles '%{ansible_roles_list}' from Galaxy
+        file_name: '{{ role_path }}/job_templates/files/ansible_roles_-_install_from_galaxy.erb'
+        job_category: Ansible Galaxy
+        kind: job_template
+        model: JobTemplate
+        name: Ansible Roles - Install from Galaxy
+        provider_type: Ansible
+        snippet: false
+        state: present
+        template_inputs:
+        - advanced: false
+          description: "List of roles in Ansible Galaxy to install, separated by commas,\
+            \ e.g: \"mysql, nginx\"\r\n\r\nThe default location is the 'roles_path'\
+            \ configured on /etc/ansible/ansible.cfg, you may override it by filling\
+            \ the 'location' input. Click on \"Advanced\" to see it."
+          input_type: user
+          name: ansible_roles_list
+          required: true
+        - advanced: true
+          description: A particular directory where you want the downloaded roles
+            to be placed.
+          input_type: user
+          name: location
+          required: false
+      - description_format: Clone roles from git repository to %{location}
+        file_name: '{{ role_path }}/job_templates/files/ansible_roles_-_install_from_git.erb'
+        job_category: Ansible Roles Installation
+        kind: job_template
+        model: JobTemplate
+        name: Ansible Roles - Install from git
+        provider_type: Ansible
+        snippet: false
+        state: present
+        template_inputs:
+        - advanced: false
+          description: "URL to the git repository containing the roles, e.g:\r\nhttps://github.com/theforeman/foreman_role_1"
+          input_type: user
+          name: git_repository
+          required: true
+        - advanced: false
+          description: For example, '/etc/ansible/roles/foobar' . Look at '/etc/ansible/ansible.cfg'
+            roles_path option to find what is your roles_path
+          input_type: user
+          name: location
+          required: true
+      - file_name: '{{ role_path }}/job_templates/files/ansible_windows_updates.erb'
+        job_category: Ansible Playbook
+        kind: job_template
+        locations:
+        - My_Location
+        model: JobTemplate
+        name: Manage Windows Updates - Ansible Default
+        organizations:
+        - My_Organization
+        provider_type: Ansible
+        snippet: false
+        state: absent
+        template_inputs:
+        - advanced: false
+          description: "A list of update titles or KB numbers that can be used to\
+            \ specify which updates are to be excluded from installation.\r\nIf an\
+            \ available update does match one of the entries, then it is skipped and\
+            \ not installed.\r\nEach entry can either be the KB article or Update\
+            \ title as a regex according to the PowerShell regex rules."
+          input_type: user
+          name: reject_list
+          required: false
+        - advanced: false
+          description: "A scalar or list of categories to install updates from. To\
+            \ get the list of categories, run the module with state=searched. The\
+            \ category must be the full category string, but is case insensitive.\r\
+            \nSome possible categories are Application, Connectors, Critical Updates,\
+            \ Definition Updates, Developer Kits, Feature Packs, Guidance, Security\
+            \ Updates, Service Packs, Tools, Update Rollups and Updates.\r\n\r\nDefault\
+            \ is '[\"CriticalUpdates\", \"SecurityUpdates\", \"UpdateRollups\"]'"
+          input_type: user
+          name: category_names
+          required: false
+        - advanced: false
+          description: If set, win_updates will append update progress to the specified
+            file. The directory must already exist.
+          input_type: user
+          name: log_path
+          required: false
+        - advanced: false
+          description: "Ansible will automatically reboot the remote host if it is\
+            \ required and continue to install updates after the reboot.\r\nThis can\
+            \ be used instead of using a win_reboot task after this one and ensures\
+            \ all updates for that category is installed in one go.\r\nAsync does\
+            \ not work when reboot=true.\r\n\r\nDefault is 'false'"
+          input_type: user
+          name: reboot
+          options: "false\r\ntrue"
+          required: false
+        - advanced: false
+          description: "The time in seconds to wait until the host is back online\
+            \ from a reboot.\r\nThis is only used if reboot=true and a reboot is required.\r\
+            \n\r\nDefault is '1200'"
+          input_type: user
+          name: reboot_timeout
+          required: false
+        - advanced: false
+          description: "Defines the Windows Update source catalog.\r\ndefault Use\
+            \ the default search source. For many systems default is set to the Microsoft\
+            \ Windows Update catalog. Systems participating in Windows Server Update\
+            \ Services (WSUS), Systems Center Configuration Manager (SCCM), or similar\
+            \ corporate update server environments may default to those managed update\
+            \ sources instead of the Windows Update catalog.\r\nmanaged_server Use\
+            \ a managed server catalog. For environments utilizing Windows Server\
+            \ Update Services (WSUS), Systems Center Configuration Manager (SCCM),\
+            \ or similar corporate update servers, this option selects the defined\
+            \ corporate update source.\r\nwindows_update Use the Microsoft Windows\
+            \ Update catalog.\r\n\r\nDefault is 'default'"
+          input_type: user
+          name: server_selection
+          options: "default\r\nmanaged_server\r\nwindows_update"
+          required: false
+        - advanced: false
+          description: "Controls whether found updates are downloaded or installed\
+            \ or listed\r\nThis module also supports Ansible check mode, which has\
+            \ the same effect as setting state=searched\r\n\r\nDefault is 'searched'"
+          input_type: user
+          name: state
+          options: "installed\r\nsearched\r\ndownloaded"
+          required: false
+        - advanced: false
+          description: "Will not auto elevate the remote process with become and use\
+            \ a scheduled task instead.\r\nSet this to true when using this module\
+            \ with async on Server 2008, 2008 R2, or Windows 7, or on Server 2008\
+            \ that is not authenticated with basic or credssp.\r\nCan also be set\
+            \ to true on newer hosts where become does not work due to further privilege\
+            \ restrictions from the OS defaults."
+          input_type: user
+          name: use_scheduled_task
+          options: "false\r\ntrue"
+          required: false
+        - advanced: false
+          description: "A list of update titles or KB numbers that can be used to\
+            \ specify which updates are to be searched or installed.\r\nIf an available\
+            \ update does not match one of the entries, then it is skipped and not\
+            \ installed.\r\nEach entry can either be the KB article or Update title\
+            \ as a regex according to the PowerShell regex rules.\r\nThe whitelist\
+            \ is only validated on updates that were found based on category_names.\
+            \ It will not force the module to install an update if it was not in the\
+            \ category specified."
+          input_type: user
+          name: whitelist
+          required: false
+      - description_format: '%{template_name}'
+        feature: ansible_run_capsule_upgrade
+        file_name: '{{ role_path }}/job_templates/files/capsule_upgrade_-_ansible_default.erb'
+        job_category: Maintenance Operations
+        kind: job_template
+        model: JobTemplate
+        name: Capsule Upgrade Playbook
+        provider_type: Ansible
+        snippet: false
+        state: present
+        template_inputs:
+        - advanced: false
+          hidden_value: false
+          input_type: user
+          name: target_version
+          required: true
+          value_type: plain
+        - advanced: false
+          hidden_value: false
+          input_type: user
+          name: whitelist_options
+          required: false
+          value_type: plain
+      - file_name: '{{ role_path }}/job_templates/files/convert_to_rhel.erb'
+        job_category: Convert 2 RHEL
+        kind: job_template
+        model: JobTemplate
+        name: Convert to RHEL
+        provider_type: Ansible
+        snippet: false
+        state: present
+        template_inputs:
+        - advanced: false
+          description: Set the activation key to assign the desired RHEL subscription
+            and life cycle environment to the converted machine at the registration
+            step.
+          hidden_value: false
+          input_type: user
+          name: Activation Key
+          required: true
+          resource_type: Katello::ActivationKey
+          value_type: resource
+        - advanced: false
+          description: Restart the system when it is successfully converted to RHEL
+            to boot the new RHEL kernel.
+          hidden_value: false
+          input_type: user
+          name: Restart
+          options: "yes\r\nno"
+          required: true
+          resource_type: Katello::ActivationKey
+          value_type: plain
+      - description_format: Insights maintenance plan for host
+        feature: ansible_run_insights_plan
+        file_name: '{{ role_path }}/job_templates/files/maintenance_plan.erb'
+        job_category: Ansible Playbook
+        kind: job_template
+        name: Ansible - Run insights maintenance plan
+        provider_type: Ansible
+        state: present
+        template_inputs:
+        - description: The playbook for the rule coming from insights.
+          input_type: user
+          name: plan_id
+          required: true
+        - description: The Foreman organization associated with the Insights account
+          input_type: user
+          name: organization_id
+          required: true
+      - description_format: Module %{action} %{module_spec}
+        file_name: '{{ role_path }}/job_templates/files/module_action_-_ansible_default.erb'
+        job_category: Ansible Modules
+        kind: job_template
+        model: JobTemplate
+        name: Module Action - Ansible Default
+        provider_type: Ansible
+        state: present
+        template_inputs:
+        - advanced: true
+          description: A script to run prior to the module action
+          input_type: user
+          name: pre_script
+          required: false
+        - description: The module action enable, install etc
+          input_type: user
+          name: action
+          options: '
 
-    - name: 'radiorabe.rabe_foreman.foreman : Configure Job Templates'
-      ansible.builtin.include_role:
-        name: radiorabe.foreman.job_templates
-      vars:
-        foreman_job_templates:
-          - name: Ansible Collection - Install from Galaxy
-            state: present
-            description_format: 'Install collections ''%{ansible_collections_list}'' from Galaxy'
-            job_category: Ansible Galaxy
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: ansible_collections_list
-                required: true
-                input_type: user
-                description: "List of collections in Ansible Galaxy to install, separated by commas,
-                  e.g: mysql,nginx\r\n\r\nThe default collections_paths is configured in /etc/ansible/ansible.cfg,
-                  you may override it by filling the 'collections_path' input. Click on \"Advanced\"
-                  to see it."
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: collections_path
-                required: false
-                input_type: user
-                description: A particular directory where you want the downloaded collections to
-                  be placed.
-                advanced: true
-                value_type: plain
-                hidden_value: false
-            #
-            # This is a hack because i am too lazy to look up how to use /files/ properly.
-            # I'm only doing it for the affected templates and not all of them.
-            #
-            # All of these templates are somewhat an artifact of bootstrapping foreman and will
-            # we removed when we're closer to v1.
-            #
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/ansible_collection__install_from_galaxy.erb
-          - name: Ansible Roles - Ansible Default
-            state: present
-            description_format: Run Ansible roles
-            job_category: Ansible Playbook
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/ansible_roles__ansible_default.erb
-          - name: Ansible Roles - Install from Galaxy
-            state: present
-            description_format: 'Install roles ''%{ansible_roles_list}'' from Galaxy'
-            job_category: Ansible Galaxy
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: ansible_roles_list
-                required: true
-                input_type: user
-                description: "List of roles in Ansible Galaxy to install, separated by commas, e.g:
-                  \"mysql, nginx\"\r\n\r\nThe default location is the 'roles_path' configured on
-                  /etc/ansible/ansible.cfg, you may override it by filling the 'location' input.
-                  Click on \"Advanced\" to see it."
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: location
-                required: false
-                input_type: user
-                description: A particular directory where you want the downloaded roles to be placed.
-                advanced: true
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/ansible_roles__install_from_galay.erb
-          - name: Ansible Roles - Install from git
-            state: present
-            description_format: 'Clone roles from git repository to %{location}'
-            job_category: Ansible Roles Installation
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: git_repository
-                required: true
-                input_type: user
-                description: "URL to the git repository containing the roles, e.g:\r\nhttps://github.com/theforeman/foreman_role_1"
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: location
-                required: true
-                input_type: user
-                description: For example, '/etc/ansible/roles/foobar' . Look at '/etc/ansible/ansible.cfg'
-                  roles_path option to find what is your roles_path
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/ansible_roles__install_from_git.erb
-          - name: Ansible - Run insights maintenance plan
-            state: present
-            description_format: Insights maintenance plan for host
-            job_category: Ansible Playbook
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: plan_id
-                required: true
-                input_type: user
-                description: The playbook for the rule coming from insights.
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: organization_id
-                required: true
-                input_type: user
-                description: The Foreman organization associated with the Insights account
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/run_insights_maintenance_plan.erb
-          - name: Ansible - Run playbook
-            state: present
-            job_category: Ansible Playbook
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: playbook
-                required: true
-                input_type: user
-                description: The playbook to run against given hosts
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/ansible__run_playbook.erb
-          - name: Capsule Upgrade Playbook
-            state: present
-            description_format: '%{template_name}'
-            job_category: Maintenance Operations
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: target_version
-                required: true
-                input_type: user
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: whitelist_options
-                required: false
-                input_type: user
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/capsule_upgrade_playbook.erb
-          - name: Change content source
-            state: present
-            description_format: Configure subscription manager to new content source
-            job_category: Katello
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/change_content_source.erb
-          - name: Check Update - Script Default
-            state: present
-            description_format: Check for package updates
-            job_category: Packages
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/check_update__script_default.erb
+            list
 
-          # cloud connector was originally in ansible_foreman but moved to foreman_rh_cloud at some point:
-          # - https://github.com/theforeman/foreman_ansible/pull/526
-          # - https://github.com/theforeman/foreman_rh_cloud/tree/master/app/views/job_templates
-          # We absent it and keep this here to ensure it doesn't get re-added.
-          - name: Configure Cloud Connector
-            state: absent
-          - name: Convert to RHEL
-            state: absent
-            job_category: Convert 2 RHEL
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: Activation Key
-                required: true
-                input_type: user
-                description: Set the activation key to assign the desired RHEL subscription and
-                  life cycle environment to the converted machine at the registration step.
-                advanced: false
-                value_type: resource
-                resource_type: Katello::ActivationKey
-                hidden_value: false
-              - name: Restart
-                required: true
-                input_type: user
-                description: Restart the system when it is successfully converted to RHEL to boot
-                  the new RHEL kernel.
-                options: "yes\r\nno"
-                advanced: false
-                value_type: plain
-                resource_type: Katello::ActivationKey
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/convert_to_rhel.erb
-          - name: Install errata by search query - Katello Script Default
-            state: present
-            description_format: 'Install errata %{Errata search query}'
-            foreign_input_sets:
-              - exclude: action,package
-                include_all: true
-                template: Package Action - Script Default
-            job_category: Katello
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            template_inputs:
-              - name: Errata search query
-                required: false
-                input_type: user
-                description: Filter criteria for errata to be installed.
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/install_errata_by_search_query__katello_script_default.erb
-          - name: Install Errata - Katello Ansible Default
-            state: present
-            description_format: 'Install errata %{errata}'
-            job_category: Katello via Ansible
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: errata
-                required: true
-                input_type: user
-                description: A comma separated list of errata to install
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/install_errata__katello_ansible_default.erb
-          - name: Install Errata - Katello Script Default
-            state: present
-            description_format: 'Install errata %{errata}'
-            foreign_input_sets:
-              - exclude: action,package
-                include_all: true
-                template: Package Action - Script Default
-            job_category: Katello
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            template_inputs:
-              - name: errata
-                required: true
-                input_type: user
-                description: A comma-separated list of errata to install
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/install_errata__katello_script_default.erb
-          - name: Install Group - Katello Ansible Default
-            state: present
-            description_format: 'Install package group(s) %{package}'
-            job_category: Katello via Ansible
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: package
-                required: true
-                input_type: user
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/install_group__katello_ansible_default.erb
-          - name: Install Group - Katello Script Default
-            state: present
-            description_format: 'Install package group(s) %{package}'
-            foreign_input_sets:
-              - exclude: action
-                include_all: true
-                template: Package Action - Script Default
-            job_category: Katello
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/install_group__katello_script_default.erb
-          - name: Install Package - Katello Ansible Default
-            state: present
-            description_format: 'Install package(s) %{package}'
-            job_category: Katello via Ansible
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: package
-                required: true
-                input_type: user
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/install_package__katello_ansible_default.erb
-          - name: Install Package - Katello Script Default
-            state: present
-            description_format: 'Install package(s) %{package}'
-            foreign_input_sets:
-              - exclude: action
-                include_all: true
-                template: Package Action - Script Default
-            job_category: Katello
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/install_package__katello_script_default.erb
-          - name: Install packages by search query - Katello Script Default
-            state: present
-            description_format: 'Install package(s) %{Package search query}'
-            job_category: Katello
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            template_inputs:
-              - name: Package search query
-                required: false
-                input_type: user
-                description: Filter criteria for packages to be installed. IMPORTANT- If left blank,
-                  the job will attempt to install all possible packages.
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/install_package_by_search_query__katello_script_default.erb
-          - name: Manage Windows Updates - Ansible Default
-            state: absent
-            job_category: Ansible Playbook
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: reject_list
-                required: false
-                input_type: user
-                description: "A list of update titles or KB numbers that can be used to specify
-                  which updates are to be excluded from installation.\r\nIf an available update
-                  does match one of the entries, then it is skipped and not installed.\r\nEach entry
-                  can either be the KB article or Update title as a regex according to the PowerShell
-                  regex rules."
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: category_names
-                required: false
-                input_type: user
-                description: "A scalar or list of categories to install updates from. To get the
-                  list of categories, run the module with state=searched. The category must be the
-                  full category string, but is case insensitive.\r\nSome possible categories are
-                  Application, Connectors, Critical Updates, Definition Updates, Developer Kits,
-                  Feature Packs, Guidance, Security Updates, Service Packs, Tools, Update Rollups
-                  and Updates.\r\n\r\nDefault is '[\"CriticalUpdates\", \"SecurityUpdates\", \"UpdateRollups\"]'"
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: log_path
-                required: false
-                input_type: user
-                description: If set, win_updates will append update progress to the specified file.
-                  The directory must already exist.
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: reboot
-                required: false
-                input_type: user
-                description: "Ansible will automatically reboot the remote host if it is required
-                  and continue to install updates after the reboot.\r\nThis can be used instead
-                  of using a win_reboot task after this one and ensures all updates for that category
-                  is installed in one go.\r\nAsync does not work when reboot=true.\r\n\r\nDefault
-                  is 'false'"
-                options: "false\r\ntrue"
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: reboot_timeout
-                required: false
-                input_type: user
-                description: "The time in seconds to wait until the host is back online from a reboot.\r\nThis
-                  is only used if reboot=true and a reboot is required.\r\n\r\nDefault is '1200'"
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: server_selection
-                required: false
-                input_type: user
-                description: "Defines the Windows Update source catalog.\r\ndefault Use the default
-                  search source. For many systems default is set to the Microsoft Windows Update
-                  catalog. Systems participating in Windows Server Update Services (WSUS), Systems
-                  Center Configuration Manager (SCCM), or similar corporate update server environments
-                  may default to those managed update sources instead of the Windows Update catalog.\r\nmanaged_server
-                  Use a managed server catalog. For environments utilizing Windows Server Update
-                  Services (WSUS), Systems Center Configuration Manager (SCCM), or similar corporate
-                  update servers, this option selects the defined corporate update source.\r\nwindows_update
-                  Use the Microsoft Windows Update catalog.\r\n\r\nDefault is 'default'"
-                options: "default\r\nmanaged_server\r\nwindows_update"
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: state
-                required: false
-                input_type: user
-                description: "Controls whether found updates are downloaded or installed or listed\r\nThis
-                  module also supports Ansible check mode, which has the same effect as setting
-                  state=searched\r\n\r\nDefault is 'searched'"
-                options: "installed\r\nsearched\r\ndownloaded"
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: use_scheduled_task
-                required: false
-                input_type: user
-                description: "Will not auto elevate the remote process with become and use a scheduled
-                  task instead.\r\nSet this to true when using this module with async on Server
-                  2008, 2008 R2, or Windows 7, or on Server 2008 that is not authenticated with
-                  basic or credssp.\r\nCan also be set to true on newer hosts where become does
-                  not work due to further privilege restrictions from the OS defaults."
-                options: "false\r\ntrue"
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: whitelist
-                required: false
-                input_type: user
-                description: "A list of update titles or KB numbers that can be used to specify
-                  which updates are to be searched or installed.\r\nIf an available update does
-                  not match one of the entries, then it is skipped and not installed.\r\nEach entry
-                  can either be the KB article or Update title as a regex according to the PowerShell
-                  regex rules.\r\nThe whitelist is only validated on updates that were found based
-                  on category_names. It will not force the module to install an update if it was
-                  not in the category specified."
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/manage_windows_updates.erb
-          - name: Module Action - Ansible Default
-            state: present
-            description_format: 'Module %{action} %{module_spec}'
-            job_category: Ansible Modules
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: pre_script
-                required: false
-                input_type: user
-                description: A script to run prior to the module action
-                advanced: true
-                value_type: plain
-                hidden_value: false
-              - name: action
-                required: true
-                input_type: user
-                description: The module action enable, install etc
-                options: |-
-                  list
-                  info
-                  enable
-                  disable
-                  install
-                  update
-                  remove
-                  provides
-                  reset
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: module_spec
-                required: false
-                input_type: user
-                description: The module specification. module:stream/profile
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: options
-                required: false
-                input_type: user
-                description: Other optional flags for the action
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: post_script
-                required: false
-                input_type: user
-                description: A script to run after the module action
-                advanced: true
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/module_action__ansible_default.erb
-          - name: Module Action - Script Default
-            state: present
-            description_format: 'Module %{action} %{module_spec}'
-            job_category: Modules
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            template_inputs:
-              - name: pre_script
-                required: false
-                input_type: user
-                description: A script to run prior to the module action
-                advanced: true
-                value_type: plain
-                hidden_value: false
-              - name: action
-                required: true
-                input_type: user
-                description: The module action enable, install etc.
-                options: |-
-                  list
-                  info
-                  enable
-                  disable
-                  install
-                  update
-                  remove
-                  provides
-                  reset
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: module_spec
-                required: false
-                input_type: user
-                description: The module specification. module:stream/profile
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: options
-                required: false
-                input_type: user
-                description: Other optional flags for the action
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: post_script
-                required: false
-                input_type: user
-                description: A script to run after the module action
-                advanced: true
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/module_action__script_default.erb
-          - name: Package Action - Ansible Default
-            state: present
-            description_format: 'Package %{name}: %{state}'
-            job_category: Ansible Packages
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: state
-                required: true
-                input_type: user
-                description: Whether to install (present, latest), or remove (absent) a package.
-                options: "present\r\nabsent\r\nlatest"
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: name
-                required: true
-                input_type: user
-                description: "Package name, or package specifier with version, like name-1.0.\r\nBe
-                  aware that packages are not always named the same and this module will not 'translate'
-                  them per distro."
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: pre_script
-                required: false
-                input_type: user
-                description: A script to run prior to the package action
-                advanced: true
-                value_type: plain
-                hidden_value: false
-              - name: post_script
-                required: false
-                input_type: user
-                description: A script to run after the package action
-                advanced: true
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/package_action__ansible_default.erb
-          - name: Package Action - Script Default
-            state: present
-            description_format: '%{action} package(s) %{package}'
-            job_category: Packages
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            template_inputs:
-              - name: pre_script
-                required: false
-                input_type: user
-                description: A script to run prior to the package action
-                advanced: true
-                value_type: plain
-                hidden_value: false
-              - name: action
-                required: true
-                input_type: user
-                description: 'The package action: install, update, or remove'
-                options: |-
-                  install
-                  update
-                  remove
-                  group install
-                  group remove
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: package
-                required: false
-                input_type: user
-                description: The name of the package, if any
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: post_script
-                required: false
-                input_type: user
-                description: A script to run after the package action
-                advanced: true
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/package_action__script_default.erb
-          - name: Power Action - Ansible Default
-            state: present
-            description_format: '%{action} host'
-            job_category: Ansible Power
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: action
-                required: true
-                input_type: user
-                description: Action to perform on the service
-                options: "restart\r\nshutdown"
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/power_action__ansible_default.erb
-          - name: Power Action - Script Default
-            state: present
-            description_format: '%{action} host'
-            job_category: Power
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            template_inputs:
-              - name: action
-                required: true
-                input_type: user
-                description: Action to perform on the service
-                options: |-
-                  restart
-                  shutdown
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/power_action__script_default.erb
-          - name: Puppet Agent Disable - Script Default
-            state: absent
-            description_format: Disable Puppet agent
-            job_category: Puppet
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            template_inputs:
-              - name: comment
-                required: false
-                input_type: user
-                description: Reason for disabling the Puppet agent
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            template: |
-              <% if @host.operatingsystem.family == 'Debian' -%>
-              export PATH=/opt/puppetlabs/bin:$PATH
-              <% end -%>
-              puppet agent --disable "<%= input("comment").present? ? input("comment") : "Disabled using Foreman Remote Execution"  %> - <%= current_user %> - $(date "+%d/%m/%Y %H:%M")"
-          - name: Puppet Agent Enable - Script Default
-            state: absent
-            description_format: Enable Puppet agent
-            job_category: Puppet
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            template: |
-              <% if @host.operatingsystem.family == 'Debian' -%>
-              export PATH=/opt/puppetlabs/bin:$PATH
-              <% end -%>
-              puppet agent --enable
-          - name: Puppet Module - Install from forge - Script Default
-            state: absent
-            description_format: 'Install Puppet Module "%{puppet_module}" from forge'
-            job_category: Puppet
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            template_inputs:
-              - name: puppet_module
-                required: true
-                input_type: user
-                description: Full name of the module, e.g. "puppetlabs-stdlib".
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: target_dir
-                required: false
-                input_type: user
-                description: The directory into which modules are installed, defaults to production
-                  environment.
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: version
-                required: false
-                input_type: user
-                description: Module version to install.
-                advanced: true
-                value_type: plain
-                hidden_value: false
-              - name: force
-                required: false
-                input_type: user
-                description: Force overwrite of existing module, if any. Type "true" to force.
-                advanced: true
-                value_type: plain
-                hidden_value: false
-              - name: ignore_dependencies
-                required: false
-                input_type: user
-                description: Do not attempt to install dependencies. Type "true" to ignore dependencies.
-                advanced: true
-                value_type: plain
-                hidden_value: false
-            template: |
-              <% if @host.operatingsystem.family == 'Debian' -%>
-              export PATH=/opt/puppetlabs/bin:$PATH
-              <% end -%>
-              puppet module install <%= input('puppet_module') %> <%= "--target-dir #{input('target_dir')}" if input('target_dir').present? %> <%= "--version #{input('version')}" if input('version').present? %> <%= "--force" if input('force') == "true" %> <%= "--ignore-dependencies" if input('ignore_dependencies') == "true" %>
-          - name: Puppet Module - Install from git - Script Default
-            state: absent
-            description_format: 'Install Puppet Module "%{puppet_module}" from git'
-            job_category: Puppet
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            template_inputs:
-              - name: git_repository
-                required: true
-                input_type: user
-                description: "URL to the git repository containing the module, e.g:\r\nhttps://github.com/theforeman/puppet-puppet"
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: target_dir
-                required: true
-                input_type: user
-                description: For example, '/etc/puppetlabs/code/environments/production/modules/puppet'.
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            template: |
-              git clone <%= input('git_repository') %> <%= input('target_dir') %>
-          - name: Puppet Run Once - Ansible Default
-            state: absent
-            description_format: 'Run Puppet once with "%{puppet_options}"'
-            job_category: Ansible Puppet
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: puppet_options
-                required: false
-                input_type: user
-                description: Additional options to pass to Puppet
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            template: |
-              ---
-              - hosts: all
-                tasks:
-                  - command: |
-                      puppet agent --onetime --no-usecacheonfailure --no-daemonize <%= input("puppet_options") -%>
-              <% if @host.operatingsystem.family == 'Debian' -%>
-                    environment:
-                      PATH: "/opt/puppetlabs/bin:{{ (ansible_env|default({})).PATH|default('') }}"
-              <% end -%>
-          - name: Puppet Run Once - Script Default
-            state: absent
-            description_format: 'Run Puppet once with "%{puppet_options}"'
-            job_category: Puppet
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            template_inputs:
-              - name: puppet_options
-                required: false
-                input_type: user
-                description: Additional options to pass to puppet
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            template: |
-              <% if @host.operatingsystem.family == 'Debian' -%>
-              export PATH=/opt/puppetlabs/bin:$PATH
-              <% end -%>
-              puppet agent --onetime --no-usecacheonfailure --no-daemonize <%= input("puppet_options") %>
-          - name: Remove Group - Katello Ansible Default
-            state: present
-            description_format: 'Remove package group(s) %{package}'
-            job_category: Katello via Ansible
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: package
-                required: true
-                input_type: user
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/remove_group__katello_ansible_default.erb
-          - name: Remove Group - Katello Script Default
-            state: present
-            description_format: 'Remove package group(s) %{package}'
-            foreign_input_sets:
-              - exclude: action
-                include_all: true
-                template: Package Action - Script Default
-            job_category: Katello
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/remove_group__katello_script_default.erb
-          - name: Remove Package - Katello Ansible Default
-            state: present
-            description_format: 'Remove package(s) %{package}'
-            job_category: Katello via Ansible
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: package
-                required: true
-                input_type: user
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/remove_package__katello_ansible_default.erb
-          - name: Remove Package - Katello Script Default
-            state: present
-            description_format: 'Remove package(s) %{package}'
-            foreign_input_sets:
-              - exclude: action
-                include_all: true
-                template: Package Action - Script Default
-            job_category: Katello
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/remove_package__katello_script_default.erb
-          - name: Remove Packages by search query - Katello Script Default
-            state: present
-            description_format: 'Remove packages %{Packages search query}'
-            job_category: Katello
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            template_inputs:
-              - name: Packages search query
-                required: true
-                input_type: user
-                description: Filter criteria for packages to be removed.
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/remove_package_by_search_query__katello_script_default.erb
-          - name: Resolve Traces - Katello Ansible Default
-            state: present
-            description_format: Resolve Traces
-            job_category: Katello via Ansible
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: Traces search query
-                required: true
-                input_type: user
-                description: Search query to provide traces to resolve
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/resolve_traces__katello_ansible_default.erb
-          - name: Resolve Traces - Katello Script Default
-            state: present
-            description_format: Resolve Traces
-            job_category: Katello
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            template_inputs:
-              - name: Traces search query
-                required: false
-                input_type: user
-                description: Search query to provide traces to resolve
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/resolve_traces__katello_script_default.erb
-          - name: Restart Services - Katello Ansible Default
-            state: present
-            description_format: Restart Services
-            job_category: Katello via Ansible
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: helper
-                required: true
-                input_type: user
-                description: A comma separated list of commands to run to restart services
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/restart_services__katello_ansible_default.erb
-          - name: Restart Services - Katello Script Default
-            state: present
-            description_format: Restart Services
-            job_category: Katello
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            template_inputs:
-              - name: helper
-                required: true
-                input_type: user
-                description: A comma separated list of commands to run to restart services
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/restart_services__katello_script_default.erb
-          - name: Run Command - Ansible Default
-            state: present
-            description_format: 'Run %{command}'
-            job_category: Ansible Commands
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: command
-                required: true
-                input_type: user
-                description: "Command to run on the host, e.g: \r\n\r\nmkdir helloworld"
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/run_command__katello_ansible_default.erb
-          - name: Run Command - Script Default
-            state: present
-            description_format: 'Run %{command}'
-            job_category: Commands
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            template_inputs:
-              - name: command
-                required: true
-                input_type: user
-                description: Command to run on the host
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/run_command__katello_script_default.erb
-          - name: Run OpenSCAP scans - Ansible Default
-            state: present
-            description_format: Run scan for all OpenSCAP policies on given hosts
-            job_category: OpenSCAP Ansible Commands
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/run_openscap_scans__ansible_default.erb
-          - name: Run OpenSCAP scans
-            state: present
-            description_format: Run scan for all OpenSCAP policies on host
-            job_category: OpenSCAP
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: SSH
-            snippet: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/run_openscap_scans.erb
-          - name: Run OVAL scans
-            state: present
-            description_format: Run scan for specified OVAL Policies
-            job_category: OpenSCAP
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: SSH
-            snippet: false
-            template_inputs:
-              - name: oval_policies
-                required: false
-                input_type: user
-                description: Comma separated OVAL Policy Ids to run
-                advanced: true
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/run_oval_scans.erb
-          - name: Service Action - Ansible Default
-            state: present
-            description_format: '%{state} service %{name}'
-            job_category: Ansible Services
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: state
-                required: true
-                input_type: user
-                description: started/stopped are idempotent actions that will not run commands unless
-                  necessary. restarted will always bounce the service. reloaded will always reload.
-                  At least one of state and enabled are required. Note that reloaded will start
-                  the service if it is not already started, even if your chosen init system wouldn't
-                  normally.
-                options: "started\r\nstopped\r\nrestarted\r\nreloaded"
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: name
-                required: true
-                input_type: user
-                description: Name of the service.
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: pattern
-                required: false
-                input_type: user
-                description: If the service does not respond to the status command, name a substring
-                  to look for as would be found in the output of the ps command as a stand-in for
-                  a status result. If the string is found, the service will be assumed to be running.
-                advanced: true
-                value_type: plain
-                hidden_value: false
-              - name: sleep
-                required: false
-                input_type: user
-                description: If the service is being restarted then sleep this many seconds between
-                  the stop and start command. This helps to workaround badly behaving init scripts
-                  that exit immediately after signaling a process to stop.
-                advanced: true
-                value_type: plain
-                hidden_value: false
-              - name: enabled
-                required: false
-                input_type: user
-                description: Whether the service should start on boot.
-                advanced: true
-                value_type: plain
-                hidden_value: false
-              - name: args
-                required: false
-                input_type: user
-                description: Additional arguments provided on the command line
-                advanced: true
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/service_action__ansible_default.erb
-          - name: Service Action - Enable Web Console
-            state: present
-            job_category: Ansible Services
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template: |
-              ---
-              - hosts: all
-                tasks:
-                - name: ensure cockpit is installed
-                  package:
-                    name: "cockpit-system"
-                    state: present
-          - name: Service Action - Script Default
-            state: present
-            description_format: '%{action} service %{service}'
-            job_category: Services
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            template_inputs:
-              - name: action
-                required: true
-                input_type: user
-                description: Action to perform on the service
-                options: |-
-                  restart
-                  start
-                  stop
-                  status
-                  reload
-                  enable
-                  disable
-                advanced: false
-                value_type: plain
-                hidden_value: false
-              - name: service
-                required: true
-                input_type: user
-                description: Name of the service
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/service_action__script_default.erb
-          - name: Update Group - Katello Ansible Default
-            state: present
-            description_format: 'Install package group(s) %{package}'
-            job_category: Katello via Ansible
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: package
-                required: true
-                input_type: user
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/update_group__katello_ansible_default.erb
-          - name: Update Group - Katello Script Default
-            state: present
-            description_format: 'Install package group(s) %{package}'
-            foreign_input_sets:
-              - exclude: action
-                include_all: true
-                template: Package Action - Script Default
-            job_category: Katello
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/update_group__katello_script_default.erb
-          - name: Update Package - Katello Ansible Default
-            state: present
-            description_format: 'Update package(s) %{package}'
-            job_category: Katello via Ansible
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: Ansible
-            snippet: false
-            template_inputs:
-              - name: package
-                required: true
-                input_type: user
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/update_package__katello_ansible_default.erb
-          - name: Update Package - Katello Script Default
-            state: present
-            description_format: 'Update package(s) %{package}'
-            foreign_input_sets:
-              - exclude: action
-                include_all: true
-                template: Package Action - Script Default
-            job_category: Katello
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/update_package__katello_script_default.erb
-          - name: Update Packages by search query - Katello Script Default
-            state: present
-            description_format: 'Update package(s) %{Packages search query}'
-            job_category: Katello
-            kind: job_template
-            locations:
-              - Randweg
-            model: JobTemplate
-            organizations:
-              - RaBe
-            provider_type: script
-            snippet: false
-            template_inputs:
-              - name: Packages search query
-                required: false
-                input_type: user
-                description: Filter criteria for packages to be updated.
-                advanced: false
-                value_type: plain
-                hidden_value: false
-            # TODO: get rid of ugly hack
-            file_name: /etc/ansible/collections/ansible_collections/radiorabe/rabe_foreman/roles/foreman/files/update_package_by_search_query__katello_ansible_default.erb
+            info
 
-  always:
-    - name: 'radiorabe.rabe_foreman.foreman : Lock All Job Templates'
-      ansible.builtin.include_role:
-        name: radiorabe.foreman.job_templates
-      vars:
-        foreman_job_templates:
-          - name: "*"
-            locked: true
-      when: not ansible_check_mode
+            enable
+
+            disable
+
+            install
+
+            update
+
+            remove
+
+            provides
+
+            reset'
+          required: true
+        - description: The module specification. module:stream/profile
+          input_type: user
+          name: module_spec
+          required: false
+        - description: Other optional flags for the action
+          input_type: user
+          name: options
+          required: false
+        - advanced: true
+          description: A script to run after the module action
+          input_type: user
+          name: post_script
+          required: false
+      - description_format: 'Package %{name}: %{state}'
+        file_name: '{{ role_path }}/job_templates/files/package_action_-_ansible_default.erb'
+        job_category: Ansible Packages
+        kind: job_template
+        model: JobTemplate
+        name: Package Action - Ansible Default
+        provider_type: Ansible
+        snippet: false
+        state: present
+        template_inputs:
+        - advanced: false
+          description: Whether to install (present, latest), or remove (absent) a
+            package.
+          input_type: user
+          name: state
+          options: "present\r\nabsent\r\nlatest"
+          required: true
+        - advanced: false
+          description: "Package name, or package specifier with version, like name-1.0.\r\
+            \nBe aware that packages are not always named the same and this module\
+            \ will not 'translate' them per distro."
+          input_type: user
+          name: name
+          required: true
+        - advanced: true
+          description: A script to run prior to the package action
+          input_type: user
+          name: pre_script
+          required: false
+        - advanced: true
+          description: A script to run after the package action
+          input_type: user
+          name: post_script
+          required: false
+      - description_format: '%{action} host'
+        file_name: '{{ role_path }}/job_templates/files/power_action_-_ansible_default.erb'
+        job_category: Ansible Power
+        kind: job_template
+        model: JobTemplate
+        name: Power Action - Ansible Default
+        provider_type: Ansible
+        snippet: false
+        state: present
+        template_inputs:
+        - advanced: false
+          description: Action to perform on the service
+          input_type: user
+          name: action
+          options: "restart\r\nshutdown"
+          required: true
+      - description_format: Run Puppet once with "%{puppet_options}"
+        file_name: '{{ role_path }}/job_templates/files/puppet_run_once_-_ansible_default.erb'
+        job_category: Ansible Puppet
+        kind: job_template
+        model: JobTemplate
+        name: Puppet Run Once - Ansible Default
+        provider_type: Ansible
+        snippet: false
+        state: present
+        template_inputs:
+        - advanced: false
+          description: Additional options to pass to Puppet
+          input_type: user
+          name: puppet_options
+          required: false
+      - description_format: Run %{command}
+        file_name: '{{ role_path }}/job_templates/files/run_command_-_ansible_default.erb'
+        job_category: Ansible Commands
+        kind: job_template
+        model: JobTemplate
+        name: Run Command - Ansible Default
+        provider_type: Ansible
+        snippet: false
+        state: present
+        template_inputs:
+        - advanced: false
+          description: "Command to run on the host, e.g: \r\n\r\nmkdir helloworld"
+          input_type: user
+          name: command
+          required: true
+      - description_format: Run scan for all OpenSCAP policies on given hosts
+        file_name: '{{ role_path }}/job_templates/files/run_openscap_scans_-_ansible_default.erb'
+        job_category: OpenSCAP Ansible Commands
+        kind: job_template
+        model: JobTemplate
+        name: Run OpenSCAP scans - Ansible Default
+        provider_type: Ansible
+        snippet: false
+        state: present
+      - feature: ansible_run_playbook
+        file_name: '{{ role_path }}/job_templates/files/run_playbook-ansible_default.erb'
+        job_category: Ansible Playbook
+        kind: job_template
+        name: Ansible - Run playbook
+        provider_type: Ansible
+        snippet: false
+        state: present
+        template_inputs:
+        - advanced: false
+          description: The playbook to run against given hosts
+          input_type: user
+          name: playbook
+          required: true
+          value_type: plain
+      - description_format: '%{state} service %{name}'
+        file_name: '{{ role_path }}/job_templates/files/service_action_-_ansible_default.erb'
+        job_category: Ansible Services
+        kind: job_template
+        model: JobTemplate
+        name: Service Action - Ansible Default
+        provider_type: Ansible
+        snippet: false
+        state: present
+        template_inputs:
+        - advanced: false
+          description: started/stopped are idempotent actions that will not run commands
+            unless necessary. restarted will always bounce the service. reloaded will
+            always reload. At least one of state and enabled are required. Note that
+            reloaded will start the service if it is not already started, even if
+            your chosen init system wouldn't normally.
+          input_type: user
+          name: state
+          options: "started\r\nstopped\r\nrestarted\r\nreloaded"
+          required: true
+        - advanced: false
+          description: Name of the service.
+          input_type: user
+          name: name
+          required: true
+        - advanced: true
+          description: If the service does not respond to the status command, name
+            a substring to look for as would be found in the output of the ps command
+            as a stand-in for a status result. If the string is found, the service
+            will be assumed to be running.
+          input_type: user
+          name: pattern
+          required: false
+        - advanced: true
+          description: If the service is being restarted then sleep this many seconds
+            between the stop and start command. This helps to workaround badly behaving
+            init scripts that exit immediately after signaling a process to stop.
+          input_type: user
+          name: sleep
+          required: false
+        - advanced: true
+          description: Whether the service should start on boot.
+          input_type: user
+          name: enabled
+          required: false
+        - advanced: true
+          description: Additional arguments provided on the command line
+          input_type: user
+          name: args
+          required: false
+      - feature: ansible_enable_web_console
+        file_name: '{{ role_path }}/job_templates/files/service_action_-_enable_web_console.erb'
+        job_category: Ansible Services
+        kind: job_template
+        model: JobTemplate
+        name: Service Action - Enable Web Console
+        provider_type: Ansible
+        snippet: false
+        state: present
+      - description_format: Configure subscription manager to new content source
+        feature: katello_change_content_source
+        file_name: '{{ role_path }}/job_templates/files/change_content_source.erb'
+        job_category: Katello
+        kind: job_template
+        model: JobTemplate
+        name: Change content source
+        provider_type: script
+        state: present
+      - description_format: Install errata %{errata}
+        feature: katello_errata_install
+        file_name: '{{ role_path }}/job_templates/files/install_errata.erb'
+        foreign_input_sets:
+        - exclude: action,package
+          template: Package Action - Script Default
+        job_category: Katello
+        kind: job_template
+        name: Install Errata - Katello Script Default
+        provider_type: script
+        state: present
+        template_inputs:
+        - description: A comma-separated list of errata to install
+          input_type: user
+          name: errata
+          required: true
+      - description_format: Install errata %{errata}
+        file_name: '{{ role_path }}/job_templates/files/install_errata_-_katello_ansible_default.erb'
+        job_category: Katello via Ansible
+        kind: job_template
+        model: JobTemplate
+        name: Install Errata - Katello Ansible Default
+        provider_type: Ansible
+        snippet: false
+        state: present
+        template_inputs:
+        - advanced: false
+          description: A comma separated list of errata to install
+          input_type: user
+          name: errata
+          required: true
+      - description_format: Install errata %{Errata search query}
+        feature: katello_errata_install_by_search
+        file_name: '{{ role_path }}/job_templates/files/install_errata_by_search_query.erb'
+        foreign_input_sets:
+        - exclude: action,package
+          template: Package Action - Script Default
+        job_category: Katello
+        kind: job_template
+        name: Install errata by search query - Katello Script Default
+        provider_type: script
+        state: present
+        template_inputs:
+        - description: Filter criteria for errata to be installed.
+          input_type: user
+          name: Errata search query
+          required: false
+      - description_format: Install package group(s) %{package}
+        feature: katello_group_install
+        file_name: '{{ role_path }}/job_templates/files/install_group.erb'
+        foreign_input_sets:
+        - exclude: action
+          template: Package Action - Script Default
+        job_category: Katello
+        kind: job_template
+        name: Install Group - Katello Script Default
+        provider_type: script
+        state: present
+      - description_format: Install package group(s) %{package}
+        file_name: '{{ role_path }}/job_templates/files/install_group_-_katello_ansible_default.erb'
+        job_category: Katello via Ansible
+        kind: job_template
+        model: JobTemplate
+        name: Install Group - Katello Ansible Default
+        provider_type: Ansible
+        snippet: false
+        state: present
+        template_inputs:
+        - advanced: false
+          input_type: user
+          name: package
+          required: true
+      - description_format: Install package(s) %{package}
+        feature: katello_package_install
+        file_name: '{{ role_path }}/job_templates/files/install_package.erb'
+        foreign_input_sets:
+        - exclude: action
+          template: Package Action - Script Default
+        job_category: Katello
+        kind: job_template
+        name: Install Package - Katello Script Default
+        provider_type: script
+        state: present
+      - description_format: Install package(s) %{package}
+        file_name: '{{ role_path }}/job_templates/files/install_package_-_katello_ansible_default.erb'
+        job_category: Katello via Ansible
+        kind: job_template
+        model: JobTemplate
+        name: Install Package - Katello Ansible Default
+        provider_type: Ansible
+        snippet: false
+        state: present
+        template_inputs:
+        - advanced: false
+          input_type: user
+          name: package
+          required: true
+      - description_format: Install package(s) %{Package search query}
+        feature: katello_package_install_by_search
+        file_name: '{{ role_path }}/job_templates/files/install_packages_by_search_query.erb'
+        job_category: Katello
+        kind: job_template
+        name: Install packages by search query - Katello Script Default
+        provider_type: script
+        state: present
+        template_inputs:
+        - description: Filter criteria for packages to be installed. IMPORTANT- If
+            left blank, the job will attempt to install all possible packages.
+          input_type: user
+          name: Package search query
+          required: false
+      - description_format: Remove package group(s) %{package}
+        feature: katello_group_remove
+        file_name: '{{ role_path }}/job_templates/files/remove_group.erb'
+        foreign_input_sets:
+        - exclude: action
+          template: Package Action - Script Default
+        job_category: Katello
+        kind: job_template
+        name: Remove Group - Katello Script Default
+        provider_type: script
+        state: present
+      - description_format: Remove package group(s) %{package}
+        file_name: '{{ role_path }}/job_templates/files/remove_group_-_katello_ansible_default.erb'
+        job_category: Katello via Ansible
+        kind: job_template
+        model: JobTemplate
+        name: Remove Group - Katello Ansible Default
+        provider_type: Ansible
+        snippet: false
+        state: present
+        template_inputs:
+        - advanced: false
+          input_type: user
+          name: package
+          required: true
+      - description_format: Remove package(s) %{package}
+        feature: katello_package_remove
+        file_name: '{{ role_path }}/job_templates/files/remove_package.erb'
+        foreign_input_sets:
+        - exclude: action
+          template: Package Action - Script Default
+        job_category: Katello
+        kind: job_template
+        name: Remove Package - Katello Script Default
+        provider_type: script
+        state: present
+      - description_format: Remove package(s) %{package}
+        file_name: '{{ role_path }}/job_templates/files/remove_package_-_katello_ansible_default.erb'
+        job_category: Katello via Ansible
+        kind: job_template
+        model: JobTemplate
+        name: Remove Package - Katello Ansible Default
+        provider_type: Ansible
+        snippet: false
+        state: present
+        template_inputs:
+        - advanced: false
+          input_type: user
+          name: package
+          required: true
+      - description_format: Remove packages %{Packages search query}
+        feature: katello_packages_remove_by_search
+        file_name: '{{ role_path }}/job_templates/files/remove_packages_by_search_query.erb'
+        job_category: Katello
+        kind: job_template
+        name: Remove Packages by search query - Katello Script Default
+        provider_type: script
+        state: present
+        template_inputs:
+        - description: Filter criteria for packages to be removed.
+          input_type: user
+          name: Packages search query
+          required: true
+      - description_format: Resolve Traces
+        feature: katello_host_tracer_resolve
+        file_name: '{{ role_path }}/job_templates/files/resolve_traces.erb'
+        job_category: Katello
+        kind: job_template
+        name: Resolve Traces - Katello Script Default
+        provider_type: script
+        state: present
+        template_inputs:
+        - description: Search query to provide traces to resolve
+          input_type: user
+          name: Traces search query
+          required: false
+      - description_format: Resolve Traces
+        file_name: '{{ role_path }}/job_templates/files/resolve_traces_-_katello_ansible_default.erb'
+        job_category: Katello via Ansible
+        kind: job_template
+        model: JobTemplate
+        name: Resolve Traces - Katello Ansible Default
+        provider_type: Ansible
+        snippet: false
+        state: present
+        template_inputs:
+        - description: Search query to provide traces to resolve
+          input_type: user
+          name: Traces search query
+          required: true
+      - description_format: Restart Services
+        feature: katello_service_restart
+        file_name: '{{ role_path }}/job_templates/files/restart_services.erb'
+        job_category: Katello
+        kind: job_template
+        name: Restart Services - Katello Script Default
+        provider_type: script
+        state: present
+        template_inputs:
+        - description: A comma separated list of commands to run to restart services
+          input_type: user
+          name: helper
+          required: true
+      - description_format: Restart Services
+        file_name: '{{ role_path }}/job_templates/files/restart_services_-_katello_ansible_default.erb'
+        job_category: Katello via Ansible
+        kind: job_template
+        model: JobTemplate
+        name: Restart Services - Katello Ansible Default
+        provider_type: Ansible
+        snippet: false
+        state: present
+        template_inputs:
+        - advanced: false
+          description: A comma separated list of commands to run to restart services
+          input_type: user
+          name: helper
+          required: true
+      - description_format: Install package group(s) %{package}
+        feature: katello_group_update
+        file_name: '{{ role_path }}/job_templates/files/update_group.erb'
+        foreign_input_sets:
+        - exclude: action
+          template: Package Action - Script Default
+        job_category: Katello
+        kind: job_template
+        name: Update Group - Katello Script Default
+        provider_type: script
+        state: present
+      - description_format: Install package group(s) %{package}
+        file_name: '{{ role_path }}/job_templates/files/update_group_-_katello_ansible_default.erb'
+        job_category: Katello via Ansible
+        kind: job_template
+        model: JobTemplate
+        name: Update Group - Katello Ansible Default
+        provider_type: Ansible
+        snippet: false
+        state: present
+        template_inputs:
+        - advanced: false
+          input_type: user
+          name: package
+          required: true
+      - description_format: Update package(s) %{package}
+        feature: katello_package_update
+        file_name: '{{ role_path }}/job_templates/files/update_package.erb'
+        foreign_input_sets:
+        - exclude: action
+          template: Package Action - Script Default
+        job_category: Katello
+        kind: job_template
+        name: Update Package - Katello Script Default
+        provider_type: script
+        state: present
+      - description_format: Update package(s) %{package}
+        file_name: '{{ role_path }}/job_templates/files/update_package_-_katello_ansible_default.erb'
+        job_category: Katello via Ansible
+        kind: job_template
+        model: JobTemplate
+        name: Update Package - Katello Ansible Default
+        provider_type: Ansible
+        snippet: false
+        state: present
+        template_inputs:
+        - advanced: false
+          input_type: user
+          name: package
+          required: true
+      - description_format: Update package(s) %{Packages search query}
+        feature: katello_packages_update_by_search
+        file_name: '{{ role_path }}/job_templates/files/update_packages_by_search_query.erb'
+        job_category: Katello
+        kind: job_template
+        name: Update Packages by search query - Katello Script Default
+        provider_type: script
+        state: present
+        template_inputs:
+        - description: Filter criteria for packages to be updated.
+          input_type: user
+          name: Packages search query
+          required: false
+      - description_format: Run scan for all OpenSCAP policies on host
+        feature: foreman_openscap_run_scans
+        file_name: '{{ role_path }}/job_templates/files/run_openscap_scans.erb'
+        job_category: OpenSCAP
+        kind: job_template
+        name: Run OpenSCAP scans
+        provider_type: SSH
+        snippet: false
+        state: present
+      - description_format: Run scan for specified OVAL Policies
+        feature: foreman_openscap_run_oval_scans
+        file_name: '{{ role_path }}/job_templates/files/run_oval_scans.erb'
+        job_category: OpenSCAP
+        kind: job_template
+        name: Run OVAL scans
+        provider_type: SSH
+        snippet: false
+        state: present
+        template_inputs:
+        - advanced: true
+          description: Comma separated OVAL Policy Ids to run
+          input_type: user
+          name: oval_policies
+      - name: Configure Cloud Connector
+        state: absent
+      - name: Convert to RHEL
+        state: absent
+      - name: Puppet Agent Disable - Script Default
+        state: absent
+      - name: Puppet Agent Enable - Script Default
+        state: absent
+      - name: Puppet Module - Install from forge - Script Default
+        state: absent
+      - name: Puppet Module - Install from git - Script Default
+        state: absent
+      - name: Puppet Run Once - Ansible Default
+        state: absent
+      - name: Puppet Run Once - Script Default
+        state: absent
+    when: not ansible_check_mode
+  name: 'radiorabe.rabe_foreman.foreman : Job Templates'
