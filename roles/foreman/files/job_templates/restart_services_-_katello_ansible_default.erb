@@ -1,0 +1,12 @@
+
+<%
+commands = input(:helper).split(',').map { |split| split.strip }
+reboot = commands.delete('reboot')
+-%>
+<%= render_template(
+    'Run Command - Ansible Default',
+    :command => (commands.push('katello-tracer-upload')).join("\n")
+) %>
+<% if reboot %>
+    - reboot:
+<% end %>

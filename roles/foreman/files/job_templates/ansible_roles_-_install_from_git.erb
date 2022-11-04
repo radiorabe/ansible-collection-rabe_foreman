@@ -1,0 +1,10 @@
+
+---
+- hosts: all
+  tasks:
+    - git:
+        repo: "<%= input('git_repository') %>"
+        dest: "<%= input('location') %>"
+      register: out
+
+    - debug: var=out

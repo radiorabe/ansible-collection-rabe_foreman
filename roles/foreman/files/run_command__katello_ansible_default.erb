@@ -1,8 +1,0 @@
----
-- hosts: all
-  tasks:
-    - shell:
-        cmd: |
-<%=       indent(10) { input('command') } %>
-      register: out
-    - debug: var=out

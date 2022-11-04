@@ -1,0 +1,12 @@
+
+---
+- hosts: all
+  tasks:
+    - shell: |
+        echo <%= input('action') %> host && sleep 3
+        <%= case input('action')
+          when 'restart'
+            'shutdown -r +1'
+          else
+            'shutdown -h +1'
+          end %>
