@@ -132,7 +132,8 @@ def gen_data(file_info):
     if file_basename in _ABSENTEES:
         meta[_FIELD_STATE] = _STATE_ABSENT
     meta["file_name"] = join(
-        "{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates",
+        "{{ role_path }}/../../../rabe_foreman",
+        "roles/foreman/files/job_templates",
         file_basename,
     )
 
