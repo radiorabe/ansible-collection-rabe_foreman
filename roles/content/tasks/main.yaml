@@ -1,4 +1,16 @@
 ---
-- import_tasks: products.yaml
-- import_tasks: sync_plans.yaml
-- import_tasks: lifecycle_environments.yaml
+- name: 'radiorabe.rabe_foreman.content : Products'
+  ansible.builtin.import_tasks: products.yaml
+  tags:
+    - role::rabe_foreman.content
+    - role::rabe_foreman.content:products
+- name: 'radiorabe.rabe_foreman.content : Sync Plans'
+  ansible.builtin.import_tasks: sync_plans.yaml
+  tags:
+    - role::rabe_foreman.content
+    - role::rabe_foreman.content:sync_plans
+- name: 'radiorabe.rabe_foreman.content : Lifecycle Environments'
+  ansible.builtin.import_tasks: lifecycle_environments.yaml
+  tags:
+    - role::rabe_foreman.content
+    - role::rabe_foreman.content:lifecycle_environments
