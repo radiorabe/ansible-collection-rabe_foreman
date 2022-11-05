@@ -1,2 +1,6 @@
 ---
-- ansible.builtin.import_tasks: domains.yaml
+- name: 'radiorabe.rabe_foreman.infrastructure : Domains'
+  ansible.builtin.import_tasks: domains.yaml
+  tags:
+    - role::rabe_foreman.infrastructure
+    - role::rabe_foreman.infrastructure:domains

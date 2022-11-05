@@ -1,4 +1,16 @@
 ---
-- ansible.builtin.import_tasks: operatingsystems.yaml
-- ansible.builtin.import_tasks: architectures.yaml
-- ansible.builtin.import_tasks: installation_mediums.yaml
+- name: 'radiorabe.rabe_foreman.hosts : Operatingsystems'
+  ansible.builtin.import_tasks: operatingsystems.yaml
+  tags:
+    - role::rabe_foreman.hosts
+    - role::rabe_foreman.hosts:operatingsystems
+- name: 'radiorabe.rabe_foreman.hosts : Architectures'
+  ansible.builtin.import_tasks: architectures.yaml
+  tags:
+    - role::rabe_foreman.hosts
+    - role::rabe_foreman.hosts:architectures
+- name: 'radiorabe.rabe_foreman.hosts : Installation Mediums'
+  ansible.builtin.import_tasks: installation_mediums.yaml
+  tags:
+    - role::rabe_foreman.hosts
+    - role::rabe_foreman.hosts:installation_mediums
