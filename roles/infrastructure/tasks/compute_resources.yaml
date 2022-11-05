@@ -1,0 +1,25 @@
+---
+- name: 'radiorabe.rabe_foreman.infrastructure : Configure Compute Resources'
+  ansible.builtin.include_role:
+    name: theforeman.foreman.compute_resources
+  vars:
+    foreman_compute_resources:
+      - name: ovirt
+        state: present
+        description: oVirt
+        organizations:
+          - RaBe
+        locations:
+          - Randweg
+        provider: ovirt
+        provider_params:
+          url: https://ovirt-engine-test.admin.int.rabe.ch/ovirt-engine/api
+          user: foreman@ovirt@internalsso
+          password: '{{ rabe_foreman_infrastructure_compute_resources_ovirt_password }}'
+          # "Default" DC
+          # TODO: read me from api
+          datacenter: 66bb512e-39e5-11ed-bc37-00163e0759f2
+          # "Default" quota
+          # TODO: read me from api
+          ovirt_quota: 69a34f04-39e5-11ed-9e5b-00163e0759f2
+          use_v4: true
