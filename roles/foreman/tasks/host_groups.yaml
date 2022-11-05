@@ -30,6 +30,7 @@
           - theforeman.foreman_scap_client
           - redhat.rhel_system_roles.kdump
           - redhat.rhel_system_roles.crypto_policies
+          - redhat.rhel_system_roles.selinux
       - name: Foreman
         description: Foreman configures standalone Foreman servers.
         parent: RaBe Core/RaBe Base/EL8/CentOS 8 Stream
