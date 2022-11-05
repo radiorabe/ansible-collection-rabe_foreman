@@ -4,3 +4,8 @@
   tags:
     - role::rabe_foreman.infrastructure
     - role::rabe_foreman.infrastructure:domains
+- name: 'radiorabe.rabe_foreman.infrastructure : Compute Resources'
+  ansible.builtin.import_tasks: compute_resources.yaml
+  tags:
+    - role::rabe_foreman.infrastructure
+    - role::rabe_foreman.infrastructure:compute_resources
