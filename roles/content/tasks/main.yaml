@@ -1,4 +1,4 @@
 ---
-- import_tasks: products.yaml
-- import_tasks: sync_plans.yaml
-- import_tasks: lifecycle_environments.yaml
+- ansible.builtin.import_tasks: products.yaml
+- ansible.builtin.import_tasks: sync_plans.yaml
+- ansible.builtin.import_tasks: lifecycle_environments.yaml

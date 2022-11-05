@@ -1,4 +1,4 @@
 ---
-- import_tasks: operatingsystems.yaml
-- import_tasks: architectures.yaml
-- import_tasks: installation_mediums.yaml
+- ansible.builtin.import_tasks: operatingsystems.yaml
+- ansible.builtin.import_tasks: architectures.yaml
+- ansible.builtin.import_tasks: installation_mediums.yaml
