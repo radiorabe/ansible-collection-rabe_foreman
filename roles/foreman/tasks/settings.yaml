@@ -1,5 +1,5 @@
 ---
-- name: 'radiorabe.rabe_foreman.foreman : Configure Settings'
+- name: 'RaBe Foreman Config : Configure Settings'
   ansible.builtin.include_role:
     name: theforeman.foreman.settings
   vars:

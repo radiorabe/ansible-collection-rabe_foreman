@@ -1,5 +1,5 @@
 ---
-- name: 'radiorabe.rabe_foreman.infrastructure : Configure Domains'
+- name: 'RaBe Foreman Infrastructure : Configure Domains'
   ansible.builtin.include_role:
     name: theforeman.foreman.domains
   vars:

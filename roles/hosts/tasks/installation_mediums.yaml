@@ -1,5 +1,5 @@
 ---
-- name: 'radiorabe.rabe_foreman.hosts : Configure Installation Mediums'
+- name: 'RaBe Foreman Hosts : Configure Installation Mediums'
   ansible.builtin.include_role:
     name: radiorabe.foreman.installation_mediums
   vars:

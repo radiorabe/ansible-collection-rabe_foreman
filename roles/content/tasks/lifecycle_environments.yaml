@@ -1,5 +1,5 @@
 ---
-- name: 'radiorabe.rabe_foreman.content : Lifecycle Environments'
+- name: 'RaBe Foreman Content : Lifecycle Environments'
   ansible.builtin.include_role:
     name: theforeman.foreman.lifecycle_environments
   vars:

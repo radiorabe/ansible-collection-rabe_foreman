@@ -34,6 +34,7 @@ from re import DOTALL, search
 from sys import stdout
 
 import yaml
+from ruamel.yaml import YAML
 
 HOME = environ["HOME"]
 BASE = f"{HOME}/Documents/git.repos"
@@ -140,6 +141,13 @@ def gen_data(file_info):
     return meta
 
 
+def strip_leading_double_space(stream):
+    # https://stackoverflow.com/a/58773229
+    if stream.startswith("  "):
+        stream = stream[2:]
+    return stream.replace("\n  ", "\n")
+
+
 def main(template_paths: list[str]):
     """
     Generate new job_templates.yaml on stdout and put files into dir.
@@ -192,7 +200,7 @@ def main(template_paths: list[str]):
     ]  # noqa: T801
     final_data = [
         {
-            _FIELD_NAME: "radiorabe.rabe_foreman.foreman : Job Templates",
+            _FIELD_NAME: "RaBe Foreman Config : Job Templates",
             "block": [
                 {
                     _FIELD_NAME: "radiorabe.rabe_foreman.foreman : Unlock All Job Templates",  # noqa: E501
@@ -210,7 +218,7 @@ def main(template_paths: list[str]):
                     "when": "not ansible_check_mode",
                 },
                 {
-                    _FIELD_NAME: "radiorabe.rabe_foreman.foreman : Configure Job Templates",  # noqa: E501
+                    _FIELD_NAME: "RaBe Foreman Config : Configure Job Templates",  # noqa: E501
                     "ansible.builtin.include_role": {
                         _FIELD_NAME: "radiorabe.foreman.job_templates",
                     },
@@ -225,7 +233,7 @@ def main(template_paths: list[str]):
             ],
             "always": [
                 {
-                    _FIELD_NAME: "radiorabe.rabe_foreman.foreman : Lock All Job Templates",  # noqa: E501
+                    _FIELD_NAME: "RaBe Foreman Config : Lock All Job Templates",  # noqa: E501
                     "ansible.builtin.include_role": {
                         _FIELD_NAME: "radiorabe.foreman.job_templates",
                     },
@@ -242,8 +250,10 @@ def main(template_paths: list[str]):
             ],
         },
     ]
-    stdout.write("---\n")
-    stdout.write(yaml.safe_dump(final_data))
+    yml = YAML()
+    yml.explicit_start = True
+    yml.indent(mapping=2, sequence=4, offset=2)
+    yml.dump(final_data, stdout, transform=strip_leading_double_space)
 
 
 if __name__ == "__main__":

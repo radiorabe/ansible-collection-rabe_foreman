@@ -1,5 +1,5 @@
 ---
-- name: 'radiorabe.rabe_foreman.infrastructure : Configure Compute Resources'
+- name: 'RaBe Foreman Infrastructure : Configure Compute Resources'
   ansible.builtin.include_role:
     name: theforeman.foreman.compute_resources
   vars:

@@ -1,5 +1,5 @@
 ---
-- name: 'radiorabe.rabe_foreman.foreman : Configure Global Parameters'
+- name: 'RaBe Foreman Config : Configure Global Parameters'
   ansible.builtin.include_role:
     name: radiorabe.foreman.global_parameters
   vars:

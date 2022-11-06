@@ -1,15 +1,15 @@
 ---
-- name: 'radiorabe.rabe_foreman.content : Products'
+- name: 'RaBe Foreman Content : Products'
   ansible.builtin.import_tasks: products.yaml
   tags:
     - role::rabe_foreman.content
     - role::rabe_foreman.content:products
-- name: 'radiorabe.rabe_foreman.content : Sync Plans'
+- name: 'RaBe Foreman Content : Sync Plans'
   ansible.builtin.import_tasks: sync_plans.yaml
   tags:
     - role::rabe_foreman.content
     - role::rabe_foreman.content:sync_plans
-- name: 'radiorabe.rabe_foreman.content : Lifecycle Environments'
+- name: 'RaBe Foreman Content : Lifecycle Environments'
   ansible.builtin.import_tasks: lifecycle_environments.yaml
   tags:
     - role::rabe_foreman.content

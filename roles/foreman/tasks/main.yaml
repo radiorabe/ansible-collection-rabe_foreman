@@ -1,35 +1,35 @@
 ---
-- name: 'radiorabe.rabe_foreman.foreman : Organizations'
+- name: 'RaBe Foreman Config : Organizations'
   ansible.builtin.import_tasks: organizations.yaml
   tags:
     - role::rabe_foreman.foreman
     - role::rabe_foreman.foreman:organizations
-- name: 'radiorabe.rabe_foreman.foreman : Locations'
+- name: 'RaBe Foreman Config : Locations'
   ansible.builtin.import_tasks: locations.yaml
   tags:
     - role::rabe_foreman.foreman
     - role::rabe_foreman.foreman:locations
-- name: 'radiorabe.rabe_foreman.foreman : Settings'
+- name: 'RaBe Foreman Config : Settings'
   ansible.builtin.import_tasks: settings.yaml
   tags:
     - role::rabe_foreman.foreman
     - role::rabe_foreman.foreman:settings
-- name: 'radiorabe.rabe_foreman.foreman : Roles'
+- name: 'RaBe Foreman Config : Roles'
   ansible.builtin.import_tasks: roles.yaml
   tags:
     - role::rabe_foreman.foreman
     - role::rabe_foreman.foreman:roles
-- name: 'radiorabe.rabe_foreman.foreman : Global Parameters'
+- name: 'RaBe Foreman Config : Global Parameters'
   ansible.builtin.import_tasks: global_parameters.yaml
   tags:
     - role::rabe_foreman.foreman
     - role::rabe_foreman.foreman:global_parameters
-- name: 'radiorabe.rabe_foreman.foreman : Host Groups'
+- name: 'RaBe Foreman Config : Host Groups'
   ansible.builtin.import_tasks: host_groups.yaml
   tags:
     - role::rabe_foreman.foreman
     - role::rabe_foreman.foreman:host_groups
-- name: 'radiorabe.rabe_foreman.foreman : Job Templates'
+- name: 'RaBe Foreman Config : Job Templates'
   ansible.builtin.import_tasks: job_templates.yaml
   tags:
     - role::rabe_foreman.foreman

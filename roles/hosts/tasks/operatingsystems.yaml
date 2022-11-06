@@ -1,5 +1,5 @@
 ---
-- name: 'radiorabe.rabe_foreman.hosts : Configure Operatingsystems'
+- name: 'RaBe Foreman Hosts : Configure Operatingsystems'
   ansible.builtin.include_role:
     name: theforeman.foreman.operatingsystems
   vars:
