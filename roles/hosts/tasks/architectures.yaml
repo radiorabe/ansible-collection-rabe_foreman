@@ -8,6 +8,7 @@
         state: absent
       - name: x86_64
         operatingsystems:
+          - CentOS 7
           - AlmaLinux 9
           - CentOS Stream 8
           - CentOS Stream 9

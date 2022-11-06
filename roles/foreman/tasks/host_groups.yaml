@@ -16,6 +16,7 @@
         parent: RaBe Core
         organization: RaBe
         location: Randweg
+        architecture: x86_64
         ansible_roles:
           - radiorabe.common.base
       - name: EL7
@@ -28,6 +29,7 @@
         parent: RaBe Core/RaBe Base/EL7
         organization: RaBe
         location: Randweg
+        operatingsystem: CentOS 7
       - name: EL8
         description: EL8 configures our EL8 baseline.
         parent: RaBe Core/RaBe Base
@@ -38,6 +40,7 @@
         parent: RaBe Core/RaBe Base/EL8
         organization: RaBe
         location: Randweg
+        operatingsystem: CentOS Stream 8
         ansible_roles:
           - theforeman.foreman_scap_client
           - redhat.rhel_system_roles.kdump
@@ -58,6 +61,7 @@
         parent: RaBe Core/RaBe Base/EL9
         organization: RaBe
         location: Randweg
+        operatingsystem: AlmaLinux 9
       - name: AlmaLinux 9 VMs
         description: AlmaLinux 9 general purpose virtual machines.
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
