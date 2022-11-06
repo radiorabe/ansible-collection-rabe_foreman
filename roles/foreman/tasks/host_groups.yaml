@@ -16,6 +16,8 @@
         parent: RaBe Core
         organization: RaBe
         location: Randweg
+        ansible_roles:
+          - radiorabe.common.base
       - name: EL8
         description: EL8 configures our EL8 baseline
         parent: RaBe Core/RaBe Base
