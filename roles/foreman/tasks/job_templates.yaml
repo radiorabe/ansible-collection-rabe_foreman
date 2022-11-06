@@ -816,6 +816,30 @@
             state: absent
           - name: Puppet Run Once - Script Default
             state: absent
+          - name: Ansible Collection - Upgrade from Galaxy
+            state: present
+            job_category: Ansible Galaxy
+            description_format: Upgrade collections '%{ansible_collections_list}'
+              from Galaxy
+            snippet: false
+            template_inputs:
+              - name: ansible_collections_list
+                required: true
+                input_type: user
+                description: |-
+                  List of collections in Ansible Galaxy to install, separated by commas, e.g: mysql,nginx
+                  The default collections_paths is configured in /etc/ansible/ansible.cfg, you may override it by filling the 'collections_path' input. Click on "Advanced" to see it.
+                advanced: false
+              - name: collections_path
+                required: false
+                input_type: user
+                description: |-
+                  A particular directory where you want the downloaded collections to be placed.
+                advanced: true
+            provider_type: Ansible
+            kind: job_template
+            model: JobTemplate
+            file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/ansible_collections_-_install_from_galaxy.erb'
       when: not ansible_check_mode
   always:
     - name: 'RaBe Foreman Config : Lock All Job Templates'

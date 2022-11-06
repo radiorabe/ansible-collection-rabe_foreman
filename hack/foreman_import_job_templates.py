@@ -32,9 +32,11 @@ from os.path import basename, isfile, join
 from pathlib import Path
 from re import DOTALL, search
 from sys import stdout
+from textwrap import dedent
 
 import yaml
 from ruamel.yaml import YAML
+from ruamel.yaml.scalarstring import LiteralScalarString
 
 HOME = environ["HOME"]
 BASE = f"{HOME}/Documents/git.repos"
@@ -51,6 +53,19 @@ _FIELD_NAME = "name"
 _FIELD_STATE = "state"
 _STATE_ABSENT = "absent"
 _STATE_PRESENT = "present"
+
+
+def LS(string):  # noqa: N802
+    """
+    Make Literal Scalar string.
+
+    Args:
+        string: string
+
+    Returns:
+        literal scalar string
+    """
+    return LiteralScalarString(dedent(string))
 
 
 def scan_dir(template_dir):
@@ -142,7 +157,17 @@ def gen_data(file_info):
 
 
 def strip_leading_double_space(stream):
-    # https://stackoverflow.com/a/58773229
+    """
+    Strip leading two spaces for yaml output.
+
+    https://stackoverflow.com/a/58773229
+
+    Args:
+        stream: ie. stdout
+
+    Returns:
+        stream
+    """
     if stream.startswith("  "):
         stream = stream[2:]
     return stream.replace("\n  ", "\n")
@@ -197,13 +222,41 @@ def main(template_paths: list[str]):
             _FIELD_NAME: "Puppet Run Once - Script Default",
             _FIELD_STATE: _STATE_ABSENT,
         },
+        # more bespoke templates get added here
+        {
+            _FIELD_NAME: "Ansible Collection - Upgrade from Galaxy",
+            _FIELD_STATE: _STATE_PRESENT,
+            "job_category": "Ansible Galaxy",
+            "description_format": "Upgrade collections '%{ansible_collections_list}' from Galaxy",  # noqa: E501
+            "snippet": False,
+            "template_inputs": [
+                {
+                    "name": "ansible_collections_list",
+                    "required": True,
+                    "input_type": "user",
+                    "description": LS("List of collections in Ansible Galaxy to install, separated by commas, e.g: mysql,nginx\nThe default collections_paths is configured in /etc/ansible/ansible.cfg, you may override it by filling the 'collections_path' input. Click on \"Advanced\" to see it."),  # noqa: E501
+                    "advanced": False,
+                },
+                {
+                    "name": "collections_path",
+                    "required": False,
+                    "input_type": "user",
+                    "description": LS("A particular directory where you want the downloaded collections to be placed."),  # noqa: E501
+                    "advanced": True,
+                },
+            ],
+            "provider_type": "Ansible",
+            "kind": "job_template",
+            "model": "JobTemplate",
+            "file_name": "{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/ansible_collections_-_install_from_galaxy.erb",  # noqa: E501
+        },
     ]  # noqa: T801
     final_data = [
         {
             _FIELD_NAME: "RaBe Foreman Config : Job Templates",
             "block": [
                 {
-                    _FIELD_NAME: "radiorabe.rabe_foreman.foreman : Unlock All Job Templates",  # noqa: E501
+                    _FIELD_NAME: "RaBe Foreman Config : Unlock All Job Templates",  # noqa: E501
                     "ansible.builtin.include_role": {
                         _FIELD_NAME: "radiorabe.foreman.job_templates",
                     },
