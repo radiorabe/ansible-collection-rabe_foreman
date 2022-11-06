@@ -9,3 +9,8 @@
   tags:
     - role::rabe_foreman.infrastructure
     - role::rabe_foreman.infrastructure:compute_resources
+- name: 'RaBe Foreman Infrastructure : Realms'
+  ansible.builtin.import_tasks: realms.yaml
+  tags:
+    - role::rabe_foreman.infrastructure
+    - role::rabe_foreman.infrastructure:realms
