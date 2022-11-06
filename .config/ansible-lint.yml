@@ -2,3 +2,4 @@
 warn_list:
   - var-spacing
   - yaml
+  - jinja[spacing]
