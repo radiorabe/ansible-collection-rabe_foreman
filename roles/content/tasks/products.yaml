@@ -1,5 +1,5 @@
 ---
-- name: 'radiorabe.rabe_foreman.content : Configure Products'
+- name: 'RaBe Foreman Content : Configure Products'
   ansible.builtin.include_role:
     name: theforeman.foreman.repositories
   vars:

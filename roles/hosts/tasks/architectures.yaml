@@ -1,5 +1,5 @@
 ---
-- name: 'radiorabe.rabe_foreman.hosts : Configure Architectures'
+- name: 'RaBe Foreman Hosts : Configure Architectures'
   ansible.builtin.include_role:
     name: radiorabe.foreman.architectures
   vars:

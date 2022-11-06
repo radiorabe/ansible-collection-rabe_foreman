@@ -1,5 +1,5 @@
 ---
-- name: 'radiorabe.rabe_foreman.foreman : Configure Host Groups'
+- name: 'RaBe Foreman Config : Configure Host Groups'
   ansible.builtin.include_role:
     name: theforeman.foreman.hostgroups
   vars:
