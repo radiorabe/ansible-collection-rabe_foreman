@@ -18,13 +18,23 @@
         location: Randweg
         ansible_roles:
           - radiorabe.common.base
+      - name: EL7
+        description: EL7 configures our EL7 baseline.
+        parent: RaBe Core/RaBe Base
+        organization: RaBe
+        location: Randweg
+      - name: CentOS 7
+        description: CentOS 7 configures the RaBe CentOS 7 baseline and serves as a catch-all for imported CentOS 7 infrastructure.
+        parent: RaBe Core/RaBe Base/EL7
+        organization: RaBe
+        location: Randweg
       - name: EL8
-        description: EL8 configures our EL8 baseline
+        description: EL8 configures our EL8 baseline.
         parent: RaBe Core/RaBe Base
         organization: RaBe
         location: Randweg
       - name: CentOS 8 Stream
-        description: CentOS 8 Stream configures the RaBe CentOS 8 Stream baseline
+        description: CentOS 8 Stream configures the RaBe CentOS 8 Stream baseline.
         parent: RaBe Core/RaBe Base/EL8
         organization: RaBe
         location: Randweg
@@ -48,3 +58,9 @@
         parent: RaBe Core/RaBe Base/EL9
         organization: RaBe
         location: Randweg
+      - name: AlmaLinux 9 VMs
+        description: AlmaLinux 9 general purpose virtual machines.
+        parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
+        organization: RaBe
+        location: Randweg
+        compute_resource: ovirt
