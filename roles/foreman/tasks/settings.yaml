@@ -16,3 +16,5 @@
           - rhel-system-roles.*
       - name: lab_features
         value: false
+      - name: login_text
+        value: '{{ radiorabe_core_admin_name }} : Foreman'

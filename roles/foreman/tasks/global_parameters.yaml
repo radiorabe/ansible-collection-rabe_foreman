@@ -15,6 +15,3 @@
       - name: host_registration_remote_execution
         parameter_type: boolean
         value: true
-      - name: login_text
-        parameter_type: string
-        value: '{{ radiorabe_core_admin_name }} : Foreman'
