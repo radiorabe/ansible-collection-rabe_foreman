@@ -1,0 +1,5 @@
+
+---
+- hosts: all
+  tasks:
+    - command: ansible-galaxy collection install --upgrade <%= input('ansible_collections_list').split(",").join(' ') %> -p <%= input('collections_path').present? ? input('collections_path') : '/etc/ansible/collections' %>
