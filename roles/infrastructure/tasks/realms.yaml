@@ -1,0 +1,7 @@
+---
+- name: 'Rabe Foreman Infrastructure : Create realm {{ radiorabe_core_realm }}'
+  theforeman.foreman.realm:
+    name: '{{ radiorabe_core_realm }}'
+    state: present
+    realm_type: 'FreeIPA'
+    realm_proxy: '{{ radiorabe_base_foreman_host }}'
