@@ -114,20 +114,38 @@
             download_policy: on_demand
             url: https://releases.ansible.com/ansible-runner/rpm/epel-8-x86_64/
           - name: Foreman 3.3
+            state: absent
             label: foreman33
             content_type: yum
             download_policy: on_demand
             url: https://yum.theforeman.org/releases/3.3/el8/x86_64/
           - name: Foreman plugins 3.3
+            state: absent
             label: foreman33-plugins
             content_type: yum
             download_policy: on_demand
             url: https://yum.theforeman.org/plugins/3.3/el8/x86_64/
+          - name: Foreman 3.4
+            label: foreman34
+            content_type: yum
+            download_policy: on_demand
+            url: https://yum.theforeman.org/releases/3.4/el8/x86_64/
+          - name: Foreman plugins 3.4
+            label: foreman34-plugins
+            content_type: yum
+            download_policy: on_demand
+            url: https://yum.theforeman.org/plugins/3.4/el8/x86_64/
           - name: Katello 4.5
+            state: absent
             label: katello45
             content_type: yum
             download_policy: on_demand
             url: https://yum.theforeman.org/katello/4.5/katello/el8/x86_64/
+          - name: Katello 4.6
+            label: katello46
+            content_type: yum
+            download_policy: on_demand
+            url: https://yum.theforeman.org/katello/4.6/katello/el8/x86_64/
           - name: 'Candlepin: an open source entitlement management system.'
             label: katello45-candlepin
             content_type: yum
