@@ -15,7 +15,8 @@ galaxy_info:
     - radiorabe
     - foreman
 dependencies:
-  - theforeman.foreman
-  - radiorabe.foreman
-  - radiorabe.base
-  - radiorabe.core
+  - radiorabe.common.base
+  - radiorabe.common.core
+  - radiorabe.foreman.realms
+  - theforeman.foreman.compute_resources
+  - theforeman.foreman.domains

@@ -15,5 +15,6 @@ galaxy_info:
     - radiorabe
     - foreman
 dependencies:
-  - theforeman.foreman
-  - radiorabe.foreman
+  - radiorabe.foreman.architectures
+  - radiorabe.foreman.installation_mediums
+  - theforeman.foreman.operatingsystems

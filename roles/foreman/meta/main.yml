@@ -15,7 +15,12 @@ galaxy_info:
     - radiorabe
     - foreman
 dependencies:
-  - theforeman.foreman
-  - radiorabe.foreman
-  - radiorabe.base
-  - radiorabe.core
+  - radiorabe.common.base
+  - radiorabe.common.core
+  - radiorabe.foreman.job_templates
+  - radiorabe.foreman.locations
+  - radiorabe.foreman.roles
+  - theforeman.foreman.global_parameters
+  - theforeman.foreman.host_groups
+  - theforeman.foreman.organizations
+  - theforeman.foreman.settings
