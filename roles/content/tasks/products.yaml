@@ -95,10 +95,38 @@
             label: cs8s_nfv
             url: http://mirror.centos.org/centos/8-stream/NFV/x86_64/os/
             download_policy: on_demand
-          - name: CentOS Stream 8 Foreman client 3.3 x86_64
+          - name: CentOS Stream 8 Foreman client 3.4 x86_64
             content_type: yum
-            label: cs8s_foreman33_client
-            url: https://yum.theforeman.org/client/3.3/el8/x86_64/
+            label: cs8s_foreman34_client
+            url: https://yum.theforeman.org/client/3.4/el8/x86_64/
+            download_policy: on_demand
+      - name: CentOS 7
+        label: c7
+        repositories:
+          - name: CentOS 7 OS x86_64
+            content_type: yum
+            label: c7_os
+            url: http://mirror.centos.org/centos/7/os/x86_64/
+            download_policy: on_demand
+          - name: CentOS 7 Extras x86_64
+            content_type: yum
+            label: c7_extras
+            url: http://mirror.centos.org/centos/7/extras/x86_64/
+            download_policy: on_demand
+          - name: CentOS 7 Updates x86_64
+            content_type: yum
+            label: c7_updates
+            url: http://mirror.centos.org/centos/7/updates/x86_64/
+            download_policy: on_demand
+          - name: Extra Packages for Enterprise Linux 7 x86_64
+            content_type: yum
+            label: c7_epel
+            url: http://download.fedoraproject.org/pub/epel/7/x86_64/
+            download_policy: on_deman
+          - name: CentOS 7 Foreman client 3.4 x86_64
+            content_type: yum
+            label: c7_foreman34_client
+            url: https://yum.theforeman.org/client/3.4/el7/x86_64/
             download_policy: on_demand
       - name: Foreman
         label: theforeman
