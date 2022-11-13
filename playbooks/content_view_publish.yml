@@ -1,0 +1,13 @@
+- name: 'RaBe Foreman Playbook : Content View Publish'
+  hosts: all
+  gather_facts: false
+  collections:
+    - theforeman.foreman
+  tasks:
+    - name: 'RaBe Foreman Playbook : Foreman : Content View Publish'
+      ansible.builtin.include_role:
+        name: theforeman.foreman.content_view_publish
+      vars:
+        foreman_content_views:
+          - AlmaLinux 9 x86_64
+          - CentOS 7 x86_64
