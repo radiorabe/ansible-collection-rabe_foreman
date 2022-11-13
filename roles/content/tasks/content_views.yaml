@@ -18,6 +18,10 @@
             product: CentOS 7
           - name: CentOS 7 Extras x86_64
             product: CentOS 7
+          - name: CentOS 7 FastTrack x86_64
+            product: CentOS 7
+          - name: CentOS 7 Plus x86_64
+            product: CentOS 7
           - name: CentOS 7 Updates x86_64
             product: CentOS 7
           - name: Extra Packages for Enterprise Linux 7 x86_64

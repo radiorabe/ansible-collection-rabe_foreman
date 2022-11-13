@@ -113,10 +113,30 @@
             label: c7_extras
             url: http://mirror.centos.org/centos/7/extras/x86_64/
             download_policy: on_demand
+          - name: CentOS 7 FastTrack x86_64
+            content_type: yum
+            label: c7_fasttrack
+            url: http://mirror.centos.org/centos/7/fasttrack/x86_64/
+            download_policy: on_demand
+          - name: CentOS 7 Plus x86_64
+            content_type: yum
+            label: c7_plus
+            url: http://mirror.centos.org/centos/7/plus/x86_64/
+            download_policy: on_demand
           - name: CentOS 7 Updates x86_64
             content_type: yum
             label: c7_updates
             url: http://mirror.centos.org/centos/7/updates/x86_64/
+            download_policy: on_demand
+          - name: CentOS 7 SCLo-rh x86_64
+            content_type: yum
+            label: c7_sclorh
+            url: http://mirror.centos.org/centos/7/sclo/x86_64/rh/
+            download_policy: on_demand
+          - name: CentOS 7 SCLo-sclo x86_64
+            content_type: yum
+            label: c7_sclo
+            url: http://mirror.centos.org/centos/7/sclo/x86_64/sclo/
             download_policy: on_demand
           - name: Extra Packages for Enterprise Linux 7 x86_64
             content_type: yum
@@ -127,6 +147,16 @@
             content_type: yum
             label: c7_foreman34_client
             url: https://yum.theforeman.org/client/3.4/el7/x86_64/
+            download_policy: on_demand
+          - name: CentOS 7 Storage GlusterFS 3.7 x86_64
+            content_type: yum
+            label: c7_storage_glusterfs3
+            url: https://download.gluster.org/pub/gluster/glusterfs/01.old-releases/3.7/LATEST/EPEL.repo/epel-7/x86_64/
+            download_policy: on_demand
+          - name: CentOS 7 Storage GlusterFS 10 x86_64
+            content_type: yum
+            label: c7_storage_glusterfs10
+            url: http://mirror.centos.org/centos/7/storage/x86_64/gluster-10/
             download_policy: on_demand
       - name: Foreman
         label: theforeman
