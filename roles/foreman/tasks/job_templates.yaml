@@ -840,6 +840,15 @@
             kind: job_template
             model: JobTemplate
             file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/ansible_collections_-_install_from_galaxy.erb'
+          - name: RaBe Foreman - Publish Content View
+            state: present
+            job_category: RaBe Foreman
+            description_format: RaBe Foreman - Publish Content View
+            snippet: false
+            provider_type: Ansible
+            kind: job_template
+            model: JobTemplate
+            file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/rabe_foreman_publish_content_view.erb'
       when: not ansible_check_mode
   always:
     - name: 'RaBe Foreman Config : Lock All Job Templates'
