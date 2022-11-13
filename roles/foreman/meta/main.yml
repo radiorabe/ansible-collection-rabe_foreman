@@ -14,13 +14,3 @@ galaxy_info:
   galaxy_tags:
     - radiorabe
     - foreman
-dependencies:
-  - radiorabe.common.base
-  - radiorabe.common.core
-  - radiorabe.foreman.job_templates
-  - radiorabe.foreman.locations
-  - radiorabe.foreman.roles
-  - theforeman.foreman.global_parameters
-  - theforeman.foreman.host_groups
-  - theforeman.foreman.organizations
-  - theforeman.foreman.settings
