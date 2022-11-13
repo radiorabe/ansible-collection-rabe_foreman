@@ -121,7 +121,7 @@
           - name: CentOS 7 Plus x86_64
             content_type: yum
             label: c7_plus
-            url: http://mirror.centos.org/centos/7/plus/x86_64/
+            url: http://mirror.centos.org/centos/7/centosplus/x86_64/
             download_policy: on_demand
           - name: CentOS 7 Updates x86_64
             content_type: yum
