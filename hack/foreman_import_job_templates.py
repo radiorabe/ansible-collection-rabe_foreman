@@ -250,6 +250,17 @@ def main(template_paths: list[str]):
             "model": "JobTemplate",
             "file_name": "{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/ansible_collections_-_install_from_galaxy.erb",  # noqa: E501
         },
+        {
+            _FIELD_NAME: "RaBe Foreman - Publish Content View",
+            _FIELD_STATE: _STATE_PRESENT,
+            "job_category": "RaBe Foreman",
+            "description_format": "RaBe Foreman - Publish Content View",
+            "snippet": False,
+            "provider_type": "Ansible",
+            "kind": "job_template",
+            "model": "JobTemplate",
+            "file_name": "{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/rabe_foreman_publish_content_view.erb",  # noqa: E501
+        },
     ]  # noqa: T801
     final_data = [
         {
