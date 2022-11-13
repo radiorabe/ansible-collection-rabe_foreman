@@ -849,6 +849,23 @@
             kind: job_template
             model: JobTemplate
             file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/rabe_foreman_publish_content_view.erb'
+          - name: RaBe Foreman - Promote Content Views to Prod
+            state: present
+            job_category: RaBe Foreman
+            description_format: RaBe Foreman - Promote Content Views to Prod
+            snippet: false
+            template_inputs:
+              - name: lifecycle_environment
+                required: true
+                input_type: user
+                description: |-
+                  Target Environment.
+                advanced: true
+                default: Prod
+            provider_type: Ansible
+            kind: job_template
+            model: JobTemplate
+            file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/rabe_foreman_promote_content_views.erb'
       when: not ansible_check_mode
   always:
     - name: 'RaBe Foreman Config : Lock All Job Templates'

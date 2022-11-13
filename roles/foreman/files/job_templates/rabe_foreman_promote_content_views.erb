@@ -1,0 +1,3 @@
+<%= render_template('Ansible - Run playbook', :playbook => '- import_playbook: radiorabe.rabe_foreman.content_view_promote
+  vars:
+    rabe_foreman_lifecycle_environments: [' + input("lifecycle_environment") + ']') %>

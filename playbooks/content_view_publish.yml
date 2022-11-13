@@ -3,11 +3,13 @@
   gather_facts: false
   collections:
     - theforeman.foreman
+  vars:
+    rabe_foreman_content_views:
+      - AlmaLinux 9 x86_64
+      - CentOS 7 x86_64
   tasks:
     - name: 'RaBe Foreman Playbook : Foreman : Content View Publish'
       ansible.builtin.include_role:
         name: theforeman.foreman.content_view_publish
       vars:
-        foreman_content_views:
-          - AlmaLinux 9 x86_64
-          - CentOS 7 x86_64
+        foreman_content_views: "{{ rabe_foreman_content_views }}"
