@@ -14,4 +14,8 @@ galaxy_info:
   galaxy_tags:
     - radiorabe
     - foreman
-dependencies: []
+dependencies:
+  - theforeman.foreman
+  - radiorabe.foreman
+  - radiorabe.base
+  - radiorabe.core

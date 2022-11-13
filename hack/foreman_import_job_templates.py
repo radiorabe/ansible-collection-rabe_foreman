@@ -261,6 +261,27 @@ def main(template_paths: list[str]):
             "model": "JobTemplate",
             "file_name": "{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/rabe_foreman_publish_content_view.erb",  # noqa: E501
         },
+        {
+            _FIELD_NAME: "RaBe Foreman - Promote Content Views to Prod",
+            _FIELD_STATE: _STATE_PRESENT,
+            "job_category": "RaBe Foreman",
+            "description_format": "RaBe Foreman - Promote Content Views to Prod",  # noqa: E501
+            "snippet": False,
+            "template_inputs": [
+                {
+                    "name": "lifecycle_environment",
+                    "required": True,
+                    "input_type": "user",
+                    "description": LS("Target Environment."),  # noqa: E501
+                    "advanced": True,
+                    "default": "Prod"
+                },
+            ],
+            "provider_type": "Ansible",
+            "kind": "job_template",
+            "model": "JobTemplate",
+            "file_name": "{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/rabe_foreman_promote_content_views.erb",  # noqa: E501
+        },
     ]  # noqa: T801
     final_data = [
         {

@@ -1,0 +1,40 @@
+---
+- name: 'RaBe Foreman Playbooks : Content View Promote'
+  hosts: all
+  gather_facts: false
+  collections:
+    - theforeman.foreman
+  vars:
+    rabe_foreman_content_views:
+      - AlmaLinux 9 x86_64
+      - CentOS 7 x86_64
+    rabe_foreman_lifecycle_environments:
+      - Library
+      - Dev
+      - Test
+  tasks:
+    - name: 'RaBe Foreman Playbook : Content Views : Gather Info'
+      theforeman.foreman.content_view_version_info:
+        username: "{{ foreman_username | default(omit) }}"
+        password: "{{ foreman_password | default(omit) }}"
+        server_url: "{{ foreman_server_url | default(omit) }}"
+        validate_certs: "{{ foreman_validate_certs | default(omit) }}"
+        organization: "{{ foreman_organization }}"
+        content_view: "{{ content_view }}"
+      loop_control:
+        loop_var: content_view
+      with_items: "{{ rabe_foreman_content_views }}"
+      register: content_view_info
+    - name: "RaBe Foreman Playbook : Content Views : Promote to target environments"
+      theforeman.foreman.content_view_version:
+        username: "{{ foreman_username | default(omit) }}"
+        password: "{{ foreman_password | default(omit) }}"
+        server_url: "{{ foreman_server_url | default(omit) }}"
+        validate_certs: "{{ foreman_validate_certs | default(omit) }}"
+        organization: "{{ foreman_organization }}"
+        content_view: "{{ content_view.content_view }}"
+        version: "{{ content_view.content_view_versions[0].version }}"
+        lifecycle_environments: "{{ rabe_foreman_lifecycle_environments }}"
+      with_items: '{{ content_view_info.results }}'
+      loop_control:
+        loop_var: content_view
