@@ -14,7 +14,3 @@ galaxy_info:
   galaxy_tags:
     - radiorabe
     - foreman
-dependencies:
-  - radiorabe.foreman.architectures
-  - radiorabe.foreman.installation_mediums
-  - theforeman.foreman.operatingsystems

@@ -14,8 +14,3 @@ galaxy_info:
   galaxy_tags:
     - radiorabe
     - foreman
-dependencies:
-  - theforeman.foreman.content_views
-  - theforeman.foreman.lifecycle_environments
-  - theforeman.foreman.repositories
-  - theforeman.foreman.sync_plans
