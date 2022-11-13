@@ -14,3 +14,8 @@
   tags:
     - role::rabe_foreman.content
     - role::rabe_foreman.content:lifecycle_environments
+- name: 'RaBe Foreman Content : Content Views'
+  ansible.builtin.import_tasks: content_views.yaml
+  tags:
+    - role::rabe_foreman.content
+    - role::rabe_foreman.content:content_views

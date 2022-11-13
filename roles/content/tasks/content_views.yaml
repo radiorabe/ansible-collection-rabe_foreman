@@ -1,0 +1,26 @@
+---
+- name: 'RaBe Foreman Content : Configure Content Views'
+  ansible.builtin.include_role:
+    name: theforeman.foreman.content_views
+  vars:
+    foreman_content_views:
+      - name: AlmaLinux 9 x86_64
+        repositories:
+          - name: AlmaLinux 9 BaseOS x86_64
+            product: AlmaLinux 9
+          - name: AlmaLinux 9 AppStream x86_64
+            product: AlmaLinux 9
+          - name: AlmaLinux 9 Extras x86_64
+            product: AlmaLinux 9
+      - name: CentOS 7 x86_64
+        repositories:
+          - name: CentOS 7 OS x86_64
+            product: CentOS 7
+          - name: CentOS 7 Extras x86_64
+            product: CentOS 7
+          - name: CentOS 7 Updates x86_64
+            product: CentOS 7
+          - name: Extra Packages for Enterprise Linux 7 x86_64
+            product: CentOS 7
+          - name: CentOS 7 Foreman client 3.4 x86_64
+            product: CentOS 7
