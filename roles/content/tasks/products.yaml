@@ -122,7 +122,7 @@
             content_type: yum
             label: c7_epel
             url: http://download.fedoraproject.org/pub/epel/7/x86_64/
-            download_policy: on_deman
+            download_policy: on_demand
           - name: CentOS 7 Foreman client 3.4 x86_64
             content_type: yum
             label: c7_foreman34_client
