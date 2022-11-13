@@ -9,6 +9,7 @@
         sync_date: 2020-11-07 00:00:00 UTC
         products:
           - AlmaLinux 9
+          - CentOS 7
           - CentOS 8 Stream
           - Foreman
           - RaBe Ansible
