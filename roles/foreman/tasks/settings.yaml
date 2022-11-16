@@ -18,3 +18,8 @@
         value: false
       - name: login_text
         value: '{{ radiorabe_core_admin_name }} : Foreman'
+      # We don't currently schedule regular ansible runs and this makes
+      # more sense than high ansible_interval and outofsync_interval
+      # settings. We'll see how not setting a high outofsync value goes.
+      - name: ansible_out_of_sync_disabled
+        value: true
