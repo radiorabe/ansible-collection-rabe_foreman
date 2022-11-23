@@ -11,6 +11,7 @@
     state: present
 - name: 'RaBe Foreman Infrastructure : Bootdisk : Copy efi'
   ansible.builtin.copy:
+    remote_src: true
     src: "/boot/efi/EFI/centos/{{ item }}"
     dest: "/var/lib/foreman/bootdisk/{{ item }}"
     owner: foreman
