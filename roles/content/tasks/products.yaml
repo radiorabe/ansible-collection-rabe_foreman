@@ -143,11 +143,6 @@
             label: c7_epel
             url: http://download.fedoraproject.org/pub/epel/7/x86_64/
             download_policy: on_demand
-          - name: CentOS 7 Foreman client 3.4 x86_64
-            content_type: yum
-            label: c7_foreman34_client
-            url: https://yum.theforeman.org/client/3.4/el7/x86_64/
-            download_policy: on_demand
           - name: CentOS 7 Storage GlusterFS 3.7 x86_64
             content_type: yum
             label: c7_storage_glusterfs3
@@ -234,3 +229,11 @@
                 name: radiorabe.foreman
               - src: radiorabe.rabe_foreman
                 name: radiorabe.rabe_foreman
+      - name: Foreman Client
+        label: theforeman
+        repositories:
+          - name: EL8 Foreman Client 3.4 x86_64
+            content_type: yum
+            label: foreman34_client
+            url: https://yum.theforeman.org/client/3.4/el8/x86_64/
+            download_policy: on_demand
