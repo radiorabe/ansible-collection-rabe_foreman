@@ -230,7 +230,7 @@
               - src: radiorabe.rabe_foreman
                 name: radiorabe.rabe_foreman
       - name: Foreman Client
-        label: theforeman
+        label: theforemanclient
         repositories:
           - name: EL8 Foreman Client 3.4 x86_64
             content_type: yum
