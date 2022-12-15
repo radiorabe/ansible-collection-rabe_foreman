@@ -19,3 +19,8 @@
   tags:
     - role::rabe_foreman.content
     - role::rabe_foreman.content:content_views
+- name: 'RaBe Foreman Content : Activation Keys'
+  ansible.builtin.import_tasks: activation_keys.yaml
+  tags:
+    - role::rabe_foreman.content
+    - role::rabe_foreman.content:activation_keys

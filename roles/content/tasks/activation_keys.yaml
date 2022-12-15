@@ -1,0 +1,30 @@
+---
+- name: 'RaBe Foreman Content : Configure Activation Keys'
+  ansible.builtin.include_role:
+    name: theforeman.foreman.activation_keys
+  vars:
+    foreman_activation_keys:
+      - name: "AlmaLinux 9 Library"
+        lifecycle_environment: "Library"
+        content_view: "AlmaLinux 9 x86_64"
+      - name: "AlmaLinux 9 Dev"
+        lifecycle_environment: "Dev"
+        content_view: "AlmaLinux 9 x86_64"
+      - name: "AlmaLinux 9 Test"
+        lifecycle_environment: "Test"
+        content_view: "AlmaLinux 9 x86_64"
+      - name: "AlmaLinux 9 Prod"
+        lifecycle_environment: Prod"
+        content_view: "AlmaLinux 9 x86_64"
+      - name: "CentOS 7 Library"
+        lifecycle_environment: "Library"
+        content_view: "CentOS 7 x86_64"
+      - name: "CentOS 7 Dev"
+        lifecycle_environment: "Dev"
+        content_view: "CentOS 7 x86_64"
+      - name: "CentOS 7 Test"
+        lifecycle_environment: "Test"
+        content_view: "CentOS 7 x86_64"
+      - name: "CentOS 7 Prod"
+        lifecycle_environment: "Prod"
+        content_view: "CentOS 7 x86_64"
