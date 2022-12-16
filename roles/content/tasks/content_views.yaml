@@ -28,5 +28,5 @@
             product: CentOS 7
           - name: Extra Packages for Enterprise Linux 7 x86_64
             product: CentOS 7
-          - name: EL8 Foreman client 3.4 x86_64
+          - name: EL8 Foreman Client 3.4 x86_64
             product: Foreman Client
