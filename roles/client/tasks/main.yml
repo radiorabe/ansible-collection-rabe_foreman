@@ -1,0 +1,6 @@
+---
+- name: 'RaBe Foreman Client : Yum : Plugin Config : Disable System Repos'
+  ansible.builtin.lineinfile:
+    path: /etc/yum/pluginconf.d/subscription-manager.conf
+    regexp: '^disable_system_repos='
+    line: 'disable_system_repos=1'
