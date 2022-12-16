@@ -12,7 +12,7 @@
             product: AlmaLinux 9
           - name: AlmaLinux 9 Extras x86_64
             product: AlmaLinux 9
-          - name: EL8 Foreman client 3.4 x86_64
+          - name: EL8 Foreman Client 3.4 x86_64
             product: Foreman Client
       - name: CentOS 7 x86_64
         repositories:
