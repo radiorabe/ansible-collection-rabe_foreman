@@ -30,3 +30,13 @@
             product: CentOS 7
           - name: EL8 Foreman Client 3.4 x86_64
             product: Foreman Client
+      - name: Zabbix 6.0 Agent EL9
+        repositories:
+          - name: Zabbix 6.0 Official Repository - EL9 - x86_64
+            product: Zabbix 6.0 (LTS) EL9
+        filters:
+          - name: Zabbix 6.0 Agent EL9
+            filter_state: present
+            filter_type: rpm
+            package_name: zabbix-agent
+            inclusion: true
