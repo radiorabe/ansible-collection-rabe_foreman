@@ -8,11 +8,16 @@
         interval: weekly
         sync_date: 2020-11-07 00:00:00 UTC
         products:
-          - AlmaLinux 9
           - CentOS 7
           - CentOS 8 Stream
+          - AlmaLinux 9
           - Foreman
           - Foreman Client
           - RaBe Ansible
           - Extra Packages for Enterprise Linux 9
+          - Foreman Client 3.4 EL7
+          - Foreman Client 3.4 EL8
+          - Foreman Client 3.4 EL9
+          - Zabbix 6.0 (LTS) EL7
+          - Zabbix 6.0 (LTS) EL8
           - Zabbix 6.0 (LTS) EL9

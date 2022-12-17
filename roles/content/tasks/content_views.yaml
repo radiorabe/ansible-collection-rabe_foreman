@@ -21,6 +21,8 @@
             product: CentOS 7
           - name: EL8 Foreman Client 3.4 x86_64
             product: Foreman Client
+          - name: Foreman Client 3.4 EL7 x86_64
+            product: Foreman Client
       - name: AlmaLinux 9 Base x86_64
         repositories:
           - name: AlmaLinux 9 BaseOS x86_64
@@ -29,11 +31,33 @@
             product: AlmaLinux 9
           - name: AlmaLinux 9 Extras x86_64
             product: AlmaLinux 9
-          - name: EL8 Foreman Client 3.4 x86_64
+          - name: Foreman Client 3.4 EL9 x86_64
             product: Foreman Client
       # Next are all non os, but enterprise linux specific content views.
       # These will often be filtered to only contain packages we want in
       # our downstream composite views.
+      - name: Zabbix 6.0 Agent EL7 x86_64
+        repositories:
+          - name: Zabbix 6.0 Official Repository - EL7 - x86_64
+            product: Zabbix 6.0 (LTS) EL7
+        filters:
+          - name: zabbix-agent
+            filter_state: present
+            filter_type: rpm
+            rule_name: zabbix-agent
+            package_name: zabbix-agent
+            inclusion: true
+      - name: Zabbix 6.0 Agent EL8 x86_64
+        repositories:
+          - name: Zabbix 6.0 Official Repository - EL8 - x86_64
+            product: Zabbix 6.0 (LTS) EL8
+        filters:
+          - name: zabbix-agent
+            filter_state: present
+            filter_type: rpm
+            rule_name: zabbix-agent
+            package_name: zabbix-agent
+            inclusion: true
       - name: Zabbix 6.0 Agent EL9 x86_64
         repositories:
           - name: Zabbix 6.0 Official Repository - EL9 - x86_64
@@ -51,6 +75,8 @@
       - name: CentOS 7 x86_64
         components:
           - content_view: CentOS 7 Base x86_64
+            latest: true
+          - content_view: Zabbix 6.0 Agent EL7 x86_64
             latest: true
       - name: AlmaLinux 9 x86_64
         components:

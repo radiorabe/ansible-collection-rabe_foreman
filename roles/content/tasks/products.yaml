@@ -4,102 +4,7 @@
     name: theforeman.foreman.repositories
   vars:
     foreman_products:
-      - name: AlmaLinux 9
-        label: alma9
-        repositories:
-          - name: AlmaLinux 9 BaseOS x86_64
-            content_type: yum
-            label: alma9_baseos
-            url: https://repo.almalinux.org/almalinux/9/BaseOS/x86_64/os/
-            download_policy: on_demand
-          - name: AlmaLinux 9 AppStream x86_64
-            content_type: yum
-            label: alma9_appstream
-            url: https://repo.almalinux.org/almalinux/9/AppStream/x86_64/os/
-            download_policy: on_demand
-          - name: AlmaLinux 9 CRB x86_64
-            content_type: yum
-            label: alma9_crb
-            url: https://repo.almalinux.org/almalinux/9/CRB/x86_64/os/
-            download_policy: on_demand
-          - name: AlmaLinux 9 Extras x86_64
-            content_type: yum
-            label: alma9_extras
-            url: https://repo.almalinux.org/almalinux/9/extras/x86_64/os/
-            download_policy: on_demand
-          - name: AlmaLinux 9 HighAvailability x86_64
-            content_type: yum
-            label: alma9_ha
-            url: https://repo.almalinux.org/almalinux/9/HighAvailability/x86_64/os/
-            download_policy: on_demand
-          - name: AlmaLinux 9 NFV x86_64
-            content_type: yum
-            label: alma9_nfv
-            url: https://repo.almalinux.org/almalinux/9/NFV/x86_64/os/
-            download_policy: on_demand
-          - name: AlmaLinux 9 Plus x86_64
-            content_type: yum
-            label: alma9_plus
-            url: https://repo.almalinux.org/almalinux/9/plus/x86_64/os/
-            download_policy: on_demand
-          - name: AlmaLinux 9 ResilientStorage x86_64
-            content_type: yum
-            label: alma9_resilientstorage
-            url: https://repo.almalinux.org/almalinux/9/ResilientStorage/x86_64/os/
-            download_policy: on_demand
-          - name: AlmaLinux 9 RT x86_64
-            content_type: yum
-            label: alma9_rt
-            url: https://repo.almalinux.org/almalinux/9/RT/x86_64/os/
-            download_policy: on_demand
-      - name: CentOS 8 Stream
-        label: cs8s
-        repositories:
-          - name: CentOS Stream 8 BaseOS x86_64
-            content_type: yum
-            label: cs8s_baseos
-            url: http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/
-            download_policy: on_demand
-          - name: CentOS Stream 8 AppStream x86_64
-            content_type: yum
-            label: cs8s_appstream
-            url: http://mirror.centos.org/centos/8-stream/AppStream/x86_64/os/
-            download_policy: on_demand
-          - name: CentOS Stream 8 Extras x86_64
-            content_type: yum
-            label: cs8s_extras
-            url: http://mirror.centos.org/centos/8-stream/extras/x86_64/os/
-            download_policy: on_demand
-          - name: CentOS Stream 8 PowerTools x86_64
-            content_type: yum
-            label: cs8s_powertools
-            url: http://mirror.centos.org/centos/8-stream/PowerTools/x86_64/os/
-            download_policy: on_demand
-          - name: CentOS Stream 8 RealTime x86_64
-            content_type: yum
-            label: cs8s_rt
-            url: http://mirror.centos.org/centos/8-stream/RT/x86_64/os/
-            download_policy: on_demand
-          - name: CentOS Stream 8 HighAvailability x86_64
-            content_type: yum
-            label: cs8s_ha
-            url: http://mirror.centos.org/centos/8-stream/HighAvailability/x86_64/os/
-            download_policy: on_demand
-          - name: CentOS Stream 8 ResilientStorage x86_64
-            content_type: yum
-            label: cs8s_resilientstorage
-            url: http://mirror.centos.org/centos/8-stream/ResilientStorage/x86_64/os/
-            download_policy: on_demand
-          - name: CentOS Stream 8 NFV x86_64
-            content_type: yum
-            label: cs8s_nfv
-            url: http://mirror.centos.org/centos/8-stream/NFV/x86_64/os/
-            download_policy: on_demand
-          - name: CentOS Stream 8 Foreman client 3.4 x86_64
-            content_type: yum
-            label: cs8s_foreman34_client
-            url: https://yum.theforeman.org/client/3.4/el8/x86_64/
-            download_policy: on_demand
+      # Products for all base operating systems get defined first.
       - name: CentOS 7
         label: c7
         repositories:
@@ -153,6 +58,104 @@
             label: c7_storage_glusterfs10
             url: http://mirror.centos.org/centos/7/storage/x86_64/gluster-10/
             download_policy: on_demand
+      - name: CentOS 8 Stream
+        label: cs8s
+        repositories:
+          - name: CentOS Stream 8 BaseOS x86_64
+            content_type: yum
+            label: cs8s_baseos
+            url: http://mirror.centos.org/centos/8-stream/BaseOS/x86_64/os/
+            download_policy: on_demand
+          - name: CentOS Stream 8 AppStream x86_64
+            content_type: yum
+            label: cs8s_appstream
+            url: http://mirror.centos.org/centos/8-stream/AppStream/x86_64/os/
+            download_policy: on_demand
+          - name: CentOS Stream 8 Extras x86_64
+            content_type: yum
+            label: cs8s_extras
+            url: http://mirror.centos.org/centos/8-stream/extras/x86_64/os/
+            download_policy: on_demand
+          - name: CentOS Stream 8 PowerTools x86_64
+            content_type: yum
+            label: cs8s_powertools
+            url: http://mirror.centos.org/centos/8-stream/PowerTools/x86_64/os/
+            download_policy: on_demand
+          - name: CentOS Stream 8 RealTime x86_64
+            content_type: yum
+            label: cs8s_rt
+            url: http://mirror.centos.org/centos/8-stream/RT/x86_64/os/
+            download_policy: on_demand
+          - name: CentOS Stream 8 HighAvailability x86_64
+            content_type: yum
+            label: cs8s_ha
+            url: http://mirror.centos.org/centos/8-stream/HighAvailability/x86_64/os/
+            download_policy: on_demand
+          - name: CentOS Stream 8 ResilientStorage x86_64
+            content_type: yum
+            label: cs8s_resilientstorage
+            url: http://mirror.centos.org/centos/8-stream/ResilientStorage/x86_64/os/
+            download_policy: on_demand
+          - name: CentOS Stream 8 NFV x86_64
+            content_type: yum
+            label: cs8s_nfv
+            url: http://mirror.centos.org/centos/8-stream/NFV/x86_64/os/
+            download_policy: on_demand
+          - name: CentOS Stream 8 Foreman client 3.4 x86_64
+            content_type: yum
+            label: cs8s_foreman34_client
+            url: https://yum.theforeman.org/client/3.4/el8/x86_64/
+            download_policy: on_demand
+      - name: AlmaLinux 9
+        label: alma9
+        repositories:
+          - name: AlmaLinux 9 BaseOS x86_64
+            content_type: yum
+            label: alma9_baseos
+            url: https://repo.almalinux.org/almalinux/9/BaseOS/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 9 AppStream x86_64
+            content_type: yum
+            label: alma9_appstream
+            url: https://repo.almalinux.org/almalinux/9/AppStream/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 9 CRB x86_64
+            content_type: yum
+            label: alma9_crb
+            url: https://repo.almalinux.org/almalinux/9/CRB/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 9 Extras x86_64
+            content_type: yum
+            label: alma9_extras
+            url: https://repo.almalinux.org/almalinux/9/extras/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 9 HighAvailability x86_64
+            content_type: yum
+            label: alma9_ha
+            url: https://repo.almalinux.org/almalinux/9/HighAvailability/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 9 NFV x86_64
+            content_type: yum
+            label: alma9_nfv
+            url: https://repo.almalinux.org/almalinux/9/NFV/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 9 Plus x86_64
+            content_type: yum
+            label: alma9_plus
+            url: https://repo.almalinux.org/almalinux/9/plus/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 9 ResilientStorage x86_64
+            content_type: yum
+            label: alma9_resilientstorage
+            url: https://repo.almalinux.org/almalinux/9/ResilientStorage/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 9 RT x86_64
+            content_type: yum
+            label: alma9_rt
+            url: https://repo.almalinux.org/almalinux/9/RT/x86_64/os/
+            download_policy: on_demand
+      # The Foreman product is here for safe-keeping but not currently used anywhere (ie. Foreman
+      # does not manage it's own content (yet?)).
       - name: Foreman
         label: theforeman
         repositories:
@@ -214,6 +217,7 @@
             content_type: yum
             download_policy: on_demand
             url: http://yum.puppetlabs.com/puppet7/el/8/x86_64/
+      # A copy of our Ansible collections for safe-keeping.
       - name: RaBe Ansible
         label: rabe_ansible
         repositories:
@@ -229,14 +233,7 @@
                 name: radiorabe.foreman
               - src: radiorabe.rabe_foreman
                 name: radiorabe.rabe_foreman
-      - name: Foreman Client
-        label: theforemanclient
-        repositories:
-          - name: EL8 Foreman Client 3.4 x86_64
-            content_type: yum
-            label: foreman34_client
-            url: https://yum.theforeman.org/client/3.4/el8/x86_64/
-            download_policy: on_demand
+      # We sync some extra repos like EPEL.
       - name: Extra Packages for Enterprise Linux 9
         label: epel9
         repositories:
@@ -244,6 +241,58 @@
             content_type: yum
             label: epel9
             url: https://download-ib01.fedoraproject.org/pub/epel/9/x86_64
+            download_policy: on_demand
+      # All of our distros should have access to foreman client tooling.
+      - name: Foreman Client 3.4 EL7
+        label: foremancliente34el7
+        repositories:
+          - name: Foreman Client 3.4 EL7 x86_64
+            content_type: yum
+            label: foreman34el7_client
+            url: https://yum.theforeman.org/client/3.4/el7/x86_64/
+            download_policy: on_demand
+      - name: Foreman Client 3.4 EL8
+        label: foremancliente34el8
+        repositories:
+          - name: Foreman Client 3.4 EL8 x86_64
+            content_type: yum
+            label: foreman34el8_client
+            url: https://yum.theforeman.org/client/3.4/el8/x86_64/
+            download_policy: on_demand
+      - name: Foreman Client EL9
+        label: foremanclientel9
+        repositories:
+          - name: Foreman Client 3.4 EL9 x86_64
+            content_type: yum
+            label: foreman34el9_client
+            url: https://yum.theforeman.org/client/3.4/el9/x86_64/
+            download_policy: on_demand
+      # Modern(ish) Zabbix packages for all of our supported EL releases.
+      - name: Zabbix 6.0 (LTS) EL7
+        label: zabbix60el8
+        repositories:
+          - name: Zabbix 6.0 Official Repository - EL7 - x86_64
+            content_type: yum
+            label: zabbix60el7
+            url: https://repo.zabbix.com/zabbix/6.0/rhel/7/x86_64/
+            download_policy: on_demand
+          - name: Zabbix 6.0 Official Repository (non-supported) - EL7 - x86_64
+            content_type: yum
+            label: zabbix60el7_unsupported
+            url: https://repo.zabbix.com/non-supported/rhel/7/x86_64/
+            download_policy: on_demand
+      - name: Zabbix 6.0 (LTS) EL8
+        label: zabbix60el8
+        repositories:
+          - name: Zabbix 6.0 Official Repository - EL8 - x86_64
+            content_type: yum
+            label: zabbix60el8
+            url: https://repo.zabbix.com/zabbix/6.0/rhel/8/x86_64/
+            download_policy: on_demand
+          - name: Zabbix 6.0 Official Repository (non-supported) - EL8 - x86_64
+            content_type: yum
+            label: zabbix60el8_unsupported
+            url: https://repo.zabbix.com/non-supported/rhel/8/x86_64/
             download_policy: on_demand
       - name: Zabbix 6.0 (LTS) EL9
         label: zabbix60
