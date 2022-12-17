@@ -4,16 +4,7 @@
     name: theforeman.foreman.content_views
   vars:
     foreman_content_views:
-      - name: AlmaLinux 9 Base x86_64
-        repositories:
-          - name: AlmaLinux 9 BaseOS x86_64
-            product: AlmaLinux 9
-          - name: AlmaLinux 9 AppStream x86_64
-            product: AlmaLinux 9
-          - name: AlmaLinux 9 Extras x86_64
-            product: AlmaLinux 9
-          - name: EL8 Foreman Client 3.4 x86_64
-            product: Foreman Client
+      # First, we define some views for all of our base repos
       - name: CentOS 7 Base x86_64
         repositories:
           - name: CentOS 7 OS x86_64
@@ -30,6 +21,19 @@
             product: CentOS 7
           - name: EL8 Foreman Client 3.4 x86_64
             product: Foreman Client
+      - name: AlmaLinux 9 Base x86_64
+        repositories:
+          - name: AlmaLinux 9 BaseOS x86_64
+            product: AlmaLinux 9
+          - name: AlmaLinux 9 AppStream x86_64
+            product: AlmaLinux 9
+          - name: AlmaLinux 9 Extras x86_64
+            product: AlmaLinux 9
+          - name: EL8 Foreman Client 3.4 x86_64
+            product: Foreman Client
+      # Next are all non os, but enterprise linux specific content views.
+      # These will often be filtered to only contain packages we want in
+      # our downstream composite views.
       - name: Zabbix 6.0 Agent EL9 x86_64
         repositories:
           - name: Zabbix 6.0 Official Repository - EL9 - x86_64
@@ -41,9 +45,16 @@
             rule_name: zabbix-agent
             package_name: zabbix-agent
             inclusion: true
+      # finally, we create composite views that combine base operating systems
+      # with any additional repos that are always part of an installation. These
+      # are also the content views that will have activation keys assigned.
+      - name: CentOS 7 x86_64
+        components:
+          - content_view: CentOS 7 Base x86_64
+            latest: true
       - name: AlmaLinux 9 x86_64
         components:
-          - name: AlmaLinux 9 Base x86_64
+          - content_view: AlmaLinux 9 Base x86_64
             latest: true
-          - name: Zabbix 6.0 Agent EL9 x86_64
+          - content_view: Zabbix 6.0 Agent EL9 x86_64
             latest: true
