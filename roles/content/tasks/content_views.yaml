@@ -22,7 +22,7 @@
           - name: EL8 Foreman Client 3.4 x86_64
             product: Foreman Client
           - name: Foreman Client 3.4 EL7 x86_64
-            product: Foreman Client
+            product: Foreman Client 3.4 EL7
       - name: AlmaLinux 9 Base x86_64
         repositories:
           - name: AlmaLinux 9 BaseOS x86_64
@@ -32,7 +32,7 @@
           - name: AlmaLinux 9 Extras x86_64
             product: AlmaLinux 9
           - name: Foreman Client 3.4 EL9 x86_64
-            product: Foreman Client
+            product: Foreman Client 3.4 EL9
       # Next are all non os, but enterprise linux specific content views.
       # These will often be filtered to only contain packages we want in
       # our downstream composite views.
