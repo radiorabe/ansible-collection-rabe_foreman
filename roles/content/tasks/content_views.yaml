@@ -4,7 +4,7 @@
     name: theforeman.foreman.content_views
   vars:
     foreman_content_views:
-      - name: AlmaLinux 9 x86_64
+      - name: AlmaLinux 9 Base x86_64
         repositories:
           - name: AlmaLinux 9 BaseOS x86_64
             product: AlmaLinux 9
@@ -14,7 +14,7 @@
             product: AlmaLinux 9
           - name: EL8 Foreman Client 3.4 x86_64
             product: Foreman Client
-      - name: CentOS 7 x86_64
+      - name: CentOS 7 Base x86_64
         repositories:
           - name: CentOS 7 OS x86_64
             product: CentOS 7
@@ -30,13 +30,20 @@
             product: CentOS 7
           - name: EL8 Foreman Client 3.4 x86_64
             product: Foreman Client
-      - name: Zabbix 6.0 Agent EL9
+      - name: Zabbix 6.0 Agent EL9 x86_64
         repositories:
           - name: Zabbix 6.0 Official Repository - EL9 - x86_64
             product: Zabbix 6.0 (LTS) EL9
         filters:
-          - name: Zabbix 6.0 Agent EL9
+          - name: zabbix-agent
             filter_state: present
             filter_type: rpm
+            rule_name: zabbix-agent
             package_name: zabbix-agent
             inclusion: true
+      - name: AlmaLinux 9 x86_64
+        components:
+          - name: AlmaLinux 9 Base x86_64
+            latest: true
+          - name: Zabbix 6.0 Agent EL9 x86_64
+            latest: true
