@@ -259,7 +259,7 @@
             label: foreman34el8_client
             url: https://yum.theforeman.org/client/3.4/el8/x86_64/
             download_policy: on_demand
-      - name: Foreman Client EL9
+      - name: Foreman Client 3.4 EL9
         label: foremanclientel9
         repositories:
           - name: Foreman Client 3.4 EL9 x86_64
@@ -269,7 +269,7 @@
             download_policy: on_demand
       # Modern(ish) Zabbix packages for all of our supported EL releases.
       - name: Zabbix 6.0 (LTS) EL7
-        label: zabbix60el8
+        label: zabbix60el7
         repositories:
           - name: Zabbix 6.0 Official Repository - EL7 - x86_64
             content_type: yum

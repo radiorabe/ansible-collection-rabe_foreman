@@ -1,6 +1,0 @@
-<% package_names = @host.package_names_for_job_template(
-  action: 'remove',
-  search: input('Packages search query')
-) -%>
-
-<%= render_template('Package Action - Script Default', :action => 'remove', :package => package_names.join(' ')) %>
