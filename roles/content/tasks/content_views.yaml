@@ -29,10 +29,24 @@
             product: AlmaLinux 9
           - name: AlmaLinux 9 AppStream x86_64
             product: AlmaLinux 9
+          - name: AlmaLinux 9 CRB x86_64
+            product: AlmaLinux 9
           - name: AlmaLinux 9 Extras x86_64
+            product: AlmaLinux 9
+          - name: AlmaLinux 9 HighAvailability x86_64
+            product: AlmaLinux 9
+          - name: AlmaLinux 9 NFV x86_64
+            product: AlmaLinux 9
+          - name: AlmaLinux 9 Plus x86_64
+            product: AlmaLinux 9
+          - name: AlmaLinux 9 ResilientStorage x86_64
+            product: AlmaLinux 9
+          - name: AlmaLinux 9 RT x86_64
             product: AlmaLinux 9
           - name: Foreman Client 3.4 EL9 x86_64
             product: Foreman Client 3.4 EL9
+          - name: Extra Packages for Enterprise Linux 9
+            product: Extra Packages for Enterprise Linux 9
       # Next are all non os, but enterprise linux specific content views.
       # These will often be filtered to only contain packages we want in
       # our downstream composite views.

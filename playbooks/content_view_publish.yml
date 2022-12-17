@@ -8,7 +8,10 @@
     rabe_foreman_content_views:
       - CentOS 7 Base x86_64
       - AlmaLinux 9 Base x86_64
+      - Zabbix 6.0 Agent EL7 x86_64
+      - Zabbix 6.0 Agent EL8 x86_64
       - Zabbix 6.0 Agent EL9 x86_64
+    rabe_foreman_composite_content_views:
       - CentOS 7 x86_64
       - AlmaLinux 9 x86_64
   tasks:
@@ -17,3 +20,8 @@
         name: theforeman.foreman.content_view_publish
       vars:
         foreman_content_views: "{{ rabe_foreman_content_views }}"
+    - name: 'RaBe Foreman Playbook : Foreman : Content View Publish (Composite)'
+      ansible.builtin.include_role:
+        name: theforeman.foreman.content_view_publish
+      vars:
+        foreman_content_views: "{{ rabe_foreman_composite_content_views }}"
