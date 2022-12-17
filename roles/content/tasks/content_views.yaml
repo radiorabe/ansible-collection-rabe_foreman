@@ -19,8 +19,6 @@
             product: CentOS 7
           - name: Extra Packages for Enterprise Linux 7 x86_64
             product: CentOS 7
-          - name: EL8 Foreman Client 3.4 x86_64
-            product: Foreman Client
           - name: Foreman Client 3.4 EL7 x86_64
             product: Foreman Client 3.4 EL7
       - name: AlmaLinux 9 Base x86_64
@@ -45,7 +43,7 @@
             product: AlmaLinux 9
           - name: Foreman Client 3.4 EL9 x86_64
             product: Foreman Client 3.4 EL9
-          - name: Extra Packages for Enterprise Linux 9
+          - name: Extra Packages for Enterprise Linux 9 x86_64
             product: Extra Packages for Enterprise Linux 9
       # Next are all non os, but enterprise linux specific content views.
       # These will often be filtered to only contain packages we want in

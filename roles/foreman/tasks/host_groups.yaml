@@ -19,6 +19,25 @@
         architecture: x86_64
         ansible_roles:
           - radiorabe.common.base
+        parameters:
+          - name: zabbix_agent_server
+            parameter_type: string
+            value: monitoring.service.int.rabe.ch
+          - name: zabbix_agent_serveractive
+            parameter_type: string
+            value: monitoring.service.int.rabe.ch
+          - name: zabbix_repo
+            parameter_type: string
+            value: other
+          - name: zabbix_agent_dont_detect_ip
+            parameter_type: boolean
+            value: true
+          - name: zabbix_install_pip_packages
+            parameter_type: boolean
+            value: false
+          - name: foreman_scap_client_server
+            parameter_type: string
+            value: foreman.service.int.rabe.ch
       - name: EL7
         description: EL7 configures our EL7 baseline.
         parent: RaBe Core/RaBe Base
