@@ -305,6 +305,16 @@
             label: foreman34el9_client
             url: https://yum.theforeman.org/client/3.4/el9/x86_64/
             download_policy: on_demand
+      # old zabbix for exiting el7 machines
+      - name: Zabbix 3.0 (LTS) EL7
+        label: zabbix30el7
+        repositories:
+          - name: Zabbix 3.0 Official Repository - EL7 - x86_64
+            content_type: yum
+            label: zabbix30el7
+            url: https://repo.zabbix.com/zabbix/3.0/rhel/7/x86_64/
+            download_policy: on_demand
+            auto_enabled: false
       # Modern(ish) Zabbix packages for all of our supported EL releases.
       - name: Zabbix 6.0 (LTS) EL7
         label: zabbix60el7

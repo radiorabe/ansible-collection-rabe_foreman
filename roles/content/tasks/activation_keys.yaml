@@ -1,30 +1,46 @@
 ---
+# TODO: figure out how disable repos by default and get rid of overrides here
 - name: 'RaBe Foreman Content : Configure Activation Keys'
   ansible.builtin.include_role:
     name: theforeman.foreman.activation_keys
   vars:
     foreman_activation_keys:
-      - name: "AlmaLinux 9 Library"
-        lifecycle_environment: "Library"
+      - name: "AlmaLinux 9"
+        lifecycle_environment: "Prod"
         content_view: "AlmaLinux 9 x86_64"
-      - name: "AlmaLinux 9 Dev"
-        lifecycle_environment: "Dev"
-        content_view: "AlmaLinux 9 x86_64"
-      - name: "AlmaLinux 9 Test"
-        lifecycle_environment: "Test"
-        content_view: "AlmaLinux 9 x86_64"
-      - name: "AlmaLinux 9 Prod"
-        lifecycle_environment: Prod"
-        content_view: "AlmaLinux 9 x86_64"
-      - name: "CentOS 7 Library"
-        lifecycle_environment: "Library"
-        content_view: "CentOS 7 x86_64"
-      - name: "CentOS 7 Dev"
-        lifecycle_environment: "Dev"
-        content_view: "CentOS 7 x86_64"
-      - name: "CentOS 7 Test"
-        lifecycle_environment: "Test"
-        content_view: "CentOS 7 x86_64"
-      - name: "CentOS 7 Prod"
+        content_overrides:
+          - label: RaBe_alma9_alma9_rt
+            override: disabled
+          - label: RaBe_alma9_alma9_resilientstorage
+            override: disabled
+          - label: RaBe_epel9_epel9
+            override: disabled
+          - label: RaBe_alma9_alma9_ha
+            override: disabled
+          - label: RaBe_alma9_alma9_plus
+            override: disabled
+          - label: RaBe_alma9_alma9_crb
+            override: disabled
+          - label: RaBe_alma9_alma9_nfv
+            override: disabled
+      - name: "CentOS 7"
         lifecycle_environment: "Prod"
         content_view: "CentOS 7 x86_64"
+        content_overrides:
+          - label: RaBe_c7_c7_fasttrack
+            override: disabled
+          - label: RaBe_c7_c7_plus
+            override: disabled
+          - label: RaBe_c7_c7_sclorh
+            override: disabled
+          - label: RaBe_c7_c7_sclo
+            override: disabled
+          - label: RaBe_c7_c7_storage_glusterfs3
+            override: disabled
+          - label: RaBe_c7_c7_storage_glusterfs10
+            override: disabled
+          - label: RaBe_epel7_epel7
+            override: disabled
+          # disable modern zabbix until we update our server
+          - label: RaBe_zabbix60el7_zabbix60el7
+            override: disabled
