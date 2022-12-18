@@ -35,7 +35,8 @@
             override: disabled
           - label: RaBe_c7_c7_sclo
             override: disabled
-          - label: RaBe_c7_c7_storage_glusterfs3
+          # disable both until end of migration
+          - label: RaBe_c7_c7_storage_glusterfs312
             override: disabled
           - label: RaBe_c7_c7_storage_glusterfs10
             override: disabled
@@ -43,4 +44,6 @@
             override: disabled
           # disable modern zabbix until we update our server
           - label: RaBe_zabbix60el7_zabbix60el7
+            override: disabled
+          - label: RaBe_zabbix60el7_unsupported
             override: disabled

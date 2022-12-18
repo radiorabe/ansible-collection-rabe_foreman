@@ -21,6 +21,8 @@
             product: CentOS 7
           - name: Foreman Client 3.4 EL7 x86_64
             product: Foreman Client 3.4 EL7
+          - name: Copr repo for rabe-zabbix x86_64
+            product: RaBe Linux EL7
       - name: AlmaLinux 9 Base x86_64
         repositories:
           - name: AlmaLinux 9 BaseOS x86_64
@@ -45,6 +47,8 @@
             product: Foreman Client 3.4 EL9
           - name: Extra Packages for Enterprise Linux 9 x86_64
             product: Extra Packages for Enterprise Linux 9
+          - name: Copr repo for rabe-zabbix x86_64
+            product: RaBe Linux EL9
       # Next are all non os, but enterprise linux specific content views.
       # These will often be filtered to only contain packages we want in
       # our downstream composite views.
