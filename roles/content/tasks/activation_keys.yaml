@@ -45,5 +45,3 @@
           # disable modern zabbix until we update our server
           - label: RaBe_zabbix60el7_zabbix60el7
             override: disabled
-          - label: RaBe_zabbix60el7_unsupported
-            override: disabled

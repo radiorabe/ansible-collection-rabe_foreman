@@ -17,8 +17,12 @@
             product: CentOS 7
           - name: CentOS 7 Updates x86_64
             product: CentOS 7
-          - name: Extra Packages for Enterprise Linux 7 x86_64
+          - name: CentOS 7 Storage GlusterFS 3.12 x86_64
             product: CentOS 7
+          - name: CentOS 7 Storage GlusterFS 10 x86_64
+            product: CentOS 7
+          - name: Extra Packages for Enterprise Linux 7 x86_64
+            product: Extra Packages for Enterprise Linux 7
           - name: Foreman Client 3.4 EL7 x86_64
             product: Foreman Client 3.4 EL7
           - name: Copr repo for rabe-zabbix x86_64
@@ -63,6 +67,12 @@
             rule_name: zabbix-agent
             package_name: zabbix-agent
             inclusion: true
+          - name: zabbix-sender
+            filter_state: present
+            filter_type: rpm
+            rule_name: zabbix-sender
+            package_name: zabbix-sender
+            inclusion: true
       - name: Zabbix 6.0 Agent EL7 x86_64
         repositories:
           - name: Zabbix 6.0 Official Repository - EL7 - x86_64
@@ -73,6 +83,12 @@
             filter_type: rpm
             rule_name: zabbix-agent
             package_name: zabbix-agent
+            inclusion: true
+          - name: zabbix-sender
+            filter_state: present
+            filter_type: rpm
+            rule_name: zabbix-sender
+            package_name: zabbix-sender
             inclusion: true
       - name: Zabbix 6.0 Agent EL8 x86_64
         repositories:
@@ -85,6 +101,12 @@
             rule_name: zabbix-agent
             package_name: zabbix-agent
             inclusion: true
+          - name: zabbix-sender
+            filter_state: present
+            filter_type: rpm
+            rule_name: zabbix-sender
+            package_name: zabbix-sender
+            inclusion: true
       - name: Zabbix 6.0 Agent EL9 x86_64
         repositories:
           - name: Zabbix 6.0 Official Repository - EL9 - x86_64
@@ -95,6 +117,12 @@
             filter_type: rpm
             rule_name: zabbix-agent
             package_name: zabbix-agent
+            inclusion: true
+          - name: zabbix-sender
+            filter_state: present
+            filter_type: rpm
+            rule_name: zabbix-sender
+            package_name: zabbix-sender
             inclusion: true
       # finally, we create composite views that combine base operating systems
       # with any additional repos that are always part of an installation. These
