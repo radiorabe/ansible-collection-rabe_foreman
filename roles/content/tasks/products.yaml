@@ -47,10 +47,10 @@
             url: http://mirror.centos.org/centos/7/sclo/x86_64/sclo/
             download_policy: on_demand
             auto_enabled: false
-          - name: CentOS 7 Storage GlusterFS 3.7 x86_64
+          - name: CentOS 7 Storage GlusterFS 3.12 x86_64
             content_type: yum
-            label: c7_storage_glusterfs3
-            url: https://download.gluster.org/pub/gluster/glusterfs/01.old-releases/3.7/LATEST/EPEL.repo/epel-7/x86_64/
+            label: c7_storage_glusterfs312
+            url: http://mirror.centos.org/centos/7/storage/x86_64/gluster-3.12/
             download_policy: on_demand
             auto_enabled: false
           - name: CentOS 7 Storage GlusterFS 10 x86_64
@@ -359,5 +359,35 @@
             content_type: yum
             label: zabbix60_unsupported
             url: https://repo.zabbix.com/non-supported/rhel/9/x86_64/
+            download_policy: on_demand
+            auto_enabled: false
+      # Some things we build and manage as part of a RaBe product. The aim
+      # is to minimise these over time but some of them like rabe-zabbix
+      # are widely used and not easy to replace.
+      - name: RaBe Linux EL7
+        label: rabeel7
+        repositories:
+          - name: Copr repo for rabe-zabbix x86_64
+            content_type: yum
+            label: rabeel7_rabezabbix
+            url: https://download.copr.fedorainfracloud.org/results/hairmare/rabe-zabbix/rhel-7-x86_64/
+            download_policy: on_demand
+            auto_enabled: false
+      - name: RaBe Linux EL8
+        label: rabeel8
+        repositories:
+          - name: Copr repo for rabe-zabbix x86_64
+            content_type: yum
+            label: rabeel8_rabezabbix
+            url: https://download.copr.fedorainfracloud.org/results/hairmare/rabe-zabbix/rhel-8-x86_64/
+            download_policy: on_demand
+            auto_enabled: false
+      - name: RaBe Linux EL9
+        label: rabeel9
+        repositories:
+          - name: Copr repo for rabe-zabbix x86_64
+            content_type: yum
+            label: rabeel9_rabezabbix
+            url: https://download.copr.fedorainfracloud.org/results/hairmare/rabe-zabbix/rhel-9-x86_64/
             download_policy: on_demand
             auto_enabled: false
