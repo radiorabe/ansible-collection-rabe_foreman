@@ -391,3 +391,19 @@
             url: https://download.copr.fedorainfracloud.org/results/hairmare/rabe-zabbix/rhel-9-x86_64/
             download_policy: on_demand
             auto_enabled: false
+      # Some audio stuffs are needed as well
+      - name: Paravel Systems EL7
+        label: paravelel7
+        repositories:
+          - name: Broadcast Applications from Paravel Systems
+            content_type: yum
+            label: paravelel7_broadcast
+            url: http://download.paravelsystems.com/CentOS/7/
+            download_policy: on_demand
+            auto_enabled: false
+          - name: Commercial Applications from Paravel Systems
+            content_type: yum
+            label: paravelel7_commercial
+            url: http://download.paravelsystems.com/CentOS/7com/
+            download_policy: on_demand
+            auto_enabled: false
