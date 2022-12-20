@@ -45,3 +45,11 @@
           # disable modern zabbix until we update our server
           - label: RaBe_zabbix60el7_zabbix60el7
             override: disabled
+      - name: "Paravel Systems EL7"
+        lifecycle_environment: "Prod"
+        content_view: "Paravel Systems EL7"
+        content_overrides:
+          - label: RaBe_paravelel7_paravelel7_broadcast
+            override: disabled
+          - label: RaBe_paravelel7_paravelel7_commercial
+            override: disabled

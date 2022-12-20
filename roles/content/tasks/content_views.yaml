@@ -141,3 +141,11 @@
             latest: true
           - content_view: Zabbix 6.0 Agent EL9 x86_64
             latest: true
+      # For some special cases we create individual products that may be subscribed to in addition to an OS Content View
+      # One such case is Paravel repos as they are only on a small subset of our machines.
+      - name: Paravel Systems EL7
+        repositories:
+          - name: Broadcast Applications from Paravel Systems
+            product: Paravel Systems EL7
+          - name: Commercial Applications from Paravel Systems
+            product: Paravel Systems EL7
