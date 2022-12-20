@@ -18,8 +18,6 @@
         value: '{{ radiorabe_core_hostname }}'
       - name: smtp_user_name
         value: '{{ radiorabe_rabe_foreman_foreman_settings_smtp_username }}'
-      - name: smtp_user_password
-        value: '{{ radiorabe_rabe_foreman_foreman_settings_smtp_password }}'
       - name: ansible_roles_to_ignore
         value:
           - linux-system-roles.*
