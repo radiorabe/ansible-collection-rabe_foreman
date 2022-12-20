@@ -10,6 +10,16 @@
         value: '{{ radiorabe_core_admin_mail }}'
       - name: email_reply_address
         value: '{{ radiorabe_base_mail_noreply }}'
+      - name: delivery_method
+        value: SMTP
+      - name: smtp_address
+        value: '{{ radiorabe_rabe_foreman_foreman_settings_smtp_address }}'
+      - name: smtp_domain
+        value: '{{ radiorabe_core_hostname }}'
+      - name: smtp_user_name
+        value: '{{ radiorabe_rabe_foreman_foreman_settings_smtp_username }}'
+      - name: smtp_user_password
+        value: '{{ radiorabe_rabe_foreman_foreman_settings_smtp_password }}'
       - name: ansible_roles_to_ignore
         value:
           - linux-system-roles.*
