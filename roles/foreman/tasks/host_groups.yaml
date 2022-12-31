@@ -40,7 +40,7 @@
             value: foreman.service.int.rabe.ch
           - name: timesync_ntp_servers
             parameter_type: yaml
-            value: |
+            value:
               - hostname: ntp-01.service.int.rabe.ch
                 iburst: true
               - hostname: ntp-02.service.int.rabe.ch
