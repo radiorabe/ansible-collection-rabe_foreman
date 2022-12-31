@@ -38,6 +38,19 @@
           - name: foreman_scap_client_server
             parameter_type: string
             value: foreman.service.int.rabe.ch
+          - name: timesync_ntp_servers
+            parameter_type: yaml
+            value: |
+              - hostname: ntp-01.service.int.rabe.ch
+                iburst: true
+              - hostname: ntp-02.service.int.rabe.ch
+                iburst: true
+              - hostname: ntp-03.service.int.rabe.ch
+                iburst: true
+              - hostname: ntp-04.service.int.rabe.ch
+                iburst: true
+              - hostname: ntp-05.service.int.rabe.ch
+                iburst: true
       - name: EL7
         description: EL7 configures our EL7 baseline.
         parent: RaBe Core/RaBe Base
