@@ -20,6 +20,10 @@
         ansible_roles:
           - radiorabe.common.base
         parameters:
+          - name: foreman_scap_client_server
+            parameter_type: string
+            value: foreman.service.int.rabe.ch
+          # base options for [zabbix](https://github.com/ansible-collections/community.zabbix) roles
           - name: zabbix_agent_server
             parameter_type: string
             value: monitoring.service.int.rabe.ch
@@ -35,9 +39,7 @@
           - name: zabbix_install_pip_packages
             parameter_type: boolean
             value: false
-          - name: foreman_scap_client_server
-            parameter_type: string
-            value: foreman.service.int.rabe.ch
+          # base options for [timesync](https://github.com/linux-system-roles/timesync) role
           - name: timesync_ntp_servers
             parameter_type: yaml
             value:
@@ -51,6 +53,13 @@
                 iburst: true
               - hostname: ntp-05.service.int.rabe.ch
                 iburst: true
+          # base options for [selinux](https://github.com/linux-system-roles/selinux) role
+          - name: selinux_policy
+            parameter_type: string
+            value: targeted
+          - name: selinux_state
+            parameter_type: string
+            value: enforcing
       - name: EL7
         description: EL7 configures our EL7 baseline.
         parent: RaBe Core/RaBe Base
