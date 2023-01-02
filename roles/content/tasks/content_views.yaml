@@ -31,7 +31,11 @@
         repositories:
           - name: AlmaLinux 9 BaseOS x86_64
             product: AlmaLinux 9
+          - name: AlmaLinux 9 BaseOS Kickstart x86_64
+            product: AlmaLinux 9
           - name: AlmaLinux 9 AppStream x86_64
+            product: AlmaLinux 9
+          - name: AlmaLinux 9 AppStream Kickstart x86_64
             product: AlmaLinux 9
           - name: AlmaLinux 9 CRB x86_64
             product: AlmaLinux 9

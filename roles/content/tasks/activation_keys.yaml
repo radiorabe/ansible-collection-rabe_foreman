@@ -9,6 +9,10 @@
         lifecycle_environment: "Prod"
         content_view: "AlmaLinux 9 x86_64"
         content_overrides:
+          - label: RaBe_alma9_alma9_baseos_kickstart
+            override: disabled
+          - label: RaBe_alma9_alma9_appstream_kickstart
+            override: disabled
           - label: RaBe_alma9_alma9_rt
             override: disabled
           - label: RaBe_alma9_alma9_resilientstorage
