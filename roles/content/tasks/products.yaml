@@ -121,10 +121,20 @@
             label: alma9_baseos
             url: https://repo.almalinux.org/almalinux/9/BaseOS/x86_64/os/
             download_policy: on_demand
+          - name: AlmaLinux 9 BaseOS Kickstart x86_64
+            content_type: yum
+            label: alma9_baseos_kickstart
+            url: https://repo.almalinux.org/almalinux/9/BaseOS/x86_64/kickstart/
+            download_policy: on_demand
           - name: AlmaLinux 9 AppStream x86_64
             content_type: yum
             label: alma9_appstream
             url: https://repo.almalinux.org/almalinux/9/AppStream/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 9 AppStream Kickstart x86_64
+            content_type: yum
+            label: alma9_appstream_kickstart
+            url: https://repo.almalinux.org/almalinux/9/AppStream/x86_64/kickstart/
             download_policy: on_demand
           - name: AlmaLinux 9 CRB x86_64
             content_type: yum
