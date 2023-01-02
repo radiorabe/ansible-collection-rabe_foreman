@@ -22,7 +22,16 @@
         value:
           - linux-system-roles.*
           - rhel-system-roles.*
-          - redhat.rhel-system-roles.private*
+          - redhat.rhel_system_roles.private_logging_subrole_rsyslog
+          - redhat.rhel_system_roles.private_metrics_subrole_bpftrace
+          - redhat.rhel_system_roles.private_metrics_subrole_elasticsearch
+          - redhat.rhel_system_roles.private_metrics_subrole_grafana
+          - redhat.rhel_system_roles.private_metrics_subrole_mssql
+          - redhat.rhel_system_roles.private_metrics_subrole_pcp
+          - redhat.rhel_system_roles.private_metrics_subrole_postfix
+          - redhat.rhel_system_roles.private_metrics_subrole_redi
+          - redhat.rhel_system_roles.private_metrics_subrole_repository
+          - redhat.rhel_system_roles.private_metrics_subrole_spark
       - name: lab_features
         value: false
       - name: login_text
