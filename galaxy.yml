@@ -14,6 +14,7 @@ dependencies:
   radiorabe.common: ">=0.2.0"
   radiorabe.foreman: ">=0.7.0"
   theforeman.foreman: ">=3.5.0"
+  freeipa.ansible_freeipa: ">=1.9.0"
 repository: https://github.com/radiorabe/ansible-collection-rabe_foreman
 documentation: https://github.com/radiorabe/ansible-collection-rabe_foreman/blob/main/README.md
 homepage: hhttps://github.com/radiorabe/ansible-collection-rabe_foreman
