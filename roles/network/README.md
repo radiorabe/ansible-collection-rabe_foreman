@@ -29,15 +29,16 @@ The `radiorabe.rabe_foreman.network` role depends on these roles:
     - role: radiorabe.rabe_foreman.network
       vars:
         # This is defined by Foreman!
-        foreman_interfaces:
-          - identifier: "enp1s0"
-            name: test-0000.service.int.example.org
-            attrs:
-              type: "ether"
-              ipv4:
-                address: "10.131.0.100"
-                network: "10.131.0.0"
-                prefix: "16"
+        foreman:
+          foreman_interfaces:
+            - identifier: "enp1s0"
+              name: test-0000.service.int.example.org
+              attrs:
+                type: "ether"
+                ipv4:
+                  address: "10.131.0.100"
+                  network: "10.131.0.0"
+                  prefix: "16"
 ```
 
 ## License
