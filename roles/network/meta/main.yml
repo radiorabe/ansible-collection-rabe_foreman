@@ -1,0 +1,18 @@
+galaxy_info:
+  author: RaBe IT-Reaktion
+  description: RaBe Foreman wrapper for redhat.rhel_linux_system.network role.
+  issue_tracker_url: https://github.com/radiorabe/ansible-collection-rabe_foreman/issues
+  license: AGPL-3.0-only
+  min_ansible_version: '2.9'
+  platforms:
+    - name: EL
+      versions:
+        - all
+    - name: Fedora
+      version:
+        - all
+  galaxy_tags:
+    - radiorabe
+    - foreman
+    - linux-system-roles
+    - network

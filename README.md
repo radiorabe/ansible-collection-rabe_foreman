@@ -4,11 +4,12 @@ GitOps our Foreman. This is where most of our Foreman configuration lives.
 
 ## Roles
 
-* [`client`](https://github.com/radiorabe/ansible-collection-rabe_foreman/tree/main/roles/client) Configure attached systems (this is the only role that is run everywhere, the others are specific to the server)
+* [`client`](https://github.com/radiorabe/ansible-collection-rabe_foreman/tree/main/roles/client) Configure attached systems (this role run everywhere, most the others are specific to the server)
 * [`content`](https://github.com/radiorabe/ansible-collection-rabe_foreman/tree/main/roles/content) Put Content into Foreman
 * [`foreman`](https://github.com/radiorabe/ansible-collection-rabe_foreman/tree/main/roles/foreman) Administer and Configure Foreman
-* [`infrastructure`](https://github.com/radiorabe/ansible-collection-rabe_foreman/tree/main/roles/infrastructure) Infrastruture
 * [`hosts`](https://github.com/radiorabe/ansible-collection-rabe_foreman/tree/main/roles/hosts) Provisioning Setup and Templates
+* [`infrastructure`](https://github.com/radiorabe/ansible-collection-rabe_foreman/tree/main/roles/infrastructure) Infrastruture
+* [`network`](https://github.com/radiorabe/ansible-collection-rabe_foreman/tree/main/roles/network) (This role wraps `rhel.rhel_system_roles.network` so we can use ansible facts for network configuration and is run on all hosts.)
 
 ## Development
 

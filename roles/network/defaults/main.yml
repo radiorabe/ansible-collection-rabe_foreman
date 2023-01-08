@@ -1,0 +1,3 @@
+---
+# defaults file for network
+radiorabe_rabe_foreman_network_dns_vip: 10.131.0.1
