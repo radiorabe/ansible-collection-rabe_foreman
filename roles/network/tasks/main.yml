@@ -1,0 +1,6 @@
+---
+- name: 'RaBe Foreman Network : Call Linux System Roles Network Role'
+  ansible.builtin.import_role:
+    name: rhel.rhel_system_roles.network
+  vars:
+    network_connections: "{{ lookup('template', 'templates/network-connections.j2') | from_yaml }}"

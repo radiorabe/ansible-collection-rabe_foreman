@@ -1,0 +1,19 @@
+{% for interface in foreman_interfaces %}
+{% set domain_parts = interface.name.split('.') %}
+{% set zone = domain_parts[1] %}
+- name: {{ interface.identifier }}
+{% if interface.attrs.type == "ether" %}
+  type: ethernet
+{% endif %}
+  zone: {{ zone }}
+  ip:
+    auto6: false
+    dhcp4: false
+    address:
+      - {{ interface.attrs.ipv4.address }}/{{ interface.attrs.ipv4.prefix }}
+    gateway4: {{ interface.attrs.ipv4.network[:-1] }}1
+    dns:
+      - {{ radiorabe_rabe_foreman_network_dns_vip }}
+    dns_search:
+      - {{ radiorabe_core_int_hostname }}
+{% endfor %}
