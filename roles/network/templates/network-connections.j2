@@ -1,4 +1,4 @@
-{% for interface in foreman_interfaces %}
+{% for interface in foreman.foreman_interfaces %}
 {% set domain_parts = interface.name.split('.') %}
 {% set zone = domain_parts[1] %}
 - name: {{ interface.identifier }}
