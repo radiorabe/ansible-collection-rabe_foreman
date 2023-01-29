@@ -29,9 +29,10 @@
           - redhat.rhel_system_roles.private_metrics_subrole_mssql
           - redhat.rhel_system_roles.private_metrics_subrole_pcp
           - redhat.rhel_system_roles.private_metrics_subrole_postfix
-          - redhat.rhel_system_roles.private_metrics_subrole_redi
+          - redhat.rhel_system_roles.private_metrics_subrole_redis
           - redhat.rhel_system_roles.private_metrics_subrole_repository
           - redhat.rhel_system_roles.private_metrics_subrole_spark
+          - theforeman.foreman.convert2rhel
       - name: lab_features
         value: false
       - name: login_text
