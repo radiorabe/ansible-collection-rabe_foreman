@@ -1,4 +1,9 @@
 ---
+- name: 'RaBe Foreman Config : Patches'
+  ansible.builtin.import_tasks: patches.yaml
+  tags:
+    - role::rabe_foreman.foreman
+    - role::rabe_foreman.foreman:patches
 - name: 'RaBe Foreman Config : Organizations'
   ansible.builtin.import_tasks: organizations.yaml
   tags:

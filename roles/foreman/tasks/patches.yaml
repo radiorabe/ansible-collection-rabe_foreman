@@ -1,0 +1,11 @@
+---
+- name: 'RaBe Foreman Patches : Get REX engine file location'
+  ansible.builtin.shell: 'gem contents foreman_remote_execution | grep "engine.rb$"'
+  register: rex_engine_cmd
+  changed_when: false
+- name: 'RaBe Foreman Patches : Remove "Run Puppet Once" from hostpage'
+  ansible.builtin.lineinfile:
+    path: '{{ rex_engine_cmd.stdout }}'
+    regexp: '^      :host_action_button => (true|false)$'
+    line: '      :host_action_button => false'
+  when: (rex_engine_cmd.stdout is defined) and (rex_engine_cmd.stdout)
