@@ -22,5 +22,4 @@
           # "Default" quota
           # TODO: read me from api
           ovirt_quota: 2e50d818-c01b-4a0a-aa61-4b68cd3bb579
-          display_type: spice
           use_v4: true
