@@ -32,10 +32,13 @@
             state: absent
           - name: Puppet Run Once - Script Default
             state: absent
+          # can be removed after 0.34.1 has been applied
           - name: RaBe Foreman - Publish Content View
+            state: absent
+          - name: RaBe Foreman - Publish Content Views
             state: present
             job_category: RaBe Foreman
-            description_format: RaBe Foreman - Publish Content View
+            description_format: RaBe Foreman - Publish Content Views
             snippet: false
             provider_type: Ansible
             kind: job_template
