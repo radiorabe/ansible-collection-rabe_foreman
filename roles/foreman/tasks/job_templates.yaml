@@ -58,6 +58,15 @@
             kind: job_template
             model: JobTemplate
             file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/rabe_foreman_promote_content_views.erb'
+          - name: RaBe Foreman - Version Cleanup Content Views
+            state: present
+            job_category: RaBe Foreman
+            description_format: RaBe Foreman - Version Cleanup Content Views
+            snippet: false
+            provider_type: Ansible
+            kind: job_template
+            model: JobTemplate
+            file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/rabe_foreman_version_cleanup_content_view.erb'
       when: not ansible_check_mode
   always:
     - name: 'RaBe Foreman Config : Lock All Job Templates'
