@@ -11,4 +11,4 @@
       ansible.builtin.include_role:
         name: theforeman.foreman.content_view_version_cleanup
       vars:
-        foreman_content_view_version_cleanup_keep: {{ rabe_foreman_content_view_version_cleanup_keep }}
+        foreman_content_view_version_cleanup_keep: "{{ rabe_foreman_content_view_version_cleanup_keep }}"
