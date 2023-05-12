@@ -281,21 +281,6 @@
       - name: Extra Packages for Enterprise Linux 8
         label: epel8
         state: absent
-        repositories:
-          - name: Extra Packages for Enterprise Linux 8 Everything x86_64
-            state: absent
-            content_type: yum
-            label: epel9_everything
-            url: http://download.fedoraproject.org/pub/epel/8/Everything/x86_64/
-            download_policy: on_demand
-            auto_enabled: false
-          - name: Extra Packages for Enterprise Linux 8 Modular x86_64
-            state: absent
-            content_type: yum
-            label: epel9_modular
-            url: http://download.fedoraproject.org/pub/epel/8/Modular/x86_64/
-            download_policy: on_demand
-            auto_enabled: false
       - name: Extra Packages for Enterprise Linux 9
         label: epel9
         repositories:
@@ -407,21 +392,6 @@
       - name: Zabbix 6.0 (LTS) EL8
         label: zabbix60el8
         state: absent
-        repositories:
-          - name: Zabbix 6.0 Official Repository - EL8 - x86_64
-            state: absent
-            content_type: yum
-            label: zabbix60el8
-            url: https://repo.zabbix.com/zabbix/6.0/rhel/8/x86_64/
-            download_policy: on_demand
-            auto_enabled: false
-          - name: Zabbix 6.0 Official Repository (non-supported) - EL8 - x86_64
-            state: absent
-            content_type: yum
-            label: zabbix60el8_unsupported
-            url: https://repo.zabbix.com/non-supported/rhel/8/x86_64/
-            download_policy: on_demand
-            auto_enabled: false
       - name: Zabbix 6.0 (LTS) EL9
         label: zabbix60
         repositories:
