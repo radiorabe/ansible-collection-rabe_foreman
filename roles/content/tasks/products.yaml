@@ -352,7 +352,7 @@
             url: https://yum.theforeman.org/client/3.5/el9/x86_64/
             download_policy: on_demand
       - name: Foreman Client 3.6 EL7
-        label: foremancliente35el7
+        label: foremanclient36el7
         repositories:
           - name: Foreman Client 3.6 EL7 x86_64
             content_type: yum
@@ -360,7 +360,7 @@
             url: https://yum.theforeman.org/client/3.6/el7/x86_64/
             download_policy: on_demand
       - name: Foreman Client 3.6 EL8
-        label: foremancliente36el8
+        label: foremanclient36el8
         repositories:
           - name: Foreman Client 3.6 EL8 x86_64
             content_type: yum
