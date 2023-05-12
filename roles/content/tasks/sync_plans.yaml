@@ -14,7 +14,6 @@
           - Foreman
           - RaBe Ansible
           - Extra Packages for Enterprise Linux 7
-          - Extra Packages for Enterprise Linux 8
           - Extra Packages for Enterprise Linux 9
           - Foreman Client 3.4 EL7
           - Foreman Client 3.4 EL8
@@ -27,7 +26,6 @@
           - Foreman Client 3.6 EL9
           - Zabbix 3.0 (LTS) EL7
           - Zabbix 6.0 (LTS) EL7
-          - Zabbix 6.0 (LTS) EL8
           - Zabbix 6.0 (LTS) EL9
           - RaBe Linux EL7
           - RaBe Linux EL8
