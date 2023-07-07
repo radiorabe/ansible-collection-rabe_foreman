@@ -291,6 +291,7 @@
             download_policy: on_demand
             auto_enabled: false
       # All of our distros should have access to foreman client tooling.
+      # Foreman 3.4
       - name: Foreman Client 3.4 EL7
         label: foremancliente34el7
         repositories:
@@ -315,6 +316,7 @@
             label: foreman34el9_client
             url: https://yum.theforeman.org/client/3.4/el9/x86_64/
             download_policy: on_demand
+      # Foreman 3.5
       - name: Foreman Client 3.5 EL7
         label: foremancliente35el7
         repositories:
@@ -339,6 +341,7 @@
             label: foreman35el9_client
             url: https://yum.theforeman.org/client/3.5/el9/x86_64/
             download_policy: on_demand
+      # Foreman 3.6
       - name: Foreman Client 3.6 EL7
         label: foremanclient36el7
         repositories:
@@ -362,6 +365,31 @@
             content_type: yum
             label: foreman36el9_client
             url: https://yum.theforeman.org/client/3.6/el9/x86_64/
+            download_policy: on_demand
+      # Foreman 3.7
+      - name: Foreman Client 3.7 EL7
+        label: foremanclient37el7
+        repositories:
+          - name: Foreman Client 3.7 EL7 x86_64
+            content_type: yum
+            label: foreman37el7_client
+            url: https://yum.theforeman.org/client/3.7/el7/x86_64/
+            download_policy: on_demand
+      - name: Foreman Client 3.7 EL8
+        label: foremanclient37el8
+        repositories:
+          - name: Foreman Client 3.6 EL8 x86_64
+            content_type: yum
+            label: foreman37el8_client
+            url: https://yum.theforeman.org/client/3.7/el8/x86_64/
+            download_policy: on_demand
+      - name: Foreman Client 3.7 EL9
+        label: foremanclient37el9
+        repositories:
+          - name: Foreman Client 3.7 EL9 x86_64
+            content_type: yum
+            label: foreman37el9_client
+            url: https://yum.theforeman.org/client/3.7/el9/x86_64/
             download_policy: on_demand
       # old zabbix for exiting el7 machines
       - name: Zabbix 3.0 (LTS) EL7
