@@ -125,6 +125,12 @@
             url: https://yum.theforeman.org/client/3.6/el8/x86_64/
             download_policy: on_demand
             auto_enabled: false
+          - name: CentOS Stream 8 Foreman client 3.9 x86_64
+            content_type: yum
+            label: cs8s_foreman39_client
+            url: https://yum.theforeman.org/client/3.9/el8/x86_64/
+            download_policy: on_demand
+            auto_enabled: false
       - name: AlmaLinux 9
         label: alma9
         repositories:
@@ -390,6 +396,31 @@
             content_type: yum
             label: foreman37el9_client
             url: https://yum.theforeman.org/client/3.7/el9/x86_64/
+            download_policy: on_demand
+      # Foreman 3.9
+      - name: Foreman Client 3.9 EL7
+        label: foremanclient39el7
+        repositories:
+          - name: Foreman Client 3.9 EL7 x86_64
+            content_type: yum
+            label: foreman39el7_client
+            url: https://yum.theforeman.org/client/3.9/el7/x86_64/
+            download_policy: on_demand
+      - name: Foreman Client 3.9 EL8
+        label: foremanclient39el8
+        repositories:
+          - name: Foreman Client 3.9 EL8 x86_64
+            content_type: yum
+            label: foreman39el8_client
+            url: https://yum.theforeman.org/client/3.9/el8/x86_64/
+            download_policy: on_demand
+      - name: Foreman Client 3.9 EL9
+        label: foremanclient39el9
+        repositories:
+          - name: Foreman Client 3.9 EL9 x86_64
+            content_type: yum
+            label: foreman39el9_client
+            url: https://yum.theforeman.org/client/3.9/el9/x86_64/
             download_policy: on_demand
       # old zabbix for exiting el7 machines
       - name: Zabbix 3.0 (LTS) EL7
