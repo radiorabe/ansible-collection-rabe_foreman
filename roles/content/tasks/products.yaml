@@ -304,33 +304,12 @@
       - name: Foreman Client 3.4 EL7
         state: absent
         label: foremancliente34el7
-        repositories:
-          - name: Foreman Client 3.4 EL7 x86_64
-            state: absent
-            content_type: yum
-            label: foreman34el7_client
-            url: https://yum.theforeman.org/client/3.4/el7/x86_64/
-            download_policy: on_demand
       - name: Foreman Client 3.4 EL8
         state: absent
         label: foremancliente34el8
-        repositories:
-          - name: Foreman Client 3.4 EL8 x86_64
-            state: absent
-            content_type: yum
-            label: foreman34el8_client
-            url: https://yum.theforeman.org/client/3.4/el8/x86_64/
-            download_policy: on_demand
       - name: Foreman Client 3.4 EL9
         state: absent
         label: foremanclientel9
-        repositories:
-          - name: Foreman Client 3.4 EL9 x86_64
-            state: absent
-            content_type: yum
-            label: foreman34el9_client
-            url: https://yum.theforeman.org/client/3.4/el9/x86_64/
-            download_policy: on_demand
       # Foreman 3.5
       - name: Foreman Client 3.5 EL7
         label: foremancliente35el7
