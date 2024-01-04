@@ -23,8 +23,8 @@
             product: CentOS 7
           - name: Extra Packages for Enterprise Linux 7 x86_64
             product: Extra Packages for Enterprise Linux 7
-          - name: Foreman Client 3.7 EL7 x86_64
-            product: Foreman Client 3.7 EL7
+          - name: Foreman Client 3.9 EL7 x86_64
+            product: Foreman Client 3.9 EL7
           - name: Copr repo for rabe-zabbix x86_64
             product: RaBe Linux EL7
       - name: AlmaLinux 9 Base x86_64
@@ -51,8 +51,8 @@
             product: AlmaLinux 9
           - name: AlmaLinux 9 RT x86_64
             product: AlmaLinux 9
-          - name: Foreman Client 3.7 EL9 x86_64
-            product: Foreman Client 3.7 EL9
+          - name: Foreman Client 3.9 EL9 x86_64
+            product: Foreman Client 3.9 EL9
           - name: Extra Packages for Enterprise Linux 9 x86_64
             product: Extra Packages for Enterprise Linux 9
           - name: Copr repo for rabe-zabbix x86_64
