@@ -27,6 +27,18 @@
             product: Foreman Client 3.9 EL7
           - name: Copr repo for rabe-zabbix x86_64
             product: RaBe Linux EL7
+          - name: Broadcast Applications from Paravel Systems
+            product: Paravel Systems EL7
+          - name: Commercial Applications from Paravel Systems
+            product: Paravel Systems EL7
+          - name: RaBe Liquidsoap Distribution for EL7
+            product: RaBe Liquidsoap Distribution for EL7
+          - name: LibreTime 2.5.x
+            product: LibreTime EL7
+          - name: RaBe Audio EL7
+            product: RaBe Audio EL7
+          - name: Nux Dextop EL7
+            product: Nux Dextop EL7
       - name: AlmaLinux 9 Base x86_64
         repositories:
           - name: AlmaLinux 9 BaseOS x86_64
@@ -130,11 +142,10 @@
             latest: true
           - content_view: Zabbix 6.0 Agent EL9 x86_64
             latest: true
-      # For some special cases we create individual products that may be subscribed to in addition to an OS Content View
-      # One such case is Paravel repos as they are only on a small subset of our machines.
+      # For some special cases we used to create individual products that may be subscribed to
+      # in addition to an OS Content View. This was replaced by manually assigning the needed
+      # repos because of the low number of affected hosts+repos. Now the repos are part of
+      # the base CentOS 7 content view and there are no similar cases for EL9.
       - name: Paravel Systems EL7
-        repositories:
-          - name: Broadcast Applications from Paravel Systems
-            product: Paravel Systems EL7
-          - name: Commercial Applications from Paravel Systems
-            product: Paravel Systems EL7
+        state: absent
+        repositories: []
