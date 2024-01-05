@@ -394,6 +394,7 @@
             label: foreman39el7_client
             url: https://yum.theforeman.org/client/3.9/el7/x86_64/
             download_policy: on_demand
+            auto_enabled: true
       - name: Foreman Client 3.9 EL8
         label: foremanclient39el8
         repositories:
@@ -402,6 +403,7 @@
             label: foreman39el8_client
             url: https://yum.theforeman.org/client/3.9/el8/x86_64/
             download_policy: on_demand
+            auto_enabled: true
       - name: Foreman Client 3.9 EL9
         label: foremanclient39el9
         repositories:
@@ -410,6 +412,7 @@
             label: foreman39el9_client
             url: https://yum.theforeman.org/client/3.9/el9/x86_64/
             download_policy: on_demand
+            auto_enabled: true
       # old zabbix for exiting el7 machines
       - name: Zabbix 3.0 (LTS) EL7
         label: zabbix30el7
@@ -499,4 +502,31 @@
             label: paravelel7_commercial
             url: http://download.paravelsystems.com/CentOS/7com/
             download_policy: on_demand
+            auto_enabled: false
+      - name: RaBe Liquidsoap Distribution for EL7
+        label: rabelsdel7
+        repositories:
+          - name: RaBe Liquidsoap  Distribution for EL7
+            content_type: yum
+            label: rabelsdel7_liquidsoap
+            url: https://download.opensuse.org/repositories/home:/radiorabe:/liquidsoap/CentOS_7/
+            # download immediatly to keep a backup from our OBS repo
+            download_policy: immediate
+            auto_enabled: false
+      - name: LibreTime EL7
+        label: libretimeel7
+        repositories:
+          - name: LibreTime 2.5.x
+            content_type: yum
+            label: libretimeel7_libretime
+            url: https://download.opensuse.org/repositories/home:/radiorabe:/airtime/CentOS_7/
+            # download immediatly to keep a backup from our OBS repo
+            download_policy: immediate
+            auto_enabled: false
+          - name: LibreTime Python Dependencies
+            content_type: yum
+            label: libretimeel7_dependencies
+            url: http://download.opensuse.org/repositories/home:/radiorabe:/airtime:/python-deps/CentOS_7/
+            # download immediatly to keep a backup from our OBS repo
+            download_policy: immediate
             auto_enabled: false
