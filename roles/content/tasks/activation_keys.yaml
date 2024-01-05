@@ -49,5 +49,3 @@
           # disable modern zabbix until we update our server
           - label: RaBe_zabbix60el7_zabbix60el7
             override: disabled
-      - name: "Paravel Systems EL7"
-        state: absent
