@@ -142,10 +142,3 @@
             latest: true
           - content_view: Zabbix 6.0 Agent EL9 x86_64
             latest: true
-      # For some special cases we used to create individual products that may be subscribed to
-      # in addition to an OS Content View. This was replaced by manually assigning the needed
-      # repos because of the low number of affected hosts+repos. Now the repos are part of
-      # the base CentOS 7 content view and there are no similar cases for EL9.
-      - name: Paravel Systems EL7
-        state: absent
-        repositories: []
