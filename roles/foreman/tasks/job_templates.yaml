@@ -20,6 +20,8 @@
             state: absent
           - name: Convert to RHEL
             state: absent
+          - name: Convert2RHEL analyze
+            state: absent
           - name: Puppet Agent Disable - Script Default
             state: absent
           - name: Puppet Agent Enable - Script Default
