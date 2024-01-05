@@ -530,3 +530,23 @@
             # download immediatly to keep a backup from our OBS repo
             download_policy: immediate
             auto_enabled: false
+      - name: RaBe Audio EL7
+        label: rabeaudioel7
+        repositories:
+          - name: RaBe Audio EL7
+            label: rabeaudioel7_audio
+            content_type: yum
+            url: http://download.opensuse.org/repositories/home:/radiorabe:/audio/CentOS_7/
+            # download immediatly to keep a backup from our OBS repo
+            download_policy: immediate
+            auto_enabled: false
+      # LibreTime has some deps in Nux, others might as well
+      - name: Nux Dextop EL7
+        label: nuxdextopel7
+        repositories:
+          - name: Nux Dextop EL7
+            label: nuxdextopel7_nux
+            content_type: yum
+            url: http://li.nux.ro/download/nux/dextop/el7/x86_64/
+            download_policy: on_demand
+            auto_enabled: false
