@@ -423,6 +423,17 @@
             url: https://repo.zabbix.com/zabbix/3.0/rhel/7/x86_64/
             download_policy: on_demand
             auto_enabled: false
+      # Logstash Addons contains Journalbeat for EL7 (we switch to filebeat for EL9 if we stick with elasticsearch)
+      - name: RaBe Logstash Addons EL7
+        label: rabelogstashel7
+        repositories:
+          - name: RaBe Logstash Addons EL7
+            content_type: yum
+            label: rabelogstashel7_logstash
+            url: https://download.opensuse.org/repositories/home:/radiorabe:/logstash/CentOS_7/
+            # download immediatly to keep a backup from our OBS repo
+            download_policy: immediate
+            auto_enabled: false
       # Modern(ish) Zabbix packages for all of our supported EL releases.
       - name: Zabbix 6.0 (LTS) EL7
         label: zabbix60el7

@@ -25,6 +25,8 @@
             product: Extra Packages for Enterprise Linux 7
           - name: Foreman Client 3.9 EL7 x86_64
             product: Foreman Client 3.9 EL7
+          - name: RaBe Logstash Addons EL7
+            product: RaBe Logstash Addons EL7
           - name: Copr repo for rabe-zabbix x86_64
             product: RaBe Linux EL7
           - name: Broadcast Applications from Paravel Systems
