@@ -31,6 +31,12 @@
         lifecycle_environment: "Prod"
         content_view: "CentOS 7 x86_64"
         content_overrides:
+          - label: RaBe_c7_c7_os
+            override: enabled
+          - label: RaBe_c7_c7_updates
+            override: enabled
+          - label: RaBe_c7_c7_extras
+            override: enabled
           - label: RaBe_c7_c7_fasttrack
             override: disabled
           - label: RaBe_c7_c7_plus
@@ -39,6 +45,8 @@
             override: disabled
           - label: RaBe_c7_c7_sclo
             override: disabled
+          - label: RaBe_foremanclient39el7_foreman39el7_client
+            override: enabled
           # disable both until end of migration
           - label: RaBe_c7_c7_storage_glusterfs312
             override: disabled
