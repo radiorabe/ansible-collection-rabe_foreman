@@ -9,6 +9,12 @@
         lifecycle_environment: "Prod"
         content_view: "AlmaLinux 9 x86_64"
         content_overrides:
+          - label: RaBe_alma9_alma9_baseos
+            override: enabled
+          - label: RaBe_alma9_alma9_extras
+            override: enabled
+          - label: RaBe_alma9_alma9_appstream
+            override: enabled
           - label: RaBe_alma9_alma9_baseos_kickstart
             override: disabled
           - label: RaBe_alma9_alma9_appstream_kickstart
@@ -27,6 +33,12 @@
             override: disabled
           - label: RaBe_alma9_alma9_nfv
             override: disabled
+          - label: RaBe_rabeel9_rabeel9_rabezabbix
+            override: enabled
+          - label: RaBe_zabbix60_zabbix60
+            override: enabled
+          - label: RaBe_foremanclient39el9_foreman39el9_client
+            override: enabled
       - name: "CentOS 7"
         lifecycle_environment: "Prod"
         content_view: "CentOS 7 x86_64"
