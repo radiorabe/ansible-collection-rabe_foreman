@@ -17,6 +17,10 @@
             product: CentOS 7
           - name: CentOS 7 Updates x86_64
             product: CentOS 7
+          - name: CentOS 7 SCLo-rh x86_64
+            product: CentOS 7
+          - name: CentOS 7 SCLo-sclo x86_64
+            product: CentOS 7
           - name: CentOS 7 Storage GlusterFS 3.12 x86_64
             product: CentOS 7
           - name: CentOS 7 Storage GlusterFS 10 x86_64
