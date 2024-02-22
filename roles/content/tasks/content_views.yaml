@@ -116,5 +116,3 @@
         components:
           - content_view: AlmaLinux 9 Base x86_64
             latest: true
-          - content_view: Zabbix 6.4 Agent EL9 x86_64
-            latest: true

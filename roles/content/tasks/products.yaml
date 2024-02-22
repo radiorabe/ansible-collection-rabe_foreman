@@ -330,29 +330,14 @@
         label: foremanclient36el9
       # Foreman 3.7
       - name: Foreman Client 3.7 EL7
+        state: absent
         label: foremanclient37el7
-        repositories:
-          - name: Foreman Client 3.7 EL7 x86_64
-            content_type: yum
-            label: foreman37el7_client
-            url: https://yum.theforeman.org/client/3.7/el7/x86_64/
-            download_policy: on_demand
       - name: Foreman Client 3.7 EL8
+        state: absent
         label: foremanclient37el8
-        repositories:
-          - name: Foreman Client 3.6 EL8 x86_64
-            content_type: yum
-            label: foreman37el8_client
-            url: https://yum.theforeman.org/client/3.7/el8/x86_64/
-            download_policy: on_demand
       - name: Foreman Client 3.7 EL9
+        state: absent
         label: foremanclient37el9
-        repositories:
-          - name: Foreman Client 3.7 EL9 x86_64
-            content_type: yum
-            label: foreman37el9_client
-            url: https://yum.theforeman.org/client/3.7/el9/x86_64/
-            download_policy: on_demand
       # Foreman 3.9
       - name: Foreman Client 3.9 EL7
         label: foremanclient39el7
