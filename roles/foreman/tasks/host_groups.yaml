@@ -23,22 +23,14 @@
           - name: foreman_scap_client_server
             parameter_type: string
             value: foreman.service.int.rabe.ch
-          # base options for [zabbix](https://github.com/ansible-collections/community.zabbix) roles
-          - name: zabbix_agent_server
+          # base options for [radiorabe.rabe_zabbix.agent](https://github.com/radiorabe/ansible-collection-rabe_zabbix/tree/main/roles/agent)
+          # TODO: remove override once we are fully migrated to agent2 and we can use the default from the role
+          - name: radiorabe_zabbix_agent_server
             parameter_type: string
-            value: monitoring.service.int.rabe.ch
-          - name: zabbix_agent_serveractive
+            value: vm-0040.service.int.rabe.ch
+          - name: radiorabe_zabbix_agent_serveractive
             parameter_type: string
-            value: monitoring.service.int.rabe.ch
-          - name: zabbix_repo
-            parameter_type: string
-            value: other
-          - name: zabbix_agent_dont_detect_ip
-            parameter_type: boolean
-            value: true
-          - name: zabbix_install_pip_packages
-            parameter_type: boolean
-            value: false
+            value: vm-0040.service.int.rabe.ch
           # base options for [timesync](https://github.com/linux-system-roles/timesync) role
           - name: timesync_ntp_servers
             parameter_type: yaml
