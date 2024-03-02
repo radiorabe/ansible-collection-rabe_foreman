@@ -9,9 +9,6 @@
       - CentOS 7 Base x86_64
       - AlmaLinux 9 Base x86_64
       - Zabbix 3.0 Agent EL7 x86_64
-      - Zabbix 6.0 Agent EL7 x86_64
-      - Zabbix 6.0 Agent EL8 x86_64
-      - Zabbix 6.0 Agent EL9 x86_64
       - CentOS 7 x86_64
       - AlmaLinux 9 x86_64
     rabe_foreman_lifecycle_environments:

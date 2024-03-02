@@ -20,8 +20,7 @@
           - Foreman Client 3.9 EL9
           - RaBe Logstash Addons EL7
           - Zabbix 3.0 (LTS) EL7
-          - Zabbix 6.0 (LTS) EL7
-          - Zabbix 6.0 (LTS) EL9
+          - Zabbix 6.4 EL7
           - Zabbix 6.4 EL9
           - RaBe Linux EL7
           - RaBe Linux EL8

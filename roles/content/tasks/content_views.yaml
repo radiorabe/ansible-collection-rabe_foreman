@@ -45,6 +45,8 @@
             product: RaBe Audio EL7
           - name: Nux Dextop EL7
             product: Nux Dextop EL7
+          - name: Zabbix 6.4 Official Repository - EL7 - x86_64
+            product: Zabbix 6.4 EL7
       - name: AlmaLinux 9 Base x86_64
         repositories:
           - name: AlmaLinux 9 BaseOS x86_64
