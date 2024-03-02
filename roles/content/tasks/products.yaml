@@ -287,9 +287,6 @@
             url: http://download.fedoraproject.org/pub/epel/7/x86_64/
             download_policy: on_demand
             auto_enabled: false
-      - name: Extra Packages for Enterprise Linux 8
-        label: epel8
-        state: absent
       - name: Extra Packages for Enterprise Linux 9
         label: epel9
         repositories:
