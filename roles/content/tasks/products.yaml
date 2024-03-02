@@ -297,44 +297,6 @@
             download_policy: on_demand
             auto_enabled: false
       # All of our distros should have access to foreman client tooling.
-      # Foreman 3.4
-      - name: Foreman Client 3.4 EL7
-        state: absent
-        label: foremancliente34el7
-      - name: Foreman Client 3.4 EL8
-        state: absent
-        label: foremancliente34el8
-      - name: Foreman Client 3.4 EL9
-        state: absent
-        label: foremanclientel9
-      # Foreman 3.5
-      - name: Foreman Client 3.5 EL7
-        state: absent
-        label: foremancliente35el7
-      - name: Foreman Client 3.5 EL8
-        label: foremancliente35el8
-      - name: Foreman Client 3.5 EL9
-        label: foremanclient35el9
-      # Foreman 3.6
-      - name: Foreman Client 3.6 EL7
-        state: absent
-        label: foremanclient36el7
-      - name: Foreman Client 3.6 EL8
-        state: absent
-        label: foremanclient36el8
-      - name: Foreman Client 3.6 EL9
-        state: absent
-        label: foremanclient36el9
-      # Foreman 3.7
-      - name: Foreman Client 3.7 EL7
-        state: absent
-        label: foremanclient37el7
-      - name: Foreman Client 3.7 EL8
-        state: absent
-        label: foremanclient37el8
-      - name: Foreman Client 3.7 EL9
-        state: absent
-        label: foremanclient37el9
       # Foreman 3.9
       - name: Foreman Client 3.9 EL7
         label: foremanclient39el7
