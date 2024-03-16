@@ -79,6 +79,12 @@
             product: Zabbix 6.4 EL9
           - name: Zabbix Official Repository (non-supported) - EL9 - x86_64
             product: Zabbix 6.4 EL9
+          - name: PostgreSQL common RPMs for EL7
+            product: PostgreSQL 15 EL7
+          - name: PostgreSQL extra RPMs for EL7
+            product: PostgreSQL 15 EL7
+          - name: PostgreSQL 15 for EL7
+            product: PostgreSQL 15 EL7
       # Next are all non os, but enterprise linux specific content views.
       # These will often be filtered to only contain packages we want in
       # our downstream composite views.
