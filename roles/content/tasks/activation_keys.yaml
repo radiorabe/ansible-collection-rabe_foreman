@@ -69,3 +69,10 @@
           # disable modern zabbix until we update our server
           - label: RaBe_zabbix60el7_zabbix60el7
             override: disabled
+          # disable postgresql repos per default as they are only for servers
+          - label: RaBe_pgdg16el7_pgdg16el7_common
+            override: disabled
+          - label: RaBe_pgdg16el7_pgdg16el7_extras
+            override: disabled
+          - label: RaBe_pgdg16el7_pgdg16el7_pgdg15
+            override: disabled
