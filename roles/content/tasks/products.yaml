@@ -198,69 +198,10 @@
             auto_enabled: false
       # The Foreman product is here for safe-keeping but not currently used anywhere (ie. Foreman
       # does not manage it's own content (yet?)).
+      # TODO removed because it was way outdated, we'll consider re-adding once we migrate foreman to el9 when it's ready
       - name: Foreman
         label: theforeman
-        repositories:
-          - name: CentOS Configmanagement SIG - ansible-29
-            label: centos-ansible-29
-            content_type: yum
-            download_policy: on_demand
-            url: http://mirror.centos.org/centos/8/configmanagement/x86_64/ansible-29/
-          - name: Ansible runner
-            label: ansible-runner
-            content_type: yum
-            download_policy: on_demand
-            url: https://releases.ansible.com/ansible-runner/rpm/epel-8-x86_64/
-          - name: Foreman 3.3
-            state: absent
-            label: foreman33
-            content_type: yum
-            download_policy: on_demand
-            url: https://yum.theforeman.org/releases/3.3/el8/x86_64/
-          - name: Foreman plugins 3.3
-            state: absent
-            label: foreman33-plugins
-            content_type: yum
-            download_policy: on_demand
-            url: https://yum.theforeman.org/plugins/3.3/el8/x86_64/
-          - name: Foreman 3.4
-            state: absent
-            label: foreman34
-            content_type: yum
-            download_policy: on_demand
-            url: https://yum.theforeman.org/releases/3.4/el8/x86_64/
-          - name: Foreman plugins 3.4
-            state: absent
-            label: foreman34-plugins
-            content_type: yum
-            download_policy: on_demand
-            url: https://yum.theforeman.org/plugins/3.4/el8/x86_64/
-          - name: Katello 4.5
-            state: absent
-            label: katello45
-            content_type: yum
-            download_policy: on_demand
-            url: https://yum.theforeman.org/katello/4.5/katello/el8/x86_64/
-          - name: Katello 4.6
-            label: katello46
-            content_type: yum
-            download_policy: on_demand
-            url: https://yum.theforeman.org/katello/4.6/katello/el8/x86_64/
-          - name: 'Candlepin: an open source entitlement management system.'
-            label: katello45-candlepin
-            content_type: yum
-            download_policy: on_demand
-            url: https://yum.theforeman.org/katello/4.5/candlepin/el8/x86_64/
-          - name: 'pulpcore: Fetch, Upload, Organize, and Distribute Software Packages.'
-            label: pulpcore
-            content_type: yum
-            download_policy: on_demand
-            url: https://yum.theforeman.org/pulpcore/3.18/el8/x86_64/
-          - name: Puppet 7 Repository el 8 - x86_64
-            label: puppet7
-            content_type: yum
-            download_policy: on_demand
-            url: http://yum.puppetlabs.com/puppet7/el/8/x86_64/
+        state: absent
       # A copy of our Ansible collections for safe-keeping.
       - name: RaBe Ansible
         label: rabe_ansible
