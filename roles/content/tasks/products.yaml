@@ -444,16 +444,19 @@
         repositories:
           - name: PostgreSQL common RPMs for EL7
             label: pgdg16el7_common
+            content_type: yum
             url: https://download.postgresql.org/pub/repos/yum/common/redhat/rhel-7-x86_64
             download_policy: on_demand
             auto_enabled: false
           - name: PostgreSQL extra RPMs for EL7
             label: pgdg16el7_extras
+            content_type: yum
             url: https://download.postgresql.org/pub/repos/yum/common/pgdg-rhel7-extras/redhat/rhel-7-x86_64
             download_policy: on_demand
             auto_enabled: false
           - name: PostgreSQL 15 for EL7
             label: pgdg16el7_pgdg15
+            content_type: yum
             url: https://download.postgresql.org/pub/repos/yum/15/redhat/rhel-7-x86_64
             download_policy: on_demand
             auto_enabled: false
