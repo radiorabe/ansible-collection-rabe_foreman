@@ -105,12 +105,6 @@
             rule_name: zabbix-sender
             package_name: zabbix-sender
             inclusion: true
-      - name: Zabbix 6.0 Agent EL7 x86_64
-        state: absent
-      - name: Zabbix 6.0 Agent EL8 x86_64
-        state: absent
-      - name: Zabbix 6.0 Agent EL9 x86_64
-        state: absent
       # finally, we create composite views that combine base operating systems
       # with any additional repos that are always part of an installation. These
       # are also the content views that will have activation keys assigned.
