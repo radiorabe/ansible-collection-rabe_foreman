@@ -107,13 +107,6 @@
             url: http://mirror.centos.org/centos/8-stream/NFV/x86_64/os/
             download_policy: on_demand
             auto_enabled: false
-          - name: CentOS Stream 8 Foreman client 3.4 x86_64
-            state: absent
-            content_type: yum
-            label: cs8s_foreman34_client
-            url: https://yum.theforeman.org/client/3.4/el8/x86_64/
-            download_policy: on_demand
-            auto_enabled: false
           - name: CentOS Stream 8 Foreman client 3.5 x86_64
             content_type: yum
             label: cs8s_foreman35_client
@@ -288,15 +281,6 @@
             download_policy: immediate
             auto_enabled: false
       # Modern(ish) Zabbix packages for all of our supported EL releases.
-      - name: Zabbix 6.0 (LTS) EL7
-        label: zabbix60el7
-        state: absent
-      - name: Zabbix 6.0 (LTS) EL8
-        label: zabbix60el8
-        state: absent
-      - name: Zabbix 6.0 (LTS) EL9
-        label: zabbix60
-        state: absent
       - name: Zabbix 6.4 EL7
         label: zabbix64el7
         repositories:
