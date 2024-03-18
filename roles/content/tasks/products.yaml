@@ -259,6 +259,34 @@
             url: https://yum.theforeman.org/client/3.9/el9/x86_64/
             download_policy: on_demand
             auto_enabled: true
+      # Foreman 3.10
+      - name: Foreman Client 3.10 EL7
+        label: foremanclient310el7
+        repositories:
+          - name: Foreman Client 3.10 EL7 x86_64
+            content_type: yum
+            label: foreman310el7_client
+            url: https://yum.theforeman.org/client/3.10/el7/x86_64/
+            download_policy: on_demand
+            auto_enabled: true
+      - name: Foreman Client 3.10 EL8
+        label: foremanclient310el8
+        repositories:
+          - name: Foreman Client 3.10 EL8 x86_64
+            content_type: yum
+            label: foreman310el8_client
+            url: https://yum.theforeman.org/client/3.10/el8/x86_64/
+            download_policy: on_demand
+            auto_enabled: true
+      - name: Foreman Client 3.10 EL9
+        label: foremanclient310el9
+        repositories:
+          - name: Foreman Client 3.10 EL9 x86_64
+            content_type: yum
+            label: foreman310el9_client
+            url: https://yum.theforeman.org/client/3.10/el9/x86_64/
+            download_policy: on_demand
+            auto_enabled: true
       # old zabbix for exiting el7 machines
       - name: Zabbix 3.0 (LTS) EL7
         label: zabbix30el7
