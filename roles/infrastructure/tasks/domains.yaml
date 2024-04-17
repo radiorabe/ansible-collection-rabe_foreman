@@ -7,6 +7,7 @@
       - name: admin.int.rabe.ch
       - name: audio.int.rabe.ch
       - name: dmz.int.rabe.ch
+      - name: dmz-admin.int.rabe.ch
       - name: guest.int.rabe.ch
       - name: office.int.rabe.ch
       - name: service.int.rabe.ch
