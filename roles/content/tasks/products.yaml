@@ -149,10 +149,10 @@
             label: alma8_appstream_kickstart
             url: https://repo.almalinux.org/almalinux/8/AppStream/x86_64/kickstart/
             download_policy: on_demand
-          - name: AlmaLinux 8 CRB x86_64
+          - name: AlmaLinux 8 PowerTools x86_64
             content_type: yum
             label: alma8_crb
-            url: https://repo.almalinux.org/almalinux/8/CRB/x86_64/os/
+            url: https://repo.almalinux.org/almalinux/8/PowerTools/x86_64/os/
             download_policy: on_demand
             auto_enabled: false
           - name: AlmaLinux 8 Extras x86_64
