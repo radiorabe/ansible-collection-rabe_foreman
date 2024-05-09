@@ -10,6 +10,7 @@
         products:
           - CentOS 7
           - CentOS 8 Stream
+          - AlmaLinux 8
           - AlmaLinux 9
           - RaBe Ansible
           - Extra Packages for Enterprise Linux 7

@@ -7,6 +7,7 @@
   vars:
     rabe_foreman_content_views:
       - CentOS 7 Base x86_64
+      - AlmaLinux 8 Base x86_64
       - AlmaLinux 9 Base x86_64
       - Zabbix 3.0 Agent EL7 x86_64
     rabe_foreman_composite_content_views:

@@ -55,6 +55,34 @@
             product: PostgreSQL 15 EL7
           - name: Trivy for EL7 (x84_64)
             product: Trivy
+      - name: AlmaLinux 8 Base x86_64
+        repositories:
+          - name: AlmaLinux 8 BaseOS x86_64
+            product: AlmaLinux 8
+          - name: AlmaLinux 8 BaseOS Kickstart x86_64
+            product: AlmaLinux 8
+          - name: AlmaLinux 8 AppStream x86_64
+            product: AlmaLinux 8
+          - name: AlmaLinux 8 AppStream Kickstart x86_64
+            product: AlmaLinux 8
+          - name: AlmaLinux 8 CRB x86_64
+            product: AlmaLinux 8
+          - name: AlmaLinux 8 Extras x86_64
+            product: AlmaLinux 8
+          - name: AlmaLinux 8 HighAvailability x86_64
+            product: AlmaLinux 8
+          - name: AlmaLinux 8 NFV x86_64
+            product: AlmaLinux 8
+          - name: AlmaLinux 8 Plus x86_64
+            product: AlmaLinux 8
+          - name: AlmaLinux 8 ResilientStorage x86_64
+            product: AlmaLinux 8
+          - name: AlmaLinux 8 RT x86_64
+            product: AlmaLinux 8
+          - name: Foreman Client 3.10 EL8 x86_64
+            product: Foreman Client 3.10 EL8
+          - name: Extra Packages for Enterprise Linux 8 x86_64
+            product: Extra Packages for Enterprise Linux 8
       - name: AlmaLinux 9 Base x86_64
         repositories:
           - name: AlmaLinux 9 BaseOS x86_64
