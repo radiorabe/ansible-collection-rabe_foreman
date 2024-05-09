@@ -65,7 +65,7 @@
             product: AlmaLinux 8
           - name: AlmaLinux 8 AppStream Kickstart x86_64
             product: AlmaLinux 8
-          - name: AlmaLinux 8 CRB x86_64
+          - name: AlmaLinux 8 PowerTools x86_64
             product: AlmaLinux 8
           - name: AlmaLinux 8 Extras x86_64
             product: AlmaLinux 8
