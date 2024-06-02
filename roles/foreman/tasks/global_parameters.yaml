@@ -15,5 +15,3 @@
       - name: host_registration_remote_execution
         parameter_type: boolean
         value: true
-      - name: time-zone
-        value: "Europe/Zurich"

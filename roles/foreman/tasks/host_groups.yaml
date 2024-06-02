@@ -45,6 +45,9 @@
                 iburst: true
               - hostname: ntp-05.service.int.rabe.ch
                 iburst: true
+          - name: time-zone
+            parameter_type: string
+            value: "Europe/Zurich"
           # base options for [selinux](https://github.com/linux-system-roles/selinux) role
           - name: selinux_policy
             parameter_type: string
