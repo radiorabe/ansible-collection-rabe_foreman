@@ -108,3 +108,43 @@
         organization: RaBe
         location: Randweg
         compute_resource: ovirt
+      - name: AlmaLinux 9 DMZ Virtualization Server
+        description: AlmaLinux 9 general purpose virtual machines.
+        parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
+        organization: RaBe
+        location: Randweg
+        domain: dmz.int.rabe.ch
+        subnet: dmz
+        ansible_roles:
+          - radiorabe.foreman_libvirt.libvirt
+          - radiorabe.common.download_file
+        parameters:
+          - name: download_file_destination
+            parameter_type: string
+            value: /var/lib/libvirt/images/
+          - name: download_file_url
+            parameter_type: string
+            value: https://foreman.service.int.rabe.ch/pulp/content/RaBe/Library/custom/AlmaLinux_OS_Generic_Cloud_Cloud-init_image/AlmaLinux_OS_Generic_Cloud_Cloud-init_image/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2
+          - name: remote_execution_ssh_keys
+            parameter_type: string
+            value: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC4arUJdueCQnOkjVOvrruEEs9M/lKw2ITorTTEIIFgcNAGZNs+SFFxugtMWY2jzrcHoxwSZel3eAMjvS76by6z3ZqZUvMxVHACR0FZvP2WtLk2BjgDjYdmBGDpMArvncHkaiVtjEaruwXVqO+64qsrYXQ3qhUiah+9soFHghWZWS3i+Dnd1JiNFX6TZP+ooqshBaClspAfcywsqFhsFNeU50rlsl11T13vLmZ/G140VF7uhaZ2ukOEj3HSSBcQ1DKIyanoo4fpAG8ealo6Nur0t5rlO67ACgRjLIVBS0LnVG5tvXtnKbz6A0uoUHC5aesDnDUskImWiKnz/6r2QenMkzD08BT6VlaFHhpp4ve2/d2lmjAl4EXvNOCwGsGV9A5BB1O130dwRk85Cxutxm94tuThElWlu37BB8pxOYz8qD+Vph5TVbC4mi1/30hUQffll0x/mcplJsFLY9H7eX0S+Ki2W++udWQ4HfwxbxXlJltMLEw7fhSxEQdGNfIaoM0= foreman@foreman.service.int.rabe.ch
+          - name: network_connections
+            parameter_type: yaml
+            value: 
+              - name: Bond bond0
+                state: up
+              - name: dmz
+                interface_name: dmz
+                type: bridge
+                ip:
+                  dhcp4: false
+                  auto6: false
+              - name: Vlan bond0.133
+                interface_name: bond0.133
+                type: vlan
+                vlan:
+                  id: '133'
+                parent: Bond bond0
+                controller: dmz
+                port_type: bridge
+
