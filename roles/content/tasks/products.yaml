@@ -537,3 +537,31 @@
             url: https://aquasecurity.github.io/trivy-repo/rpm/releases/8/x86_64
             download_policy: on_demand
             auto_enabled: false
+      - name: AlmaLinux OS Generic Cloud (Cloud-init) image
+        label: AlmaLinux_OS_Generic_Cloud_Cloud-init_image
+        description: > 
+          The Generic Cloud image is a general purpose virtual machine image
+          that contains the Cloud-init (opens new window)package. During boot,
+          cloud-init will take configuration options from cloud metadata and
+          initialize a system accordingly. This may include network
+          configuration, user's SSH key pair installation, attaching storage
+          devices, etc.
+        repositories:
+          - name: AlmaLinux OS Generic Cloud (Cloud-init) image
+            label: AlmaLinux_OS_Generic_Cloud_Cloud-init_image
+            description: >
+              The Generic Cloud image is a general purpose virtual machine
+              image that contains the Cloud-init (opens new window)package.
+              During boot, cloud-init will take configuration options from
+              cloud metadata and initialize a system accordingly. This may
+              include network configuration, user's SSH key pair installation,
+              attaching storage devices, etc.
+
+              To be used with libvirt, the image has to be altered with 
+              guestfs-tools and
+
+              virt-customize -a
+              Downloads/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2 --install
+              subscription-manager --run-command "echo -e 'network:\n  config:
+              disabled\n' > /etc/cloud/cloud.cfg"
+            content_type: file
