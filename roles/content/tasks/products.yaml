@@ -541,7 +541,7 @@
         label: AlmaLinux_OS_Generic_Cloud_Cloud-init_image
         description: > 
           The Generic Cloud image is a general purpose virtual machine image
-          that contains the Cloud-init (opens new window)package. During boot,
+          that contains the Cloud-init package. During boot,
           cloud-init will take configuration options from cloud metadata and
           initialize a system accordingly. This may include network
           configuration, user's SSH key pair installation, attaching storage
@@ -551,7 +551,7 @@
             label: AlmaLinux_OS_Generic_Cloud_Cloud-init_image
             description: >
               The Generic Cloud image is a general purpose virtual machine
-              image that contains the Cloud-init (opens new window)package.
+              image that contains the Cloud-init package.
               During boot, cloud-init will take configuration options from
               cloud metadata and initialize a system accordingly. This may
               include network configuration, user's SSH key pair installation,
