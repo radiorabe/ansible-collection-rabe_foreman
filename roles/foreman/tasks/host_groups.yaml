@@ -55,6 +55,12 @@
           - name: selinux_state
             parameter_type: string
             value: enforcing
+          - name: subscription_manager
+            parameter_type: boolean
+            value: true
+          - name: only_subscription_manager_repos
+            parameter_type: boolean
+            value: true
       - name: EL7
         description: EL7 configures our EL7 baseline.
         parent: RaBe Core/RaBe Base
@@ -102,6 +108,10 @@
         operatingsystem: AlmaLinux 9
         lifecycle_environment: Prod
         content_view: AlmaLinux 9 x86_64
+        parameters:
+          - name: kt_activation_keys
+            parameter_type: string
+            value: AlmaLinux 9
       - name: AlmaLinux 9 VMs
         description: AlmaLinux 9 general purpose virtual machines.
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
