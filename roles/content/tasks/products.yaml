@@ -562,6 +562,5 @@
 
               virt-customize -a
               Downloads/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2 --install
-              subscription-manager --run-command "echo -e 'network:\n  config:
-              disabled\n' > /etc/cloud/cloud.cfg"
+              subscription-manager
             content_type: file

@@ -1,0 +1,114 @@
+---
+- name: 'RaBe Foreman Infrastructure : Configure Compute Profiles'
+  ansible.builtin.include_role:
+    name: theforeman.foreman.compute_profiles
+  vars:
+    foreman_compute_profiles:
+      - name: 1-Small
+        compute_attributes:
+          - compute_resource: server-008.dmz-admin.int.rabe.ch
+            vm_attrs:
+              cpus: 1
+              memory: 2147483648
+              image_id: /var/lib/libvirt/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2
+              volumes_attributes:
+                0:
+                  pool_name: default
+                  capacity: 10G
+                  allocation: 10G
+                  format_type: qcow2
+              interfaces_attributes:
+                0:
+                  type: bridge
+                  network: dmz
+                  model: virtio
+      - name: 2-Medium
+        compute_attributes:
+          - compute_resource: server-008.dmz-admin.int.rabe.ch
+            vm_attrs:
+              cpus: 2
+              memory: 4294967296
+              image_id: /var/lib/libvirt/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2
+              volumes_attributes:
+                0:
+                  pool_name: default
+                  capacity: 10G
+                  allocation: 10G
+                  format_type: qcow2
+              interfaces_attributes:
+                0:
+                  type: bridge
+                  network: dmz
+                  model: virtio
+      - name: 3-Large
+        compute_attributes:
+          - compute_resource: server-008.dmz-admin.int.rabe.ch
+            vm_attrs:
+              cpus: 4
+              memory: 8589934592
+              image_id: /var/lib/libvirt/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2
+              volumes_attributes:
+                0:
+                  pool_name: default
+                  capacity: 10G
+                  allocation: 10G
+                  format_type: qcow2
+              interfaces_attributes:
+                0:
+                  type: bridge
+                  network: dmz
+                  model: virtio
+      - name: 1-Small
+        compute_attributes:
+          - compute_resource: server-009.dmz-admin.int.rabe.ch
+            vm_attrs:
+              cpus: 1
+              memory: 2147483648
+              image_id: /var/lib/libvirt/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2
+              volumes_attributes:
+                0:
+                  pool_name: default
+                  capacity: 10G
+                  allocation: 10G
+                  format_type: qcow2
+              interfaces_attributes:
+                0:
+                  type: bridge
+                  network: dmz
+                  model: virtio
+      - name: 2-Medium
+        compute_attributes:
+          - compute_resource: server-009.dmz-admin.int.rabe.ch
+            vm_attrs:
+              cpus: 2
+              memory: 4294967296
+              image_id: /var/lib/libvirt/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2
+              volumes_attributes:
+                0:
+                  pool_name: default
+                  capacity: 10G
+                  allocation: 10G
+                  format_type: qcow2
+              interfaces_attributes:
+                0:
+                  type: bridge
+                  network: dmz
+                  model: virtio
+      - name: 3-Large
+        compute_attributes:
+          - compute_resource: server-009.dmz-admin.int.rabe.ch
+            vm_attrs:
+              cpus: 4
+              memory: 8589934592
+              image_id: /var/lib/libvirt/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2
+              volumes_attributes:
+                0:
+                  pool_name: default
+                  capacity: 10G
+                  allocation: 10G
+                  format_type: qcow2
+              interfaces_attributes:
+                0:
+                  type: bridge
+                  network: dmz
+                  model: virtio
