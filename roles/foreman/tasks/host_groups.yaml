@@ -124,7 +124,6 @@
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
         organization: RaBe
         location: Randweg
-        compute_resource: ovirt
         ansible_roles:
           - radiorabe.certbot.certbot
         parameters:
@@ -162,7 +161,8 @@
                 immediate: true
               - set_default_zone: drop
                 permanent: true
-                immediate: true      - name: AlmaLinux 9 DMZ Virtualization Server
+                immediate: true
+      - name: AlmaLinux 9 DMZ Virtualization Server
         description: AlmaLinux 9 general purpose virtual machines.
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
         organization: RaBe
