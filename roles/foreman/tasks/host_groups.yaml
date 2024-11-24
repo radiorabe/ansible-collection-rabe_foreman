@@ -167,6 +167,110 @@
         subnet: dmz
         compute_resource: server-008.dmz-admin.int.rabe
         compute_profile: 1-Small	
+      - name: vm-2001.dmz.int.rabe.ch
+        description: >
+          AlmaLinux 9 DMZ virtual machine vm-2001
+           for running reverse-proxy container
+        parent: >
+          RaBe Core/RaBe Base/EL9/AlmaLinux 9/
+          AlmaLinux 9 DMZ server-009 Vms
+        organization: RaBe
+        location: Randweg
+        ansible_roles:
+          - radiorabe.common.local_user
+          - redhat.rhel_system_roles.podman
+        parameters:
+          - name: firewall
+            parameter_type: yaml
+            value:
+              - service: http-alt
+                port: 8080/tcp
+                state: present
+                permanent: true
+              - service: https-alt
+                port: 8443/tcp
+                state: present
+                permanent: true
+              - zone: dmz
+                interface: eth0
+                state: present
+                permanent: true
+              - zone: dmz
+                state: enabled
+                permanent: true
+                service:
+                  - cockpit
+                  - ssh
+                  - http-alt
+                  - https-alt
+                  - pmcd
+          - name: local_user_username
+            parameter_type: string
+            value: revproxy
+          - name: podman_create_host_directories
+            parameter_type: boolean
+            value: true
+          - name: podman_firewall
+            parameter_type: yaml
+            value:
+              - port: 8080/tcp
+                state: enabled
+              - port: 8090/tcp
+                state: enabled
+              - port: 8443/tcp
+                state: enabled
+          - name: podman_kube_specs
+            parameter_type: yaml
+            value:
+              - state: started
+                kube_file_content:
+                  apiVersion: v1
+                  kind: Pod
+                  metadata:
+                    name: revproxy
+                  spec:
+                    containers:
+                    - name: revproxy
+                      image: ghcr.io/radiorabe/httpd:0.3.0
+                      ports:
+                      - containerPort: 8080
+                        hostPort: 8080
+                      - containerPort: 8090
+                        hostPort: 8090
+                      - containerPort: 8443
+                        hostPort: 8443
+                      volumeMounts:
+                      - mountPath: "/etc/httpd/conf.d/local_configs:Z"
+                        name: local_httpd_configs
+                      - mountPath: "/etc/httpd/modsecurity.d/local_rules:Z"
+                        name: local_modsec_rules
+                      - mountPath: "/etc/pki/tls/private/rabe_certs:Z"
+                        name: local_letsencrypt_certs
+                    volumes:
+                    - name: local_httpd_configs
+                      hostPath:
+                        path: "/home/revproxy/httpd/conf.d/local_configs"
+                    - name: local_modsec_rules
+                      hostPath:
+                        path: "/home/revproxy/httpd/modsecurity.d/local_rules"
+                    - name: local_letsencrypt_certs
+                      hostPath:
+                        path: "/home/revproxy/httpd/rabe_certs"
+          - name: podman_run_as_group
+            parameter_type: string
+            value: revproxy
+          - name: podman_run_as_user
+            parameter_type: string
+            value: revproxy
+          - name: podman_selinux_ports
+            parameter_type: yaml
+            value:
+              - ports: 8080
+                setype: http_port_t
+              - ports: 8090
+                setype: http_port_t
+              - ports: 8443
+                setype: http_port_t
       - name: AlmaLinux 9 DMZ server-009 VMs
         description: AlmaLinux 9 virtual machines to be run on server-009
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
@@ -176,3 +280,107 @@
         subnet: dmz
         compute_resource: server-009.dmz-admin.int.rabe
         compute_profile: 1-Small	
+      - name: vm-2002.dmz.int.rabe.ch
+        description: >
+          AlmaLinux 9 DMZ virtual machine vm-2002
+           for running reverse-proxy container
+        parent: >
+          RaBe Core/RaBe Base/EL9/AlmaLinux 9/
+          AlmaLinux 9 DMZ server-009 Vms
+        organization: RaBe
+        location: Randweg
+        ansible_roles:
+          - radiorabe.common.local_user
+          - redhat.rhel_system_roles.podman
+        parameters:
+          - name: firewall
+            parameter_type: yaml
+            value:
+              - service: http-alt
+                port: 8080/tcp
+                state: present
+                permanent: true
+              - service: https-alt
+                port: 8443/tcp
+                state: present
+                permanent: true
+              - zone: dmz
+                interface: eth0
+                state: present
+                permanent: true
+              - zone: dmz
+                state: enabled
+                permanent: true
+                service:
+                  - cockpit
+                  - ssh
+                  - http-alt
+                  - https-alt
+                  - pmcd
+          - name: local_user_username
+            parameter_type: string
+            value: revproxy
+          - name: podman_create_host_directories
+            parameter_type: boolean
+            value: true
+          - name: podman_firewall
+            parameter_type: yaml
+            value:
+              - port: 8080/tcp
+                state: enabled
+              - port: 8090/tcp
+                state: enabled
+              - port: 8443/tcp
+                state: enabled
+          - name: podman_kube_specs
+            parameter_type: yaml
+            value:
+              - state: started
+                kube_file_content:
+                  apiVersion: v1
+                  kind: Pod
+                  metadata:
+                    name: revproxy
+                  spec:
+                    containers:
+                    - name: revproxy
+                      image: ghcr.io/radiorabe/httpd:0.3.0
+                      ports:
+                      - containerPort: 8080
+                        hostPort: 8080
+                      - containerPort: 8090
+                        hostPort: 8090
+                      - containerPort: 8443
+                        hostPort: 8443
+                      volumeMounts:
+                      - mountPath: "/etc/httpd/conf.d/local_configs:Z"
+                        name: local_httpd_configs
+                      - mountPath: "/etc/httpd/modsecurity.d/local_rules:Z"
+                        name: local_modsec_rules
+                      - mountPath: "/etc/pki/tls/private/rabe_certs:Z"
+                        name: local_letsencrypt_certs
+                    volumes:
+                    - name: local_httpd_configs
+                      hostPath:
+                        path: "/home/revproxy/httpd/conf.d/local_configs"
+                    - name: local_modsec_rules
+                      hostPath:
+                        path: "/home/revproxy/httpd/modsecurity.d/local_rules"
+                    - name: local_letsencrypt_certs
+                      hostPath:
+                        path: "/home/revproxy/httpd/rabe_certs"
+          - name: podman_run_as_group
+            parameter_type: string
+            value: revproxy
+          - name: podman_run_as_user
+            parameter_type: string
+            value: revproxy
+          - name: podman_selinux_ports
+            parameter_type: yaml
+            value:
+              - ports: 8080
+                setype: http_port_t
+              - ports: 8090
+                setype: http_port_t
+              - ports: 8443
+                setype: http_port_t
