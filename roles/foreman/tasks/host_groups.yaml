@@ -231,7 +231,7 @@
                   spec:
                     containers:
                     - name: revproxy
-                      image: ghcr.io/radiorabe/httpd:0.3.0
+                      image: ghcr.io/radiorabe/httpd:0.5.1
                       ports:
                       - containerPort: 8080
                         hostPort: 8080
@@ -344,7 +344,7 @@
                   spec:
                     containers:
                     - name: revproxy
-                      image: ghcr.io/radiorabe/httpd:0.3.0
+                      image: ghcr.io/radiorabe/httpd:0.5.1
                       ports:
                       - containerPort: 8080
                         hostPort: 8080
