@@ -271,6 +271,11 @@
                 setype: http_port_t
               - ports: 8443
                 setype: http_port_t
+          - name: podman_containers_conf
+            parameter_type: yaml
+            value:
+              containers:
+                log_size_max: 1073741824 # 1Gib in bytes
       - name: AlmaLinux 9 DMZ server-009 VMs
         description: AlmaLinux 9 virtual machines to be run on server-009
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
@@ -384,3 +389,8 @@
                 setype: http_port_t
               - ports: 8443
                 setype: http_port_t
+          - name: podman_containers_conf
+            parameter_type: yaml
+            value:
+              containers:
+                log_size_max: 1073741824 # 1Gib in bytes
