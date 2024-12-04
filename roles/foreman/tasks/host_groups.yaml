@@ -131,8 +131,10 @@
             parameter_type: string
             value: it@rabe.ch
           - name: certbot_certificates
-            parameter_type: string
-            value: letest.rabe.ch
+            parameter_type: yaml
+            value:
+              - letest.rabe.ch
+              - dmz-rev-proxy.ewb.rabe.ch
           - name: certbot_remote_hosts
             parameter_type: yaml
             value:
