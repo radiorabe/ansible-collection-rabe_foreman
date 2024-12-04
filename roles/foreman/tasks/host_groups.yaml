@@ -232,6 +232,9 @@
                     containers:
                     - name: revproxy
                       image: ghcr.io/radiorabe/httpd:0.5.1
+                      env:
+                      - name: PODMAN_HOST
+                        value: "{{ansible_host}}"
                       ports:
                       - containerPort: 8080
                         hostPort: 8080
@@ -350,6 +353,9 @@
                     containers:
                     - name: revproxy
                       image: ghcr.io/radiorabe/httpd:0.5.1
+                      env:
+                      - name: PODMAN_HOST
+                        value: "{{ansible_host}}"
                       ports:
                       - containerPort: 8080
                         hostPort: 8080
