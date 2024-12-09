@@ -27,8 +27,8 @@
             product: CentOS 7
           - name: Extra Packages for Enterprise Linux 7 x86_64
             product: Extra Packages for Enterprise Linux 7
-          - name: Foreman Client 3.11 EL7 x86_64
-            product: Foreman Client 3.11 EL7
+          - name: Foreman Client 3.12 EL7 x86_64
+            product: Foreman Client 3.12 EL7
           - name: RaBe Logstash Addons EL7
             product: RaBe Logstash Addons EL7
           - name: Copr repo for rabe-zabbix x86_64
@@ -79,8 +79,8 @@
             product: AlmaLinux 8
           - name: AlmaLinux 8 RT x86_64
             product: AlmaLinux 8
-          - name: Foreman Client 3.11 EL8 x86_64
-            product: Foreman Client 3.11 EL8
+          - name: Foreman Client 3.12 EL8 x86_64
+            product: Foreman Client 3.12 EL8
           - name: Extra Packages for Enterprise Linux 8 x86_64
             product: Extra Packages for Enterprise Linux 8
       - name: AlmaLinux 9 Base x86_64
@@ -107,8 +107,8 @@
             product: AlmaLinux 9
           - name: AlmaLinux 9 RT x86_64
             product: AlmaLinux 9
-          - name: Foreman Client 3.11 EL9 x86_64
-            product: Foreman Client 3.11 EL9
+          - name: Foreman Client 3.12 EL9 x86_64
+            product: Foreman Client 3.12 EL9
           - name: Extra Packages for Enterprise Linux 9 x86_64
             product: Extra Packages for Enterprise Linux 9
           - name: Zabbix 7.0 Official Repository - EL9 - x86_64
