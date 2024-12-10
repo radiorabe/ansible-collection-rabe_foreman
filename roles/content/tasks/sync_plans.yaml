@@ -9,7 +9,6 @@
         sync_date: 2020-11-07 00:00:00 UTC
         products:
           - CentOS 7
-          - CentOS 8 Stream
           - AlmaLinux 8
           - AlmaLinux 9
           - RaBe Ansible
