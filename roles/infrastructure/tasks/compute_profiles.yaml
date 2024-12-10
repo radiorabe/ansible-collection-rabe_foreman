@@ -17,6 +17,11 @@
                   capacity: 10G
                   allocation: 10G
                   format_type: qcow2
+                1:
+                  pool_name: default
+                  capacity: 30G
+                  allocation: 30G
+                  format_type: qcow2
               interfaces_attributes:
                 0:
                   type: bridge
@@ -35,6 +40,11 @@
                   capacity: 10G
                   allocation: 10G
                   format_type: qcow2
+                1:
+                  pool_name: default
+                  capacity: 30G
+                  allocation: 30G
+                  format_type: qcow2
               interfaces_attributes:
                 0:
                   type: bridge
@@ -52,6 +62,11 @@
                   pool_name: default
                   capacity: 10G
                   allocation: 10G
+                  format_type: qcow2
+                1:
+                  pool_name: default
+                  capacity: 30G
+                  allocation: 30G
                   format_type: qcow2
               interfaces_attributes:
                 0:
@@ -71,6 +86,11 @@
                   capacity: 10G
                   allocation: 10G
                   format_type: qcow2
+                1:
+                  pool_name: default
+                  capacity: 30G
+                  allocation: 30G
+                  format_type: qcow2
               interfaces_attributes:
                 0:
                   type: bridge
@@ -89,6 +109,11 @@
                   capacity: 10G
                   allocation: 10G
                   format_type: qcow2
+                1:
+                  pool_name: default
+                  capacity: 30G
+                  allocation: 30G
+                  format_type: qcow2
               interfaces_attributes:
                 0:
                   type: bridge
@@ -106,6 +131,11 @@
                   pool_name: default
                   capacity: 10G
                   allocation: 10G
+                  format_type: qcow2
+                1:
+                  pool_name: default
+                  capacity: 30G
+                  allocation: 30G
                   format_type: qcow2
               interfaces_attributes:
                 0:
