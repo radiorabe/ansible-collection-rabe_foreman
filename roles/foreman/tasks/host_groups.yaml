@@ -123,9 +123,10 @@
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
         organization: RaBe
         location: Randweg
-        domain: dmz.int.rabe.ch
-        subnet: dmz
+        domain: dmz-admin.int.rabe.ch
+        subnet: dmz-admin
         ansible_roles:
+          - redhat.rhel_system_roles.network
           - radiorabe.foreman_libvirt.libvirt
           - radiorabe.common.download_file
         parameters:
@@ -157,4 +158,21 @@
                 parent: Bond bond0
                 controller: dmz
                 port_type: bridge
-
+      - name: AlmaLinux 9 DMZ server-008 VMs
+        description: AlmaLinux 9 virtual machines to be run on server-008
+        parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
+        organization: RaBe
+        location: Randweg
+        domain: dmz.int.rabe.ch
+        subnet: dmz
+        compute_resource: server-008.dmz-admin.int.rabe.ch
+        compute_profile: 1-Small	
+      - name: AlmaLinux 9 DMZ server-009 VMs
+        description: AlmaLinux 9 virtual machines to be run on server-009
+        parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
+        organization: RaBe
+        location: Randweg
+        domain: dmz.int.rabe.ch
+        subnet: dmz
+        compute_resource: server-009.dmz-admin.int.rabe.ch
+        compute_profile: 1-Small	

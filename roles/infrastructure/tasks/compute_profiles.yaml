@@ -54,7 +54,7 @@
         compute_attributes:
           - compute_resource: server-008.dmz-admin.int.rabe.ch
             vm_attrs:
-              cpus: 2
+              cpus: 4
               memory: 8589934592
               image_id: /var/lib/libvirt/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2
               volumes_attributes:
@@ -123,7 +123,7 @@
         compute_attributes:
           - compute_resource: server-009.dmz-admin.int.rabe.ch
             vm_attrs:
-              cpus: 2
+              cpus: 4
               memory: 8589934592
               image_id: /var/lib/libvirt/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2
               volumes_attributes:

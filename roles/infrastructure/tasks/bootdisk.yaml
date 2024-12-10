@@ -12,7 +12,7 @@
 - name: 'RaBe Foreman Infrastructure : Bootdisk : Copy efi'
   ansible.builtin.copy:
     remote_src: true
-    src: "/boot/efi/EFI/centos/{{ item }}"
+    src: "/boot/efi/EFI/almalinux/{{ item }}"
     dest: "/var/lib/foreman/bootdisk/{{ item }}"
     owner: foreman
     group: foreman

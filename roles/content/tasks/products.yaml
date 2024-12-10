@@ -11,52 +11,52 @@
           - name: CentOS 7 OS x86_64
             content_type: yum
             label: c7_os
-            url: http://mirror.centos.org/centos/7/os/x86_64/
+            url: https://vault.centos.org/7.9.2009/os/x86_64/
             download_policy: on_demand
           - name: CentOS 7 Extras x86_64
             content_type: yum
             label: c7_extras
-            url: http://mirror.centos.org/centos/7/extras/x86_64/
+            url: https://vault.centos.org/7.9.2009/extras/x86_64/
             download_policy: on_demand
           - name: CentOS 7 FastTrack x86_64
             content_type: yum
             label: c7_fasttrack
-            url: http://mirror.centos.org/centos/7/fasttrack/x86_64/
+            url: https://vault.centos.org/7.9.2009/fasttrack/x86_64/
             download_policy: on_demand
           - name: CentOS 7 Plus x86_64
             content_type: yum
             label: c7_plus
-            url: http://mirror.centos.org/centos/7/centosplus/x86_64/
+            url: https://vault.centos.org/7.9.2009/centosplus/x86_64/
             download_policy: on_demand
             auto_enabled: false
           - name: CentOS 7 Updates x86_64
             content_type: yum
             label: c7_updates
-            url: http://mirror.centos.org/centos/7/updates/x86_64/
+            url: https://vault.centos.org/7.9.2009/updates/x86_64/
             download_policy: on_demand
             auto_enabled: false
           - name: CentOS 7 SCLo-rh x86_64
             content_type: yum
             label: c7_sclorh
-            url: http://mirror.centos.org/centos/7/sclo/x86_64/rh/
+            url: https://vault.centos.org/7.9.2009/sclo/x86_64/rh/
             download_policy: on_demand
             auto_enabled: false
           - name: CentOS 7 SCLo-sclo x86_64
             content_type: yum
             label: c7_sclo
-            url: http://mirror.centos.org/centos/7/sclo/x86_64/sclo/
+            url: https://vault.centos.org/7.9.2009/sclo/x86_64/sclo/
             download_policy: on_demand
             auto_enabled: false
           - name: CentOS 7 Storage GlusterFS 3.12 x86_64
             content_type: yum
             label: c7_storage_glusterfs312
-            url: http://mirror.centos.org/centos/7/storage/x86_64/gluster-3.12/
+            url: https://vault.centos.org/7.9.2009/storage/x86_64/gluster-3.12/
             download_policy: on_demand
             auto_enabled: false
           - name: CentOS 7 Storage GlusterFS 10 x86_64
             content_type: yum
             label: c7_storage_glusterfs10
-            url: http://mirror.centos.org/centos/7/storage/x86_64/gluster-10/
+            url: https://vault.centos.org/7.9.2009/storage/x86_64/gluster-10/
             download_policy: on_demand
             auto_enabled: false
       - name: CentOS 8 Stream
@@ -361,6 +361,62 @@
             url: https://yum.theforeman.org/client/3.10/el9/x86_64/
             download_policy: on_demand
             auto_enabled: true
+      # Foreman 3.11
+      - name: Foreman Client 3.11 EL7
+        label: foremanclient311el7
+        repositories:
+          - name: Foreman Client 3.11 EL7 x86_64
+            content_type: yum
+            label: foreman311el7_client
+            url: https://yum.theforeman.org/client/3.11/el7/x86_64/
+            download_policy: on_demand
+            auto_enabled: true
+      - name: Foreman Client 3.11 EL8
+        label: foremanclient311el8
+        repositories:
+          - name: Foreman Client 3.11 EL8 x86_64
+            content_type: yum
+            label: foreman311el8_client
+            url: https://yum.theforeman.org/client/3.11/el8/x86_64/
+            download_policy: on_demand
+            auto_enabled: true
+      - name: Foreman Client 3.11 EL9
+        label: foremanclient311el9
+        repositories:
+          - name: Foreman Client 3.11 EL9 x86_64
+            content_type: yum
+            label: foreman311el9_client
+            url: https://yum.theforeman.org/client/3.11/el9/x86_64/
+            download_policy: on_demand
+            auto_enabled: true
+      # Foreman 3.12
+      - name: Foreman Client 3.12 EL7
+        label: foremanclient312el7
+        repositories:
+          - name: Foreman Client 3.12 EL7 x86_64
+            content_type: yum
+            label: foreman321el7_client
+            url: https://yum.theforeman.org/client/3.12/el7/x86_64/
+            download_policy: on_demand
+            auto_enabled: true
+      - name: Foreman Client 3.12 EL8
+        label: foremanclient312el8
+        repositories:
+          - name: Foreman Client 3.12 EL8 x86_64
+            content_type: yum
+            label: foreman312el8_client
+            url: https://yum.theforeman.org/client/3.12/el8/x86_64/
+            download_policy: on_demand
+            auto_enabled: true
+      - name: Foreman Client 3.12 EL9
+        label: foremanclient312el9
+        repositories:
+          - name: Foreman Client 3.12 EL9 x86_64
+            content_type: yum
+            label: foreman312el9_client
+            url: https://yum.theforeman.org/client/3.12/el9/x86_64/
+            download_policy: on_demand
+            auto_enabled: true
       # old zabbix for exiting el7 machines
       - name: Zabbix 3.0 (LTS) EL7
         label: zabbix30el7
@@ -399,6 +455,15 @@
             content_type: yum
             label: zabbix64
             url: https://repo.zabbix.com/zabbix/6.4/rhel/9/x86_64/
+            download_policy: on_demand
+            auto_enabled: false
+      - name: Zabbix 7.0 EL9
+        label: zabbix70
+        repositories:
+          - name: Zabbix 7.0 Official Repository - EL9 - x86_64
+            content_type: yum
+            label: zabbix70
+            url: https://repo.zabbix.com/zabbix/7.0/rhel/9/x86_64/
             download_policy: on_demand
             auto_enabled: false
           - name: Zabbix Official Repository (non-supported) - EL9 - x86_64
@@ -562,6 +627,5 @@
 
               virt-customize -a
               Downloads/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2 --install
-              subscription-manager --run-command "echo -e 'network:\n  config:
-              disabled\n' > /etc/cloud/cloud.cfg"
+              subscription-manager
             content_type: file
