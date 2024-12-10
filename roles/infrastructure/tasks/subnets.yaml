@@ -1,7 +1,7 @@
 ---
 - name: 'Rabe Foreman Infrastructure : Create subnets'
   ansible.builtin.include_role:
-    name: radiorabe.foreman.subnets
+    name: theforeman.foreman.subnets
   vars:
     foreman_subnets:
       - name: dmz-admin

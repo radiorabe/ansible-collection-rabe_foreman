@@ -167,7 +167,7 @@
         location: Randweg
         domain: dmz.int.rabe.ch
         subnet: dmz
-        compute_resource: server-008.dmz-admin.int.rabe
+        compute_resource: server-008.dmz-admin.int.rabe.ch
         compute_profile: 1-Small	
       - name: AlmaLinux 9 DMZ server-009 VMs
         description: AlmaLinux 9 virtual machines to be run on server-009
@@ -176,5 +176,5 @@
         location: Randweg
         domain: dmz.int.rabe.ch
         subnet: dmz
-        compute_resource: server-009.dmz-admin.int.rabe
+        compute_resource: server-009.dmz-admin.int.rabe.ch
         compute_profile: 1-Small	

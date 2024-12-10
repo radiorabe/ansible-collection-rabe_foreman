@@ -33,13 +33,13 @@
         provider: libvirt
         provider_params:
           url: qemu+ssh://root@server-008.dmz-admin.int.rabe.ch/system
-          images:
-            - name: AlmaLinux-9-GenericCloud-9.4-20240507.x86_64.qcow2
-              operatingsystem: AlmaLinux 9
-              architecture: "x86_64"
-              image_username: almalinux
-              user_data: true
-              uuid: /var/lib/libvirt/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2
+        images:
+          - name: AlmaLinux-9-GenericCloud-9.4-20240507.x86_64.qcow2
+            operatingsystem: AlmaLinux 9
+            architecture: "x86_64"
+            image_username: almalinux
+            user_data: true
+            uuid: /var/lib/libvirt/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2
       - name: server-009.dmz-admin.int.rabe.ch
         state: present
         description: DMZ libvirt hypervisor server-009.dmz-admin.int.rabe.ch
@@ -50,10 +50,10 @@
         provider: libvirt
         provider_params:
           url: qemu+ssh://root@server-009.dmz-admin.int.rabe.ch/system
-          images:
-            - name: AlmaLinux-9-GenericCloud-9.4-20240507.x86_64.qcow2
-              operatingsystem: AlmaLinux 9
-              architecture: "x86_64"
-              image_username: almalinux
-              user_data: true
-              uuid: /var/lib/libvirt/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2
+        images:
+          - name: AlmaLinux-9-GenericCloud-9.4-20240507.x86_64.qcow2
+            operatingsystem: AlmaLinux 9
+            architecture: "x86_64"
+            image_username: almalinux
+            user_data: true
+            uuid: /var/lib/libvirt/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2

@@ -35,7 +35,7 @@
             override: disabled
           - label: RaBe_rabeel9_rabeel9_rabezabbix
             override: enabled
-          - label: RaBe_zabbix60_zabbix60
+          - label: RaBe_zabbix70_zabbix70
             override: enabled
           - label: RaBe_foremanclient39el9_foreman39el9_client
             override: enabled
