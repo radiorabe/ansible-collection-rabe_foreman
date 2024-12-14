@@ -37,8 +37,6 @@
             override: enabled
           - label: RaBe_zabbix70_zabbix70
             override: enabled
-          - label: RaBe_foremanclient39el9_foreman39el9_client
-            override: enabled
       - name: "CentOS 7"
         lifecycle_environment: "Prod"
         content_view: "CentOS 7 x86_64"
@@ -57,8 +55,6 @@
             override: disabled
           - label: RaBe_c7_c7_sclo
             override: disabled
-          - label: RaBe_foremanclient39el7_foreman39el7_client
-            override: enabled
           # disable both until end of migration
           - label: RaBe_c7_c7_storage_glusterfs312
             override: disabled
