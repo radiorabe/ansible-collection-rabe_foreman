@@ -80,6 +80,7 @@
         organization: RaBe
         location: Randweg
       - name: CentOS 8 Stream
+        state: absent
         description: CentOS 8 Stream configures the RaBe CentOS 8 Stream baseline.
         parent: RaBe Core/RaBe Base/EL8
         organization: RaBe
@@ -91,6 +92,7 @@
           - redhat.rhel_system_roles.crypto_policies
           - redhat.rhel_system_roles.selinux
       - name: Foreman
+        state: absent
         description: Foreman configures standalone Foreman servers.
         parent: RaBe Core/RaBe Base/EL8/CentOS 8 Stream
         organization: RaBe
