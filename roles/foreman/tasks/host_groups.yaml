@@ -214,7 +214,7 @@
         location: Randweg
         domain: dmz.int.rabe.ch
         subnet: dmz
-        compute_resource: server-008.dmz-admin.int.rabe
+        compute_resource: server-008.dmz-admin.int.rabe.ch
         compute_profile: "1-Small"
       - name: vm-2001.dmz.int.rabe.ch
         description: >
@@ -333,7 +333,7 @@
         location: Randweg
         domain: dmz.int.rabe.ch
         subnet: dmz
-        compute_resource: server-009.dmz-admin.int.rabe
+        compute_resource: server-009.dmz-admin.int.rabe.ch
         compute_profile: "1-Small"
       - name: vm-2002.dmz.int.rabe.ch
         description: >
