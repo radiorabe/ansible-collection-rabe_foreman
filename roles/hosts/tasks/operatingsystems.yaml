@@ -9,14 +9,9 @@
         major: "9"
         os_family: Redhat
         password_hash: SHA256
-      - name: CentOS_Stream
-        description: CentOS Stream 8
+      - name: AlmaLinux
+        description: AlmaLinux 8
         major: "8"
-        os_family: Redhat
-        password_hash: SHA256
-      - name: CentOS_Stream
-        description: CentOS Stream 9
-        major: "9"
         os_family: Redhat
         password_hash: SHA256
       - name: CentOS
