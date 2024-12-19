@@ -1,21 +1,23 @@
 ---
-- name: 'RaBe Foreman Infrastructure : Bootdisk : Base Dir'
+- name: "RaBe Foreman Infrastructure : Bootdisk : Base Dir"
   ansible.builtin.file:
     path: /var/lib/foreman/bootdisk/
     state: directory
     owner: foreman
     group: foreman
-- name: 'RaBe Foreman Infrastructure : Bootdisk : Install grub2-efi-x64'
+    mode: "755"
+- name: "RaBe Foreman Infrastructure : Bootdisk : Install grub2-efi-x64"
   ansible.builtin.package:
     name: grub2-efi-x64
     state: present
-- name: 'RaBe Foreman Infrastructure : Bootdisk : Copy efi'
+- name: "RaBe Foreman Infrastructure : Bootdisk : Copy efi"
   ansible.builtin.copy:
     remote_src: true
     src: "/boot/efi/EFI/almalinux/{{ item }}"
     dest: "/var/lib/foreman/bootdisk/{{ item }}"
     owner: foreman
     group: foreman
+    mode: "700"
   loop:
     - grubx64.efi
     - shimx64.efi

@@ -1,12 +1,11 @@
 ---
-- name: 'RaBe Foreman Config : Configure Host Groups'
+- name: "RaBe Foreman Config : Configure Host Groups"
   ansible.builtin.include_role:
     name: theforeman.foreman.hostgroups
   vars:
     foreman_hostgroups:
       - name: RaBe Core
-        description: RaBe Core contains roles that set facts and sets settings that don't
-          rely on anything and are not OS specific.
+        description: RaBe Core contains roles that set facts and sets settings that don't rely on anything and are not OS specific.
         organization: RaBe
         location: Randweg
         ansible_roles:
@@ -191,7 +190,7 @@
             value: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC4arUJdueCQnOkjVOvrruEEs9M/lKw2ITorTTEIIFgcNAGZNs+SFFxugtMWY2jzrcHoxwSZel3eAMjvS76by6z3ZqZUvMxVHACR0FZvP2WtLk2BjgDjYdmBGDpMArvncHkaiVtjEaruwXVqO+64qsrYXQ3qhUiah+9soFHghWZWS3i+Dnd1JiNFX6TZP+ooqshBaClspAfcywsqFhsFNeU50rlsl11T13vLmZ/G140VF7uhaZ2ukOEj3HSSBcQ1DKIyanoo4fpAG8ealo6Nur0t5rlO67ACgRjLIVBS0LnVG5tvXtnKbz6A0uoUHC5aesDnDUskImWiKnz/6r2QenMkzD08BT6VlaFHhpp4ve2/d2lmjAl4EXvNOCwGsGV9A5BB1O130dwRk85Cxutxm94tuThElWlu37BB8pxOYz8qD+Vph5TVbC4mi1/30hUQffll0x/mcplJsFLY9H7eX0S+Ki2W++udWQ4HfwxbxXlJltMLEw7fhSxEQdGNfIaoM0= foreman@foreman.service.int.rabe.ch
           - name: network_connections
             parameter_type: yaml
-            value: 
+            value:
               - name: Bond bond0
                 state: up
               - name: dmz
@@ -204,7 +203,7 @@
                 interface_name: bond0.133
                 type: vlan
                 vlan:
-                  id: '133'
+                  id: "133"
                 parent: Bond bond0
                 controller: dmz
                 port_type: bridge
@@ -216,7 +215,7 @@
         domain: dmz.int.rabe.ch
         subnet: dmz
         compute_resource: server-008.dmz-admin.int.rabe.ch
-        compute_profile: 1-Small	
+        compute_profile: "1-Small"
       - name: AlmaLinux 9 DMZ server-009 VMs
         description: AlmaLinux 9 virtual machines to be run on server-009
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
@@ -225,4 +224,4 @@
         domain: dmz.int.rabe.ch
         subnet: dmz
         compute_resource: server-009.dmz-admin.int.rabe.ch
-        compute_profile: 1-Small	
+        compute_profile: "1-Small"

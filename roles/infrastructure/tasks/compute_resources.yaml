@@ -1,5 +1,5 @@
 ---
-- name: 'RaBe Foreman Infrastructure : Configure Compute Resources'
+- name: "RaBe Foreman Infrastructure : Configure Compute Resources"
   ansible.builtin.include_role:
     name: theforeman.foreman.compute_resources
   vars:
@@ -15,7 +15,7 @@
         provider_params:
           url: https://ovirt-engine-01.admin.int.rabe.ch/ovirt-engine/api
           user: foreman@ovirt@internalsso
-          password: '{{ rabe_foreman_infrastructure_compute_resources_ovirt_password }}'
+          password: "{{ rabe_foreman_infrastructure_compute_resources_ovirt_password }}"
           # "Default" DC
           # TODO: read me from api
           datacenter: 459954c0-5d2d-4c21-9e3b-689a54d32000

@@ -1,0 +1,11 @@
+# This file contains ignores rule violations for ansible-lint
+
+# We should start writing changelogs at some point
+galaxy.yml galaxy[no-changelog]
+
+# ansible-lint can't find redhat.rhel_system_roles.network
+# we should fix this, maybe by renaming to upstream?
+roles/network/tasks/main.yml syntax-check[specific]
+
+# this might take some work to rename
+roles/network/defaults/main.yml var-naming[no-role-prefix]

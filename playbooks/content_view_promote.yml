@@ -1,9 +1,7 @@
 ---
-- name: 'RaBe Foreman Playbooks : Content View Promote'
+- name: "RaBe Foreman Playbooks : Content View Promote"
   hosts: all
   gather_facts: false
-  collections:
-    - theforeman.foreman
   vars:
     rabe_foreman_content_views:
       - CentOS 7 Base x86_64
@@ -17,7 +15,7 @@
       - Dev
       - Test
   tasks:
-    - name: 'RaBe Foreman Playbook : Content Views : Gather Info'
+    - name: "RaBe Foreman Playbook : Content Views : Gather Info"
       theforeman.foreman.content_view_version_info:
         username: "{{ foreman_username | default(omit) }}"
         password: "{{ foreman_password | default(omit) }}"
@@ -39,6 +37,6 @@
         content_view: "{{ content_view.content_view }}"
         version: "{{ content_view.content_view_versions[0].version }}"
         lifecycle_environments: "{{ rabe_foreman_lifecycle_environments }}"
-      with_items: '{{ content_view_info.results }}'
+      with_items: "{{ content_view_info.results }}"
       loop_control:
         loop_var: content_view

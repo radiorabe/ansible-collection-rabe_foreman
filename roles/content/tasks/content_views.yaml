@@ -1,5 +1,5 @@
 ---
-- name: 'RaBe Foreman Content : Configure Content Views'
+- name: "RaBe Foreman Content : Configure Content Views"
   ansible.builtin.include_role:
     name: theforeman.foreman.content_views
   vars:

@@ -1,6 +1,6 @@
 ---
 # TODO: figure out how disable repos by default and get rid of overrides here
-- name: 'RaBe Foreman Content : Configure Activation Keys'
+- name: "RaBe Foreman Content : Configure Activation Keys"
   ansible.builtin.include_role:
     name: theforeman.foreman.activation_keys
   vars:
