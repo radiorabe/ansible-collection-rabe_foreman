@@ -78,6 +78,12 @@
         parent: RaBe Core/RaBe Base
         organization: RaBe
         location: Randweg
+      - name: Foreman
+        state: absent
+        description: Foreman configures standalone Foreman servers.
+        parent: RaBe Core/RaBe Base/EL8/CentOS 8 Stream
+        organization: RaBe
+        location: Randweg
       - name: CentOS 8 Stream
         state: absent
         description: CentOS 8 Stream configures the RaBe CentOS 8 Stream baseline.
@@ -90,12 +96,6 @@
           - redhat.rhel_system_roles.kdump
           - redhat.rhel_system_roles.crypto_policies
           - redhat.rhel_system_roles.selinux
-      - name: Foreman
-        state: absent
-        description: Foreman configures standalone Foreman servers.
-        parent: RaBe Core/RaBe Base/EL8/CentOS 8 Stream
-        organization: RaBe
-        location: Randweg
       - name: EL9
         description: EL9 configures our EL9 baseline
         parent: RaBe Core/RaBe Base
@@ -217,7 +217,7 @@
         compute_profile: "1-Small"
       - name: vm-2001.dmz.int.rabe.ch
         description: AlmaLinux 9 DMZ virtual machine vm-2001 for running reverse-proxy container
-        parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-009 Vms
+        parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-009 VMs
         organization: RaBe
         location: Randweg
         ansible_roles:
@@ -334,7 +334,7 @@
         compute_profile: "1-Small"
       - name: vm-2002.dmz.int.rabe.ch
         description: AlmaLinux 9 DMZ virtual machine vm-2002 for running reverse-proxy container
-        parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-009 Vms
+        parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-009 VMs
         organization: RaBe
         location: Randweg
         ansible_roles:
