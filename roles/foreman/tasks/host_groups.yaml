@@ -122,6 +122,52 @@
         organization: RaBe
         location: Randweg
         compute_resource: ovirt
+      - name: vm-0043.service.int.rabe.ch
+        description: >
+          AlmaLinux 9 VM for Letsencrypt certificate renewal on reverse proxies
+        parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
+        organization: RaBe
+        location: Randweg
+        ansible_roles:
+          - radiorabe.certbot.certbot
+        parameters:
+          - name: certbot_acme_account_mail
+            parameter_type: string
+            value: it@rabe.ch
+          - name: certbot_certificates
+            parameter_type: yaml
+            value:
+              - letest.rabe.ch
+              - dmz-rev-proxy.ewb.rabe.ch
+          - name: certbot_remote_hosts
+            parameter_type: yaml
+            value:
+              - vm-2001.dmz.int.rabe.ch
+              - vm-2002.dmz.int.rabe.ch
+          - name: firewall
+            parameter_type: yaml
+            value:
+              - zone: service
+                state: present
+                permanent: true
+                immediate: true
+              - zone: service
+                interface: enp1s0
+                state: present
+                permanent: true
+                immediate: true
+              - zone: service
+                service:
+                  - cockpit
+                  - ssh
+                  - http
+                  - pmcd
+                state: enabled
+                permanent: true
+                immediate: true
+              - set_default_zone: drop
+                permanent: true
+                immediate: true
       - name: AlmaLinux 9 DMZ Virtualization Server
         description: AlmaLinux 9 general purpose virtual machines.
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
