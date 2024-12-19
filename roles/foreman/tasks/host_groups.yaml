@@ -78,24 +78,6 @@
         parent: RaBe Core/RaBe Base
         organization: RaBe
         location: Randweg
-      - name: Foreman
-        state: absent
-        description: Foreman configures standalone Foreman servers.
-        parent: RaBe Core/RaBe Base/EL8/CentOS 8 Stream
-        organization: RaBe
-        location: Randweg
-      - name: CentOS 8 Stream
-        state: absent
-        description: CentOS 8 Stream configures the RaBe CentOS 8 Stream baseline.
-        parent: RaBe Core/RaBe Base/EL8
-        organization: RaBe
-        location: Randweg
-        operatingsystem: CentOS Stream 8
-        ansible_roles:
-          - theforeman.foreman_scap_client
-          - redhat.rhel_system_roles.kdump
-          - redhat.rhel_system_roles.crypto_policies
-          - redhat.rhel_system_roles.selinux
       - name: EL9
         description: EL9 configures our EL9 baseline
         parent: RaBe Core/RaBe Base
