@@ -277,35 +277,35 @@
                     name: revproxy
                   spec:
                     containers:
-                    - name: revproxy
-                      image: ghcr.io/radiorabe/httpd:0.5.1
-                      env:
-                      - name: PODMAN_HOST
-                        value: "{{ansible_host}}"
-                      ports:
-                      - containerPort: 8080
-                        hostPort: 8080
-                      - containerPort: 8090
-                        hostPort: 8090
-                      - containerPort: 8443
-                        hostPort: 8443
-                      volumeMounts:
-                      - mountPath: "/etc/httpd/conf.d/local_configs:Z"
-                        name: local_httpd_configs
-                      - mountPath: "/etc/httpd/modsecurity.d/local_rules:Z"
-                        name: local_modsec_rules
-                      - mountPath: "/etc/pki/tls/private/rabe_certs:Z"
-                        name: local_letsencrypt_certs
+                      - name: revproxy
+                        image: ghcr.io/radiorabe/httpd:0.5.1
+                        env:
+                          - name: PODMAN_HOST
+                            value: "{{ ansible_host }}"
+                        ports:
+                          - containerPort: 8080
+                            hostPort: 8080
+                          - containerPort: 8090
+                            hostPort: 8090
+                          - containerPort: 8443
+                            hostPort: 8443
+                        volumeMounts:
+                          - mountPath: "/etc/httpd/conf.d/local_configs:Z"
+                            name: local_httpd_configs
+                          - mountPath: "/etc/httpd/modsecurity.d/local_rules:Z"
+                            name: local_modsec_rules
+                          - mountPath: "/etc/pki/tls/private/rabe_certs:Z"
+                            name: local_letsencrypt_certs
                     volumes:
-                    - name: local_httpd_configs
-                      hostPath:
-                        path: "/home/revproxy/httpd/conf.d/local_configs"
-                    - name: local_modsec_rules
-                      hostPath:
-                        path: "/home/revproxy/httpd/modsecurity.d/local_rules"
-                    - name: local_letsencrypt_certs
-                      hostPath:
-                        path: "/home/revproxy/httpd/rabe_certs"
+                      - name: local_httpd_configs
+                        hostPath:
+                          path: "/home/revproxy/httpd/conf.d/local_configs"
+                      - name: local_modsec_rules
+                        hostPath:
+                          path: "/home/revproxy/httpd/modsecurity.d/local_rules"
+                      - name: local_letsencrypt_certs
+                        hostPath:
+                          path: "/home/revproxy/httpd/rabe_certs"
           - name: podman_run_as_group
             parameter_type: string
             value: revproxy
@@ -396,35 +396,35 @@
                     name: revproxy
                   spec:
                     containers:
-                    - name: revproxy
-                      image: ghcr.io/radiorabe/httpd:0.5.1
-                      env:
-                      - name: PODMAN_HOST
-                        value: "{{ansible_host}}"
-                      ports:
-                      - containerPort: 8080
-                        hostPort: 8080
-                      - containerPort: 8090
-                        hostPort: 8090
-                      - containerPort: 8443
-                        hostPort: 8443
-                      volumeMounts:
-                      - mountPath: "/etc/httpd/conf.d/local_configs:Z"
-                        name: local_httpd_configs
-                      - mountPath: "/etc/httpd/modsecurity.d/local_rules:Z"
-                        name: local_modsec_rules
-                      - mountPath: "/etc/pki/tls/private/rabe_certs:Z"
-                        name: local_letsencrypt_certs
+                      - name: revproxy
+                        image: ghcr.io/radiorabe/httpd:0.5.1
+                        env:
+                          - name: PODMAN_HOST
+                            value: "{{ ansible_host }}"
+                        ports:
+                          - containerPort: 8080
+                            hostPort: 8080
+                          - containerPort: 8090
+                            hostPort: 8090
+                          - containerPort: 8443
+                            hostPort: 8443
+                        volumeMounts:
+                          - mountPath: "/etc/httpd/conf.d/local_configs:Z"
+                            name: local_httpd_configs
+                          - mountPath: "/etc/httpd/modsecurity.d/local_rules:Z"
+                            name: local_modsec_rules
+                          - mountPath: "/etc/pki/tls/private/rabe_certs:Z"
+                            name: local_letsencrypt_certs
                     volumes:
-                    - name: local_httpd_configs
-                      hostPath:
-                        path: "/home/revproxy/httpd/conf.d/local_configs"
-                    - name: local_modsec_rules
-                      hostPath:
-                        path: "/home/revproxy/httpd/modsecurity.d/local_rules"
-                    - name: local_letsencrypt_certs
-                      hostPath:
-                        path: "/home/revproxy/httpd/rabe_certs"
+                      - name: local_httpd_configs
+                        hostPath:
+                          path: "/home/revproxy/httpd/conf.d/local_configs"
+                      - name: local_modsec_rules
+                        hostPath:
+                          path: "/home/revproxy/httpd/modsecurity.d/local_rules"
+                      - name: local_letsencrypt_certs
+                        hostPath:
+                          path: "/home/revproxy/httpd/rabe_certs"
           - name: podman_run_as_group
             parameter_type: string
             value: revproxy
