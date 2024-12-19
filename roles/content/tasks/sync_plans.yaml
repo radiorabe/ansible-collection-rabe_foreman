@@ -1,5 +1,5 @@
 ---
-- name: 'RaBe Foreman Content : Configure Sync Plans'
+- name: "RaBe Foreman Content : Configure Sync Plans"
   ansible.builtin.include_role:
     name: theforeman.foreman.sync_plans
   vars:
@@ -9,23 +9,20 @@
         sync_date: 2020-11-07 00:00:00 UTC
         products:
           - CentOS 7
-          - CentOS 8 Stream
           - AlmaLinux 8
           - AlmaLinux 9
           - RaBe Ansible
           - Extra Packages for Enterprise Linux 7
           - Extra Packages for Enterprise Linux 8
           - Extra Packages for Enterprise Linux 9
-          - Foreman Client 3.9 EL7
-          - Foreman Client 3.9 EL8
-          - Foreman Client 3.9 EL9
-          - Foreman Client 3.10 EL7
-          - Foreman Client 3.10 EL8
-          - Foreman Client 3.10 EL9
+          - Foreman Client 3.12 EL7
+          - Foreman Client 3.12 EL8
+          - Foreman Client 3.12 EL9
           - RaBe Logstash Addons EL7
           - Zabbix 3.0 (LTS) EL7
           - Zabbix 6.4 EL7
           - Zabbix 6.4 EL9
+          - Zabbix 7.0 EL9
           - RaBe Linux EL7
           - RaBe Linux EL8
           - RaBe Linux EL9

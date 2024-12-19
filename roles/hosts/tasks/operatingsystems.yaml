@@ -1,26 +1,26 @@
 ---
-- name: 'RaBe Foreman Hosts : Configure Operatingsystems'
+- name: "RaBe Foreman Hosts : Configure Operatingsystems"
   ansible.builtin.include_role:
     name: theforeman.foreman.operatingsystems
   vars:
     foreman_operatingsystems:
       - name: AlmaLinux
         description: AlmaLinux 9
-        major: '9'
+        major: "9"
         os_family: Redhat
         password_hash: SHA256
       - name: CentOS_Stream
         description: CentOS Stream 8
-        major: '8'
+        major: "8"
         os_family: Redhat
         password_hash: SHA256
       - name: CentOS_Stream
         description: CentOS Stream 9
-        major: '9'
+        major: "9"
         os_family: Redhat
         password_hash: SHA256
       - name: CentOS
         description: CentOS 7
-        major: '7'
+        major: "7"
         os_family: Redhat
         password_hash: SHA256

@@ -1,6 +1,6 @@
 ---
 # TODO: figure out how disable repos by default and get rid of overrides here
-- name: 'RaBe Foreman Content : Configure Activation Keys'
+- name: "RaBe Foreman Content : Configure Activation Keys"
   ansible.builtin.include_role:
     name: theforeman.foreman.activation_keys
   vars:
@@ -35,9 +35,7 @@
             override: disabled
           - label: RaBe_rabeel9_rabeel9_rabezabbix
             override: enabled
-          - label: RaBe_zabbix60_zabbix60
-            override: enabled
-          - label: RaBe_foremanclient39el9_foreman39el9_client
+          - label: RaBe_zabbix70_zabbix70
             override: enabled
       - name: "CentOS 7"
         lifecycle_environment: "Prod"
@@ -57,8 +55,6 @@
             override: disabled
           - label: RaBe_c7_c7_sclo
             override: disabled
-          - label: RaBe_foremanclient39el7_foreman39el7_client
-            override: enabled
           # disable both until end of migration
           - label: RaBe_c7_c7_storage_glusterfs312
             override: disabled

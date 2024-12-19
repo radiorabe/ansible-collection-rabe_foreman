@@ -1,12 +1,11 @@
 ---
-- name: 'RaBe Foreman Config : Configure Roles'
+- name: "RaBe Foreman Config : Configure Roles"
   ansible.builtin.include_role:
     name: radiorabe.foreman.roles
   vars:
     foreman_roles:
       - name: Default role
-        description: Role that is automatically assigned to every user in the system. Adding
-          a permission grants it to everybody
+        description: Role that is automatically assigned to every user in the system. Adding a permission grants it to everybody
         state: present
         filters:
           - permissions:

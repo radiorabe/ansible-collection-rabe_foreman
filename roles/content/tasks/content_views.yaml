@@ -1,5 +1,5 @@
 ---
-- name: 'RaBe Foreman Content : Configure Content Views'
+- name: "RaBe Foreman Content : Configure Content Views"
   ansible.builtin.include_role:
     name: theforeman.foreman.content_views
   vars:
@@ -27,8 +27,8 @@
             product: CentOS 7
           - name: Extra Packages for Enterprise Linux 7 x86_64
             product: Extra Packages for Enterprise Linux 7
-          - name: Foreman Client 3.10 EL7 x86_64
-            product: Foreman Client 3.10 EL7
+          - name: Foreman Client 3.12 EL7 x86_64
+            product: Foreman Client 3.12 EL7
           - name: RaBe Logstash Addons EL7
             product: RaBe Logstash Addons EL7
           - name: Copr repo for rabe-zabbix x86_64
@@ -79,8 +79,8 @@
             product: AlmaLinux 8
           - name: AlmaLinux 8 RT x86_64
             product: AlmaLinux 8
-          - name: Foreman Client 3.10 EL8 x86_64
-            product: Foreman Client 3.10 EL8
+          - name: Foreman Client 3.12 EL8 x86_64
+            product: Foreman Client 3.12 EL8
           - name: Extra Packages for Enterprise Linux 8 x86_64
             product: Extra Packages for Enterprise Linux 8
       - name: AlmaLinux 9 Base x86_64
@@ -107,12 +107,14 @@
             product: AlmaLinux 9
           - name: AlmaLinux 9 RT x86_64
             product: AlmaLinux 9
-          - name: Foreman Client 3.10 EL9 x86_64
-            product: Foreman Client 3.10 EL9
+          - name: Foreman Client 3.12 EL9 x86_64
+            product: Foreman Client 3.12 EL9
           - name: Extra Packages for Enterprise Linux 9 x86_64
             product: Extra Packages for Enterprise Linux 9
-          - name: Zabbix 6.4 Official Repository - EL9 - x86_64
-            product: Zabbix 6.4 EL9
+          - name: Zabbix 7.0 Official Repository - EL9 - x86_64
+            product: Zabbix 7.0 EL9
+          # TODO: move unsupported repo to 7.0 product and update here once done
+          # this is most likely a multi-step change
           - name: Zabbix Official Repository (non-supported) - EL9 - x86_64
             product: Zabbix 6.4 EL9
           - name: Trivy for EL9 (x84_64)

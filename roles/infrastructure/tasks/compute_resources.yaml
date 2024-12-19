@@ -1,5 +1,5 @@
 ---
-- name: 'RaBe Foreman Infrastructure : Configure Compute Resources'
+- name: "RaBe Foreman Infrastructure : Configure Compute Resources"
   ansible.builtin.include_role:
     name: theforeman.foreman.compute_resources
   vars:
@@ -15,7 +15,7 @@
         provider_params:
           url: https://ovirt-engine-01.admin.int.rabe.ch/ovirt-engine/api
           user: foreman@ovirt@internalsso
-          password: '{{ rabe_foreman_infrastructure_compute_resources_ovirt_password }}'
+          password: "{{ rabe_foreman_infrastructure_compute_resources_ovirt_password }}"
           # "Default" DC
           # TODO: read me from api
           datacenter: 459954c0-5d2d-4c21-9e3b-689a54d32000
@@ -33,13 +33,13 @@
         provider: libvirt
         provider_params:
           url: qemu+ssh://root@server-008.dmz-admin.int.rabe.ch/system
-          images:
-            - name: AlmaLinux-9-GenericCloud-9.4-20240507.x86_64.qcow2
-              operatingsystem: AlmaLinux 9
-              architecture: "x86_64"
-              image_username: almalinux
-              user_data: true
-              uuid: /var/lib/libvirt/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2
+        images:
+          - name: AlmaLinux-9-GenericCloud-9.4-20240507.x86_64.qcow2
+            operatingsystem: AlmaLinux 9
+            architecture: "x86_64"
+            image_username: almalinux
+            user_data: true
+            uuid: /var/lib/libvirt/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2
       - name: server-009.dmz-admin.int.rabe.ch
         state: present
         description: DMZ libvirt hypervisor server-009.dmz-admin.int.rabe.ch
@@ -50,10 +50,10 @@
         provider: libvirt
         provider_params:
           url: qemu+ssh://root@server-009.dmz-admin.int.rabe.ch/system
-          images:
-            - name: AlmaLinux-9-GenericCloud-9.4-20240507.x86_64.qcow2
-              operatingsystem: AlmaLinux 9
-              architecture: "x86_64"
-              image_username: almalinux
-              user_data: true
-              uuid: /var/lib/libvirt/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2
+        images:
+          - name: AlmaLinux-9-GenericCloud-9.4-20240507.x86_64.qcow2
+            operatingsystem: AlmaLinux 9
+            architecture: "x86_64"
+            image_username: almalinux
+            user_data: true
+            uuid: /var/lib/libvirt/images/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2

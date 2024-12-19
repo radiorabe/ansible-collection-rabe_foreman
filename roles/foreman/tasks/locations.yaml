@@ -1,5 +1,5 @@
 ---
-- name: 'RaBe Foreman Config : Configure Locations'
+- name: "RaBe Foreman Config : Configure Locations"
   ansible.builtin.include_role:
     name: radiorabe.foreman.locations
   vars:

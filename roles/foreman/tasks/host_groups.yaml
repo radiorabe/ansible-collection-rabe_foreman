@@ -1,12 +1,11 @@
 ---
-- name: 'RaBe Foreman Config : Configure Host Groups'
+- name: "RaBe Foreman Config : Configure Host Groups"
   ansible.builtin.include_role:
     name: theforeman.foreman.hostgroups
   vars:
     foreman_hostgroups:
       - name: RaBe Core
-        description: RaBe Core contains roles that set facts and sets settings that don't
-          rely on anything and are not OS specific.
+        description: RaBe Core contains roles that set facts and sets settings that don't rely on anything and are not OS specific.
         organization: RaBe
         location: Randweg
         ansible_roles:
@@ -61,6 +60,8 @@
           - name: only_subscription_manager_repos
             parameter_type: boolean
             value: true
+          - name: package_upgrade
+            value: false
       - name: EL7
         description: EL7 configures our EL7 baseline.
         parent: RaBe Core/RaBe Base
@@ -78,6 +79,7 @@
         organization: RaBe
         location: Randweg
       - name: CentOS 8 Stream
+        state: absent
         description: CentOS 8 Stream configures the RaBe CentOS 8 Stream baseline.
         parent: RaBe Core/RaBe Base/EL8
         organization: RaBe
@@ -89,6 +91,7 @@
           - redhat.rhel_system_roles.crypto_policies
           - redhat.rhel_system_roles.selinux
       - name: Foreman
+        state: absent
         description: Foreman configures standalone Foreman servers.
         parent: RaBe Core/RaBe Base/EL8/CentOS 8 Stream
         organization: RaBe
@@ -118,6 +121,52 @@
         organization: RaBe
         location: Randweg
         compute_resource: ovirt
+      - name: vm-0043.service.int.rabe.ch
+        description: >
+          AlmaLinux 9 VM for Letsencrypt certificate renewal on reverse proxies
+        parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
+        organization: RaBe
+        location: Randweg
+        ansible_roles:
+          - radiorabe.certbot.certbot
+        parameters:
+          - name: certbot_acme_account_mail
+            parameter_type: string
+            value: it@rabe.ch
+          - name: certbot_certificates
+            parameter_type: yaml
+            value:
+              - letest.rabe.ch
+              - dmz-rev-proxy.ewb.rabe.ch
+          - name: certbot_remote_hosts
+            parameter_type: yaml
+            value:
+              - vm-2001.dmz.int.rabe.ch
+              - vm-2002.dmz.int.rabe.ch
+          - name: firewall
+            parameter_type: yaml
+            value:
+              - zone: service
+                state: present
+                permanent: true
+                immediate: true
+              - zone: service
+                interface: enp1s0
+                state: present
+                permanent: true
+                immediate: true
+              - zone: service
+                service:
+                  - cockpit
+                  - ssh
+                  - http
+                  - pmcd
+                state: enabled
+                permanent: true
+                immediate: true
+              - set_default_zone: drop
+                permanent: true
+                immediate: true
       - name: AlmaLinux 9 DMZ Virtualization Server
         description: AlmaLinux 9 general purpose virtual machines.
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
@@ -141,7 +190,7 @@
             value: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC4arUJdueCQnOkjVOvrruEEs9M/lKw2ITorTTEIIFgcNAGZNs+SFFxugtMWY2jzrcHoxwSZel3eAMjvS76by6z3ZqZUvMxVHACR0FZvP2WtLk2BjgDjYdmBGDpMArvncHkaiVtjEaruwXVqO+64qsrYXQ3qhUiah+9soFHghWZWS3i+Dnd1JiNFX6TZP+ooqshBaClspAfcywsqFhsFNeU50rlsl11T13vLmZ/G140VF7uhaZ2ukOEj3HSSBcQ1DKIyanoo4fpAG8ealo6Nur0t5rlO67ACgRjLIVBS0LnVG5tvXtnKbz6A0uoUHC5aesDnDUskImWiKnz/6r2QenMkzD08BT6VlaFHhpp4ve2/d2lmjAl4EXvNOCwGsGV9A5BB1O130dwRk85Cxutxm94tuThElWlu37BB8pxOYz8qD+Vph5TVbC4mi1/30hUQffll0x/mcplJsFLY9H7eX0S+Ki2W++udWQ4HfwxbxXlJltMLEw7fhSxEQdGNfIaoM0= foreman@foreman.service.int.rabe.ch
           - name: network_connections
             parameter_type: yaml
-            value: 
+            value:
               - name: Bond bond0
                 state: up
               - name: dmz
@@ -154,7 +203,7 @@
                 interface_name: bond0.133
                 type: vlan
                 vlan:
-                  id: '133'
+                  id: "133"
                 parent: Bond bond0
                 controller: dmz
                 port_type: bridge
@@ -166,7 +215,7 @@
         domain: dmz.int.rabe.ch
         subnet: dmz
         compute_resource: server-008.dmz-admin.int.rabe
-        compute_profile: 1-Small	
+        compute_profile: "1-Small"
       - name: vm-2001.dmz.int.rabe.ch
         description: >
           AlmaLinux 9 DMZ virtual machine vm-2001
@@ -287,7 +336,7 @@
         domain: dmz.int.rabe.ch
         subnet: dmz
         compute_resource: server-009.dmz-admin.int.rabe
-        compute_profile: 1-Small	
+        compute_profile: "1-Small"
       - name: vm-2002.dmz.int.rabe.ch
         description: >
           AlmaLinux 9 DMZ virtual machine vm-2002

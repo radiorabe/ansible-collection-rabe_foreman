@@ -1,15 +1,15 @@
 ---
-- name: 'RaBe Foreman Hosts : Operatingsystems'
+- name: "RaBe Foreman Hosts : Operatingsystems"
   ansible.builtin.import_tasks: operatingsystems.yaml
   tags:
     - role::rabe_foreman.hosts
     - role::rabe_foreman.hosts:operatingsystems
-- name: 'RaBe Foreman Hosts : Architectures'
+- name: "RaBe Foreman Hosts : Architectures"
   ansible.builtin.import_tasks: architectures.yaml
   tags:
     - role::rabe_foreman.hosts
     - role::rabe_foreman.hosts:architectures
-- name: 'RaBe Foreman Hosts : Installation Mediums'
+- name: "RaBe Foreman Hosts : Installation Mediums"
   ansible.builtin.import_tasks: installation_mediums.yaml
   tags:
     - role::rabe_foreman.hosts

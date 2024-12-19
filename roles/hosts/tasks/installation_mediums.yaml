@@ -1,5 +1,5 @@
 ---
-- name: 'RaBe Foreman Hosts : Configure Installation Mediums'
+- name: "RaBe Foreman Hosts : Configure Installation Mediums"
   ansible.builtin.include_role:
     name: radiorabe.foreman.installation_mediums
   vars:
@@ -13,7 +13,7 @@
         os_family: Redhat
         path: http://mirror.centos.org/centos/$major/BaseOS/$arch/kickstart
       - name: CentOS Stream
-        state: present
+        state: absent
         os_family: Redhat
         path: http://mirror.centos.org/centos/$major-stream/BaseOS/$arch/os
       - name: CoreOS mirror

@@ -1,5 +1,5 @@
 ---
-- name: 'RaBe Foreman Config : Configure Settings'
+- name: "RaBe Foreman Config : Configure Settings"
   ansible.builtin.include_role:
     name: theforeman.foreman.settings
   vars:
@@ -7,17 +7,17 @@
       - name: rss_enable
         value: false
       - name: administrator
-        value: '{{ radiorabe_core_admin_mail }}'
+        value: "{{ radiorabe_core_admin_mail }}"
       - name: email_reply_address
-        value: '{{ radiorabe_base_mail_noreply }}'
+        value: "{{ radiorabe_base_mail_noreply }}"
       - name: delivery_method
         value: SMTP
       - name: smtp_address
-        value: '{{ radiorabe_rabe_foreman_foreman_settings_smtp_address }}'
+        value: "{{ radiorabe_rabe_foreman_foreman_settings_smtp_address }}"
       - name: smtp_domain
-        value: '{{ radiorabe_core_hostname }}'
+        value: "{{ radiorabe_core_hostname }}"
       - name: smtp_user_name
-        value: '{{ radiorabe_rabe_foreman_foreman_settings_smtp_username }}'
+        value: "{{ radiorabe_rabe_foreman_foreman_settings_smtp_username }}"
       - name: ansible_roles_to_ignore
         value:
           - linux-system-roles.*
@@ -35,7 +35,7 @@
       - name: lab_features
         value: false
       - name: login_text
-        value: '{{ radiorabe_core_admin_name }} : Foreman'
+        value: "{{ radiorabe_core_admin_name }} : Foreman"
       # We don't currently schedule regular ansible runs and this makes
       # more sense than high ansible_interval and outofsync_interval
       # settings. We'll see how not setting a high outofsync value goes.

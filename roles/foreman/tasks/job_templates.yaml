@@ -1,15 +1,15 @@
 ---
-- name: 'RaBe Foreman Config : Job Templates'
+- name: "RaBe Foreman Config : Job Templates"
   block:
-    - name: 'RaBe Foreman Config : Unlock All Job Templates'
+    - name: "RaBe Foreman Config : Unlock All Job Templates"
       ansible.builtin.include_role:
         name: radiorabe.foreman.job_templates
       vars:
         foreman_job_templates:
-          - name: '*'
+          - name: "*"
             locked: false
       when: not ansible_check_mode
-    - name: 'RaBe Foreman Config : Configure Job Templates'
+    - name: "RaBe Foreman Config : Configure Job Templates"
       ansible.builtin.include_role:
         name: radiorabe.foreman.job_templates
       vars:
@@ -44,7 +44,7 @@
             provider_type: Ansible
             kind: job_template
             model: JobTemplate
-            file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/rabe_foreman_publish_content_view.erb'
+            file_name: "{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/rabe_foreman_publish_content_view.erb"
           - name: RaBe Foreman - Promote Content Views to Prod
             state: present
             job_category: RaBe Foreman
@@ -61,7 +61,7 @@
             provider_type: Ansible
             kind: job_template
             model: JobTemplate
-            file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/rabe_foreman_promote_content_views.erb'
+            file_name: "{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/rabe_foreman_promote_content_views.erb"
           - name: RaBe Foreman - Version Cleanup Content Views
             state: present
             job_category: RaBe Foreman
@@ -70,14 +70,14 @@
             provider_type: Ansible
             kind: job_template
             model: JobTemplate
-            file_name: '{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/rabe_foreman_version_cleanup_content_view.erb'
+            file_name: "{{ role_path }}/../../../rabe_foreman/roles/foreman/files/job_templates/rabe_foreman_version_cleanup_content_view.erb"
       when: not ansible_check_mode
   always:
-    - name: 'RaBe Foreman Config : Lock All Job Templates'
+    - name: "RaBe Foreman Config : Lock All Job Templates"
       ansible.builtin.include_role:
         name: radiorabe.foreman.job_templates
       vars:
         foreman_job_templates:
-          - name: '*'
+          - name: "*"
             locked: true
       when: not ansible_check_mode

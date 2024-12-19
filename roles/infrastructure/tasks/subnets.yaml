@@ -1,7 +1,7 @@
 ---
-- name: 'Rabe Foreman Infrastructure : Create subnets'
+- name: "Rabe Foreman Infrastructure : Create subnets"
   ansible.builtin.include_role:
-    name: radiorabe.foreman.subnets
+    name: theforeman.foreman.subnets
   vars:
     foreman_subnets:
       - name: dmz-admin
@@ -12,13 +12,13 @@
         vlanid: 138
         mtu: 1500
         domains:
-        - dmz-admin.int.rabe.ch
+          - dmz-admin.int.rabe.ch
         organizations:
-        - RaBe
+          - RaBe
         locations:
-        - Randweg
+          - Randweg
         dns_primary: 10.131.0.1
-        dns_secondary:  10.131.0.2
+        dns_secondary: 10.131.0.2
       - name: dmz
         network: 10.133.0.0
         mask: 255.255.0.0
@@ -27,10 +27,10 @@
         vlanid: 133
         mtu: 1500
         domains:
-        - dmz.int.rabe.ch
+          - dmz.int.rabe.ch
         organizations:
-        - RaBe
+          - RaBe
         locations:
-        - Randweg
+          - Randweg
         dns_primary: 10.131.0.1
-        dns_secondary:  10.131.0.2
+        dns_secondary: 10.131.0.2

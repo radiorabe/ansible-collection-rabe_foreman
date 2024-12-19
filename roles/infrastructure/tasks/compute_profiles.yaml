@@ -1,5 +1,5 @@
 ---
-- name: 'RaBe Foreman Infrastructure : Configure Compute Profiles'
+- name: "RaBe Foreman Infrastructure : Configure Compute Profiles"
   ansible.builtin.include_role:
     name: theforeman.foreman.compute_profiles
   vars:

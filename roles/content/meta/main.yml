@@ -1,9 +1,10 @@
+---
 galaxy_info:
   author: RaBe IT-Reaktion
   description: Manage Foreman Content
   issue_tracker_url: https://github.com/radiorabe/ansible-collection-rabe_foreman/issues
   license: AGPL-3.0-only
-  min_ansible_version: '2.9'
+  min_ansible_version: "2.14"
   platforms:
     - name: EL
       versions:

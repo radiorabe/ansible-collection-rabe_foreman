@@ -1,5 +1,5 @@
 ---
-- name: 'RaBe Foreman Network : Call Linux System Roles Network Role'
+- name: "RaBe Foreman Network : Call Linux System Roles Network Role"
   ansible.builtin.import_role:
     name: redhat.rhel_system_roles.network
   vars:

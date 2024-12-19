@@ -1,10 +1,10 @@
 ---
-- name: 'Rabe Foreman Infrastructure : Create realm {{ radiorabe_core_realm }}'
+- name: "Rabe Foreman Infrastructure : Create realm {{ radiorabe_core_realm }}"
   ansible.builtin.include_role:
     name: radiorabe.foreman.realms
   vars:
     foreman_realms:
-      - name: '{{ radiorabe_core_realm }}'
+      - name: "{{ radiorabe_core_realm }}"
         state: present
-        realm_type: 'FreeIPA'
-        realm_proxy: '{{ radiorabe_base_foreman_host }}'
+        realm_type: "FreeIPA"
+        realm_proxy: "{{ radiorabe_base_foreman_host }}"
