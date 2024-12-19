@@ -220,9 +220,7 @@
         description: >
           AlmaLinux 9 DMZ virtual machine vm-2001
            for running reverse-proxy container
-        parent: >
-          RaBe Core/RaBe Base/EL9/AlmaLinux 9/
-          AlmaLinux 9 DMZ server-009 Vms
+        parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-009 Vms
         organization: RaBe
         location: Randweg
         ansible_roles:
@@ -341,9 +339,7 @@
         description: >
           AlmaLinux 9 DMZ virtual machine vm-2002
            for running reverse-proxy container
-        parent: >
-          RaBe Core/RaBe Base/EL9/AlmaLinux 9/
-          AlmaLinux 9 DMZ server-009 Vms
+        parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-009 Vms
         organization: RaBe
         location: Randweg
         ansible_roles:
