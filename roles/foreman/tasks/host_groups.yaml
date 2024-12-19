@@ -122,8 +122,7 @@
         location: Randweg
         compute_resource: ovirt
       - name: vm-0043.service.int.rabe.ch
-        description: >
-          AlmaLinux 9 VM for Letsencrypt certificate renewal on reverse proxies
+        description: AlmaLinux 9 VM for Letsencrypt certificate renewal on reverse proxies
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
         organization: RaBe
         location: Randweg
@@ -217,9 +216,7 @@
         compute_resource: server-008.dmz-admin.int.rabe.ch
         compute_profile: "1-Small"
       - name: vm-2001.dmz.int.rabe.ch
-        description: >
-          AlmaLinux 9 DMZ virtual machine vm-2001
-           for running reverse-proxy container
+        description: AlmaLinux 9 DMZ virtual machine vm-2001 for running reverse-proxy container
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-009 Vms
         organization: RaBe
         location: Randweg
@@ -336,9 +333,7 @@
         compute_resource: server-009.dmz-admin.int.rabe.ch
         compute_profile: "1-Small"
       - name: vm-2002.dmz.int.rabe.ch
-        description: >
-          AlmaLinux 9 DMZ virtual machine vm-2002
-           for running reverse-proxy container
+        description: AlmaLinux 9 DMZ virtual machine vm-2002 for running reverse-proxy container
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-009 Vms
         organization: RaBe
         location: Randweg
