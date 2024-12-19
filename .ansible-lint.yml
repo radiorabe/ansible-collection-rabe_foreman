@@ -1,0 +1,8 @@
+---
+exclude_paths:
+  - .github/
+  - venv/
+write_list:
+  - all
+warn_list:
+  - meta-runtime[unsupported-version]

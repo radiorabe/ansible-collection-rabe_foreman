@@ -1,5 +1,5 @@
 ---
-- name: 'RaBe Foreman Content : Configure Products'
+- name: "RaBe Foreman Content : Configure Products"
   ansible.builtin.include_role:
     name: theforeman.foreman.repositories
   vars:
@@ -580,7 +580,7 @@
             auto_enabled: false
       - name: AlmaLinux OS Generic Cloud (Cloud-init) image
         label: AlmaLinux_OS_Generic_Cloud_Cloud-init_image
-        description: > 
+        description: >
           The Generic Cloud image is a general purpose virtual machine image
           that contains the Cloud-init package. During boot,
           cloud-init will take configuration options from cloud metadata and
@@ -598,8 +598,7 @@
               include network configuration, user's SSH key pair installation,
               attaching storage devices, etc.
 
-              To be used with libvirt, the image has to be altered with 
-              guestfs-tools and
+              To be used with libvirt, the image has to be altered with guestfs-tools and
 
               virt-customize -a
               Downloads/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2 --install

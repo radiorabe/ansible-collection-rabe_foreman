@@ -1,3 +1,4 @@
+---
 namespace: radiorabe
 name: rabe_foreman
 version: 0.0.0
@@ -9,13 +10,14 @@ license_file: LICENSE
 tags:
   - radiorabe
   - foreman
+  - infrastructure
 dependencies:
   ansible.posix: ">=1.3.0"
   community.general: ">=3.7.0"
   community.postgresql: ">=3.3.0" # for zabbix
   community.zabbix: ">=1.9.0"
   radiorabe.common: ">=0.2.0"
-  radiorabe.foreman: ">=0.7.0"
+  radiorabe.foreman: ">=0.9.0"
   radiorabe.podman: ">=0.1.0"
   radiorabe.rabe_zabbix: ">=0.1.1"
   theforeman.foreman: ">=3.5.0"

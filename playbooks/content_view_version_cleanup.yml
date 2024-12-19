@@ -1,13 +1,11 @@
 ---
-- name: 'RaBe Foreman Playbook : Content View Version Cleanup'
+- name: "RaBe Foreman Playbook : Content View Version Cleanup"
   hosts: all
   gather_facts: false
-  collections:
-    - theforeman.foreman
   vars:
     rabe_foreman_content_view_version_cleanup_keep: 3
   tasks:
-    - name: 'RaBe Foreman Playbook : Foreman : Content View Version Cleanup'
+    - name: "RaBe Foreman Playbook : Foreman : Content View Version Cleanup"
       ansible.builtin.include_role:
         name: theforeman.foreman.content_view_version_cleanup
       vars:
