@@ -17,6 +17,7 @@ dependencies:
   community.postgresql: ">=3.3.0" # for zabbix
   community.zabbix: ">=1.9.0"
   radiorabe.common: ">=0.2.0"
+  radiorabe.certbot: ">=0.2.1"
   radiorabe.foreman: ">=0.9.0"
   radiorabe.podman: ">=0.1.0"
   radiorabe.rabe_zabbix: ">=0.1.1"
