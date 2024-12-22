@@ -85,6 +85,11 @@
         location: Randweg
         ansible_roles:
           - radiorabe.rabe_foreman.client
+          - redhat.rhel_system_roles.journald
+        parameters:
+          - name: journald_persistent
+            parameter_type: boolean
+            value: true
       - name: AlmaLinux 9
         description: AlmaLinux 9.
         parent: RaBe Core/RaBe Base/EL9
