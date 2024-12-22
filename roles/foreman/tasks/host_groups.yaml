@@ -87,6 +87,7 @@
           - radiorabe.rabe_foreman.client
           - redhat.rhel_system_roles.timesync
           - redhat.rhel_system_roles.journald
+          - redhat.rhel_system_roles.kdump
         parameters:
           - name: journald_persistent
             parameter_type: boolean
