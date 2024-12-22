@@ -88,6 +88,7 @@
           - redhat.rhel_system_roles.timesync
           - redhat.rhel_system_roles.journald
           - redhat.rhel_system_roles.kdump
+          - redhat.rhel_system_roles.logging
         parameters:
           - name: journald_persistent
             parameter_type: boolean
