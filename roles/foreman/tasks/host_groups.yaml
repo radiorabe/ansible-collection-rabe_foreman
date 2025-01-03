@@ -212,6 +212,7 @@
         location: Randweg
         ansible_roles:
           - radiorabe.common.local_user
+          - radiorabe.common.git_clone
           - redhat.rhel_system_roles.podman
         parameters:
           - name: firewall
@@ -313,6 +314,12 @@
             value:
               containers:
                 log_size_max: 1073741824 # 1Gib in bytes
+          - name: radiorabe_git_local_clone
+            parameter_type: boolean
+            value: true
+          - name: radiorabe_git_clone_remote_dest
+            parameter_type: string
+            value: /home/revproxy
       - name: AlmaLinux 9 DMZ server-009 VMs
         description: AlmaLinux 9 virtual machines to be run on server-009
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
@@ -329,6 +336,7 @@
         location: Randweg
         ansible_roles:
           - radiorabe.common.local_user
+          - radiorabe.common.git_clone
           - redhat.rhel_system_roles.podman
         parameters:
           - name: firewall
@@ -430,3 +438,9 @@
             value:
               containers:
                 log_size_max: 1073741824 # 1Gib in bytes
+          - name: radiorabe_git_local_clone
+            parameter_type: boolean
+            value: true
+          - name: radiorabe_git_clone_remote_dest
+            parameter_type: string
+            value: /home/revproxy
