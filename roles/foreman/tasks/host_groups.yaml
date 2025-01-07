@@ -207,7 +207,7 @@
         compute_profile: "1-Small"
       - name: vm-2001.dmz.int.rabe.ch
         description: AlmaLinux 9 DMZ virtual machine vm-2001 for running reverse-proxy container
-        parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-009 VMs
+        parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-008 VMs
         organization: RaBe
         location: Randweg
         ansible_roles:
