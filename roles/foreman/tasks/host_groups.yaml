@@ -314,6 +314,8 @@
             value:
               containers:
                 log_size_max: 1073741824 # 1Gib in bytes
+              network:
+                default_rootless_network_cmd: slirp4netns
           - name: radiorabe_git_local_clone
             parameter_type: boolean
             value: true
@@ -438,6 +440,8 @@
             value:
               containers:
                 log_size_max: 1073741824 # 1Gib in bytes
+              network:
+                default_rootless_network_cmd: slirp4netns
           - name: radiorabe_git_local_clone
             parameter_type: boolean
             value: true
