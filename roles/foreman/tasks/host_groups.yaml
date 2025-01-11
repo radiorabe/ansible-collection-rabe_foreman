@@ -274,7 +274,7 @@
                         image: ghcr.io/radiorabe/httpd:0.5.4
                         env:
                           - name: PODMAN_HOST
-                            value: "{{ ansible_host }}"
+                            value: "{{'{{ ansible_host }}'}}"
                         ports:
                           - containerPort: 8080
                             hostPort: 8080
@@ -400,7 +400,7 @@
                         image: ghcr.io/radiorabe/httpd:0.5.4
                         env:
                           - name: PODMAN_HOST
-                            value: "{{ ansible_host }}"
+                            value: "{{'{{ ansible_host }}'}}"
                         ports:
                           - containerPort: 8080
                             hostPort: 8080
