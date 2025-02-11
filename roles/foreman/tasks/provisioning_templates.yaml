@@ -1,0 +1,1125 @@
+---
+- name: "RaBe Foreman Config : Provisioning Templates"
+  block:
+    - name: "RaBe Foreman Config : Unlock All Provisioning Templates"
+      ansible.builtin.include_role:
+        name: radiorabe.foreman.provisioning_templates
+      vars:
+        foreman_provisioning_templates:
+          - name: "*"
+            locked: false
+      when: not ansible_check_mode
+    - name: "RaBe Foreman Config : Configure Provisioning Templates"
+      ansible.builtin.include_role:
+        name: radiorabe.foreman.provisioning_templates
+      vars:
+        foreman_provisioning_templates:
+          - name: RaBe UserData
+            kind: user_data
+            state: present
+            template: |
+              <%#
+              kind: user_data
+              name: RaBe UserData
+              model: ProvisioningTemplate
+              oses:
+              - AlmaLinux
+              - CentOS
+              - CentOS_Stream
+              - Fedora
+              - Rocky
+              - Debian
+              - Ubuntu
+              test_on:
+              - host4dhcp
+              - debian4dhcp
+              - ubuntu4dhcp
+              description: |
+                This template is used during image based provisioning, when the image is configured to use user-data.
+                The output is a list of cloud-init directives that cloud-init parses to configures the VM
+                booted from the image. The image must have cloud-init installed in order for this to work.
+
+                This template accepts the following parameters:
+                - force-puppet: boolean (default=false)
+                - enable-puppetlabs-repo: boolean (default=false)
+                - enable-puppetlabs-puppet5-repo: boolean (default=false)
+                - enable-puppetlabs-puppet6-repo: boolean (default=false)
+                - enable-official-puppet7-repo: boolean (default=false)
+                - enable-official-puppet8-repo: boolean (default=false)
+                - skip-puppet-setup: boolean (default=false)
+              -%>
+              <%
+                rhel_compatible = @host.operatingsystem.family == 'Redhat' && @host.operatingsystem.name != 'Fedora'
+                proxy_uri = host_param('http-proxy') ? "http://#{host_param('http-proxy')}:#{host_param('http-proxy-port')}" : nil
+                puppet_enabled = !host_param_true?('skip-puppet-setup') && (host_puppet_server.present? || host_param_true?('force-puppet'))
+                chef_enabled = @host.respond_to?(:chef_proxy) && @host.chef_proxy
+              -%>
+
+              #cloud-config
+              fqdn: <%= @host %>
+              manage_etc_hosts: true
+              password: <%= root_pass %>
+
+              write_files:
+              - path: /etc/sysconfig/network-scripts/ifcfg-<%= @host.interfaces[0].identifier %>
+                permissions: '0644'
+                owner: root
+                content: |
+                  # Created by cloud-init from the foreman user-data template
+                  NAME=<%= @host.interfaces[0].identifier %>
+                  DEVICE=<%= @host.interfaces[0].identifier %>
+                  ONBOOT=yes
+                  USERCTL=no
+                  PEERDNS=no
+                  IPV6INIT=no
+                  IPV6_AUTOCONF=no
+                  GATEWAY=<%= @host.interfaces[0].subnet.gateway %>
+                  DOMAIN=<%= @host.interfaces[0].domain %>
+                  BOOTPROTO=static
+                  NETMASK=<%= @host.interfaces[0].subnet.mask %>
+                  IPADDR=<%= @host.ip %>
+                  DNS1=<%=@host.interfaces[0].subnet.dns_primary %>
+                  DNS2=<%=@host.interfaces[0].subnet.dns_secondary  %>
+              - content: |
+                  network: {config: disabled}
+                path: /etc/cloud/cloud.cfg.d/99_disable-network-config.cfg
+
+              runcmd:
+              - |
+                systemctl restart NetworkManager
+              <%= indent(2) { snippet 'fix_hosts' } -%>
+              - |
+              <%= indent(2) { snippet 'yum_proxy' } -%>
+              - |
+              <%= indent(2) { snippet 'ntp' } -%>
+              - |
+              <% if rhel_compatible && host_param_true?('enable-epel') -%>
+              <%= indent(2) { snippet 'epel' } -%>
+              <% end -%>
+              - |
+              <%= indent(2) { snippet 'rabe_redhat_register' } -%>
+              - |
+              <% if host_enc['parameters']['realm'] && @host.realm && (@host.realm.realm_type == 'FreeIPA' || @host.realm.realm_type == 'Red Hat Identity Management') -%>
+              <%= indent(2) { snippet 'rabe_freeipa_register' } %>
+              <% end -%>
+              - |
+              <%= indent(2) { snippet 'remote_execution_ssh_keys' } %>
+              - |
+              <%= indent(2) { snippet 'blacklist_kernel_modules' } %>
+              - |
+              <% if chef_enabled %>
+              <%= indent(2) { snippet 'chef_client' } %>
+              <% end -%>
+              - |
+              <% if puppet_enabled %>
+              <% if host_param_true?('enable-puppetlabs-repo') || host_param_true?('enable-official-puppet8-repo') || host_param_true?('enable-official-puppet7-repo') || host_param_true?('enable-puppetlabs-puppet6-repo') || host_param_true?('enable-puppetlabs-puppet5-repo') -%>
+              <%= indent(2) { snippet 'puppetlabs_repo' } %>
+              <% end -%>
+              <%= indent(2) { snippet 'puppet_setup' } %>
+              <% end -%>
+              phone_home:
+                url: <%= foreman_url('built') %>
+                post: []
+                tries: 10
+          - name: rabe_redhat_register
+            kind: snippet
+            state: present
+            template: |
+              <%#
+              kind: snippet
+              name: rabe_redhat_register
+              model: ProvisioningTemplate
+              snippet: true
+              description: |
+                Red Hat Registration Snippet
+
+                General parameters:
+
+                  redhat_install_host_tools = [true|false]    Install the katello-host-tools yum/dnf plugins.
+
+                  redhat_install_host_tracer_tools = [true|false]  Install the katello-host-tools Tracer yum/dnf plugin.
+
+                  activation_key = <key>                      Activation key string, not needed if using
+                                                              subscription-manager with username/password
+
+                Parameters for use with subscription-manager (Red Hat CDN, Satellite, or Katello)
+
+                  subscription_manager = 'true'               You're going to use subscription-manager
+
+                  subscription_manager_auto_attach = 'false'  Run attach --auto after registering.
+
+                  subscription_manager_username = <username>  Username for subscription-manager
+
+                  subscription_manager_password = <password>  Password for subscription-manager
+
+                  subscription_manager_certpkg_url = <url>    Custom certificate package URL
+
+                  subscription_manager_org = <org name>       Organization name, if required
+
+                  subscription_manager_repos = <repos>        Additional repositories to enable
+                                                              after registration.
+                                                              Seperate multiple repositories with commas.
+
+                  subscription_manager_override_repos_cost = <cost>  Override repository cost
+
+                  subscription_manager_pool = <pool>          Specific subscription pool to use
+
+                  only_subscription_manager_repos = 'true'    dnf/yum should only use repos managed by sub-man
+
+                  http-proxy = <host>                         Proxy hostname to be used for registration
+
+                  http-proxy-port = <port>                    Proxy port to be used for registration
+
+                  http-proxy-user = <user>                    Proxy user to be used for registration
+
+                  http-proxy-password = <password>            Proxy password to be used for registration
+
+                  syspurpose_role                             Sets the system purpose role
+
+                  syspurpose_usage                            Sets the system purpose usage
+
+                  syspurpose_sla                              Sets the system purpose SLA
+
+                  syspurpose_addons                           Sets the system purpose add-ons. Separate multiple
+                                                              values with commas.
+
+                Set these parameters if you're using rhnreg_ks:
+
+                  spacewalk_host = <hostname>                 Hostname of Spacewalk server
+              -%>
+
+              <%
+                # Katello or subscription-manager:
+                if host_param_true?('subscription_manager') || host_param('kt_activation_keys')
+                  registration_type = 'subscription_manager'
+                # Spacewalk:
+                elsif host_param('spacewalk_host')
+                  registration_type = 'spacewalk'
+                end if
+              %>
+
+              <% if registration_type == 'subscription_manager' %>
+                <%
+                  if host_param('kt_activation_keys')
+                    subscription_manager_certpkg_url = subscription_manager_configuration_url(@host)
+                    subscription_manager_org = @host.rhsm_organization_label
+                    activation_key = host_param('kt_activation_keys')
+                    redhat_install_host_tools = host_param_true?('redhat_install_host_tools', true)
+                    redhat_install_host_tracer_tools = host_param_true?('redhat_install_host_tracer_tools')
+                  else
+                    subscription_manager_certpkg_url = host_param('subscription_manager_certpkg_url')
+                    subscription_manager_org = host_param('subscription_manager_org')
+                    activation_key = host_param('activation_key')
+                    redhat_install_host_tools = host_param_true?('redhat_install_host_tools')
+                    redhat_install_host_tracer_tools = host_param_true?('redhat_install_host_tracer_tools')
+                  end
+                %>
+
+                echo "##############################################################"
+                echo "################# SUBSCRIPTION MANAGER #######################"
+                echo "##############################################################"
+                echo
+                echo "Starting the subscription-manager registration process"
+
+                # Set up subscription-manager
+                <%= indent(2) { snippet("rabe_subscription_manager_setup", variables: { subman_setup_scenario: 'provisioning' }).strip } -%>
+
+                <%- if (host_param('syspurpose_role') || host_param('syspurpose_usage') || host_param('syspurpose_sla') || host_param('syspurpose_addons')) %>
+                  # Avoid timeout accessing unreachable repo on air gapped infrastructure,
+                  #  assuming subscription-manager-syspurpose is installed in custom packages section.
+                  if ! rpm --query --quiet subscription-manager-syspurpose ; then
+                    $PKG_MANAGER_INSTALL subscription-manager-syspurpose
+                  fi
+
+                  if [ -f /usr/sbin/syspurpose ]; then
+                    <%- if host_param('syspurpose_role') %>
+                      syspurpose set-role "<%= host_param('syspurpose_role') %>"
+                    <%- end %>
+                    <%- if host_param('syspurpose_usage') %>
+                      syspurpose set-usage "<%= host_param('syspurpose_usage') %>"
+                    <%- end %>
+                    <%- if host_param('syspurpose_sla') %>
+                      syspurpose set-sla "<%= host_param('syspurpose_sla') %>"
+                    <%- end %>
+                    <%- if host_param('syspurpose_addons') %>
+                      <%- addons = host_param('syspurpose_addons').split(',')
+                            .map { |add_on| "'#{add_on.strip}'" }.join(" ") %>
+                      syspurpose add-addons <%= addons %>
+                    <%- end %>
+                  else
+                    echo "Syspurpose CLI not found."
+                  fi
+                <% end %>
+
+                <% if host_param('http-proxy') %>
+                  subscription-manager config --server.proxy_hostname='<%= host_param("http-proxy") %>'
+                  <% if host_param('http-proxy-user') %>
+                    subscription-manager config --server.proxy_user='<%= host_param("http-proxy-user") %>'
+                  <% end %>
+                  <% if host_param('http-proxy-password') %>
+                    subscription-manager config --server.proxy_password='<%= host_param("http-proxy-password") %>'
+                  <% end %>
+                  <% if host_param('http-proxy-port') %>
+                    subscription-manager config --server.proxy_port='<%= host_param("http-proxy-port") %>'
+                  <% end %>
+                <% end %>
+                
+                <% if host_param('subscription_manager_username') && host_param('subscription_manager_password') %>
+                  <% if host_param('subscription_manager_pool') %>
+                    subscription-manager register --name="<%= @host.name %>" --username='<%= host_param("subscription_manager_username") %>' --password='<%= host_param("subscription_manager_password") %>'
+                    subscription-manager attach --pool='<%= host_param('subscription_manager_pool') %>'
+                  <% else %>
+                    subscription-manager register --name="<%= @host.name %>" --username='<%= host_param("subscription_manager_username") %>' --password='<%= host_param("subscription_manager_password") %>' --auto-attach
+                  <% end %>
+
+                <% elsif activation_key %>
+                  subscription-manager register --name="<%= @host.name %>" --org='<%= subscription_manager_org %>' --activationkey='<%= activation_key %>'
+                <% else %>
+                  echo "No activation key found: Not registering to subscription manager"
+                <% end %>
+
+                <% if host_param_true?('only_subscription_manager_repos') %>
+                  for subman_config_file in /etc/yum/pluginconf.d/subscription-manager.conf /etc/dnf/plugins/subscription-manager.conf; do
+                    if [ -f $subman_config_file ]; then
+                      egrep -q "^disable_system_repos=" $subman_config_file
+                      if [ "$?" -eq 0 ]; then
+                        sed s/^disable_system_repos=.*/disable_system_repos=1/ $subman_config_file >"${subman_config_file}.new"
+                        mv -f "${subman_config_file}.new" $subman_config_file
+                      else
+                        echo "disable_system_repos=1" >>$subman_config_file
+                      fi
+                    fi
+                  done
+                <% end %>
+
+                <% if host_param_true?('subscription_manager_auto_attach', false) -%>
+                  subscription-manager attach --auto
+
+                <% end -%>
+                <% if host_param('subscription_manager_repos') %>
+                  # workaround for RHEL 6.4 bug https://bugzilla.redhat.com/show_bug.cgi?id=1008016
+                  subscription-manager repos --list > /dev/null
+                  <%= "subscription-manager repos --enable #{host_param('subscription_manager_repos').gsub(/,\s*/, ' --enable ')}" %>
+                <% end %>
+
+                <% if host_param('subscription_manager_override_repos_cost') %>
+                  for repo in $(subscription-manager repos --list-enabled | grep "Repo ID:" | awk -F' ' '{ print $3 }'); do
+                    <%= "subscription-manager repo-override --list --repo $repo | grep 'cost:' &>/dev/null || subscription-manager repo-override --repo $repo --add=cost:#{host_param('subscription_manager_override_repos_cost')}" %>
+                  done
+                <% end %>
+
+                <% if redhat_install_host_tools %>
+                  $PKG_MANAGER_INSTALL katello-host-tools
+                <% end %>
+
+                <% if redhat_install_host_tracer_tools %>
+                  $PKG_MANAGER_INSTALL katello-host-tools-tracer
+                <% end %>
+              <% end %>
+
+              <% if registration_type == 'spacewalk' %>
+                echo "##############################################################"
+                echo "################ SPACEWALK REGISTRATION ######################"
+                echo "##############################################################"
+
+                <% if host_param('activation_key') %>
+                  rhn_activation_key="<%= host_param('activation_key') -%>"
+                  satellite_hostname="<%= host_param('spacewalk_host') -%>"
+                  rhn_cert_file="RHN-ORG-TRUSTED-SSL-CERT"
+
+                  echo "Registering to RHN Satellite at [$satellite_hostname]"
+                  echo "Using Registration Key [$rhn_activation_key]"
+
+                  # Obtain our RHN Satellite Certificate
+                  echo "Obtaining RHN SSL certificate"
+                  curl -o /usr/share/rhn/$rhn_cert_file -k https://$satellite_hostname/pub/$rhn_cert_file
+
+                  <% if @host.operatingsystem.name == 'SLES' -%>
+                    # If SLES then add CA Cert to CA Certs for curl
+                    cp /usr/share/rhn/$rhn_cert_file /etc/ssl/certs/
+                    ln -s /etc/ssl/certs/$rhn_cert_file /etc/ssl/certs/`openssl x509 -hash -noout -in /etc/ssl/certs/$rhn_cert_file`.0
+                  <% end -%>
+
+                  # Update our up2date configuration file
+                  echo "Updating SSL CA Certificate to /usr/share/rhn/$rhn_cert_file"
+                  sed -i -e "s|^sslCACert=.*$|sslCACert=/usr/share/rhn/$rhn_cert_file|" /etc/sysconfig/rhn/up2date
+
+                  # Update our Satellite Hostname
+                  echo "Updating Satellite Hostname to [$satellite_hostname]"
+                  sed -i -e "s|^serverURL=.*$|serverURL=https://$satellite_hostname/XMLRPC|" /etc/sysconfig/rhn/up2date
+                  sed -i -e "s|^noSSLServerURL=.*$|noSSLServerURL=https://$satellite_hostname/XMLRPC|" /etc/sysconfig/rhn/up2date
+
+                  # Restart messagebus/HAL to try and prevent hardware detection errors in rhnreg_ks
+                  echo "Restarting services..."
+                  <% if @host.operatingsystem.name == 'SLES' && @host.operatingsystem.major.to_i < 12 -%>
+                    service haldaemon restart
+                  <% else -%>
+                    service messagebus restart
+                    service hald restart
+                  <% end -%>
+
+                  # Now, perform our registration
+                  #  (might get hardware errors here, due to dbus/messagebus lameness. These are safe to ignore.)
+                  echo -n "Performing RHN Registration... "
+                  rhnreg_ks --activationkey=$rhn_activation_key
+                  echo "done."
+
+                  # Check we registered
+                  echo -n "Checking System Registration... "
+                  if ! rhn_check; then
+                      echo "FAILED"
+                      echo " >> RHN Registration FAILED. Please Investigate. <<"
+                  else
+                      echo "registration successful."
+                  fi
+
+                <% else %>
+                  echo "No activation key found: Not registering"
+                <% end %>
+              <% end %>
+          - name: rabe_freeipa_register
+            kind: snippet
+            state: present
+            template: |
+              <%#
+              kind: snippet
+              name: rabe_freeipa_register
+              model: ProvisioningTemplate
+              snippet: true
+              description: |
+                Installs IPA client and enrolls the host in IPA realm using the OTP
+                Optional parameters:
+                  freeipa_server              IPA server
+                  freeipa_sudo                Enable sudoers
+                  freeipa_ssh                 Enable ssh integration
+                                              Default: true
+                  freeipa_automount           Enable automounter
+                                              Default: false
+                  freeipa_automount_location  Location for automounts
+                  freeipa_mkhomedir           Enable automatically making home directories
+                                              Default: true
+                  freeipa_opts                Additional options to pass directly to installer
+                  freeipa_automount_server    Override automount server if freeipa_automount is true and the server differs from freeipa_server
+              -%>
+              <% if @host.operatingsystem.family == 'Redhat' -%>
+              <% if @host.operatingsystem.name == 'Fedora' -%>
+              freeipa_client=freeipa-client
+              <% else -%>
+              freeipa_client=ipa-client
+              <% end -%>
+              <% os_major = @host.operatingsystem.major.to_i %>
+              <% if os_major == 7 -%>
+              /usr/sbin/sshd-keygen
+              <% elsif os_major > 7 %>
+              /usr/libexec/openssh/sshd-keygen rsa
+              <% end -%>
+              <% else -%>
+              freeipa_client=freeipa-client
+              <% end -%>
+
+              <%= @host.operatingsystem.family == 'Redhat' ? 'yum install -y libsss_sudo' : 'DEBIAN_FRONTEND=noninteractive apt-get install -y libsss-sudo' %> $freeipa_client
+
+              ##
+              ## IPA Client Installation
+              ##
+              <% if host_param('freeipa_server') -%>
+              <% domain = host_param('freeipa_domain') || @host.realm.name.downcase -%>
+
+              freeipa_server="--server <%= host_param('freeipa_server') %>"
+              freeipa_domain="--domain <%= domain %>"
+              <% end -%>
+
+              <% unless host_param_false?('freeipa_mkhomedir') %>
+              freeipa_mkhomedir="--mkhomedir"
+              <% end -%>
+
+              <% if host_param_false?('freeipa_ssh') %>
+              freeipa_ssh="--no-ssh"
+              <% end -%>
+
+              <% if host_param('freeipa_opts') -%>
+              freeipa_opts="<%= host_param('freeipa_opts') %>"
+              <% end -%>
+
+              # One-time password will be requested at install time. Otherwise, $HOST[OTP] is used as a placeholder value.
+              /usr/sbin/ipa-client-install -w '<%= @host.otp || "$HOST[OTP]" %>' --realm=<%= @host.realm %> -U $freeipa_mkhomedir $freeipa_opts $freeipa_server $freeipa_domain $freeipa_ssh
+
+              ##
+              ## Automounter
+              ##
+
+              <% if host_param('freeipa_automount_location') -%>
+              automount_location="--location <%= host_param('freeipa_automount_location') %>"
+              <% end -%>
+
+              <% if host_param_true?('freeipa_automount') -%>
+              if [ -f /usr/sbin/ipa-client-automount ]
+              then
+                automount_server=$freeipa_server
+                <%- if automount_server = host_param('freeipa_automount_server') || host_param('freeipa_server') -%>
+                automount_server="--server <%= automount_server %>"
+                <%- end -%>
+                /usr/sbin/ipa-client-automount $automount_server $automount_location --unattended
+              fi
+              <% end -%>
+
+              ##
+              ## Sudoers
+              ##
+
+              <% unless host_param_false?('freeipa_enable_sudo') %>
+
+              freeipa_client_version=$(ipa-client-install --version)
+              freeipa_client_version_major=$(echo $freeipa_client_version | cut -f1 -d.)
+              freeipa_client_version_minor=$(echo $freeipa_client_version | cut -f2 -d.)
+              freeipa_realm=$(grep default_realm /etc/krb5.conf | cut -d"=" -f2 | tr -d ' ')
+              freeipa_domain=$(grep -A 2 domain_realm /etc/krb5.conf | tail -n1 | awk '{print $1}')
+              freeipa_dn=$(for word in $(echo $freeipa_domain | sed 's/\./ /g'); do echo -n dc=$word,; done)
+              sssd_version=$(sssd --version)
+              sssd_major=$(echo $sssd_version | cut -f1 -d.)
+              sssd_minor=$(echo $sssd_version | cut -f2 -d.)
+              LDAP_CONFIG=$(mktemp)
+
+              # >=ipa-client-4.1.0 automatically configures sssd for sudo
+              # =<ipa-client-3 requires manual configuration which this snippet takes care of
+
+              if [ $freeipa_client_version_major -lt 4 ]
+              then
+                # Modify sssd.conf
+                sed -i -e "s/services = .*/\0, sudo/" /etc/sssd/sssd.conf
+
+                # Modify sssd.conf for sssd <1.11 (RHEL <6.6)
+                if [ $sssd_minor -lt 11 ] || [ $sssd_major -lt 1 ]
+                then
+                  <% if host_param('freeipa_server') -%>
+                  ldap_uri=", ldap://<%= host_param('freeipa_server') %>"
+                  krb5_server=<%= host_param('freeipa_server') %>
+                  <% else -%>
+                  krb5_server="_srv_"
+                  <% end -%>
+
+              cat <<EOF > $LDAP_CONFIG
+              sudo_provider = ldap
+              ldap_uri = _srv_ $ldap_uri
+              ldap_sudo_search_base = ou=SUDOers,${freeipa_dn%?}
+              ldap_sasl_mech = GSSAPI
+              ldap_sasl_authid = host/$HOSTNAME
+              ldap_sasl_realm = $freeipa_realm
+              krb5_server = $krb5_server
+              EOF
+                sed -i -e "/\[domain\/.*\]/ r $LDAP_CONFIG" /etc/sssd/sssd.conf
+                fi
+
+                # Modify nsswitch.conf
+                grep -q sudoers /etc/nsswitch.conf
+                if [[ $? -eq 0 ]];
+                then
+                  sed -i -e "s/^sudoers.*/sudoers:    files sss/" /etc/nsswitch.conf
+                else
+                  echo "sudoers:    files sss" >> /etc/nsswitch.conf
+                fi
+
+                # Configure nisdomain
+                <% if @host.operatingsystem.family == 'Redhat' -%>
+                  authconfig --nisdomain ${freeipa_domain} --update
+                  chkconfig sssd on
+                  
+                  if [[ $(rpm -qa systemd | wc -l) -gt 0 ]];
+                  then
+                    domain_service=/usr/lib/systemd/system/*-domainname.service
+                    
+                    # Workaround for BZ1071969 on RHEL 7.0
+                    grep -q "DefaultDependencies=no" $domain_service
+                    if [[ $? -ne 0 ]]
+                    then
+                      sed -i -e "s/\[Unit\]/\[Unit\]\nDefaultDependencies=no/" $domain_service
+                    fi
+
+                    systemctl start $(basename $domain_service)
+                    systemctl enable $(basename $domain_service)
+                  fi
+                <% else -%>
+                # OS is not RedHat
+                sed -i -e '/^exit /d' /etc/rc.local
+                echo "nisdomainname ${freeipa_domain}" >> /etc/rc.local
+                echo "exit 0" >> /etc/rc.local
+                nisdomainname ${freeipa_domain}  
+                <% end -%>
+              fi
+
+              <% end -%>
+          - name: RaBe Kickstart
+            kind: provision
+            state: present
+            template: |
+              <%#
+              kind: provision
+              name: RaBe Kickstart
+              model: ProvisioningTemplate
+              oses:
+              - AlmaLinux
+              - CentOS
+              - CentOS_Stream
+              - Fedora
+              - RedHat
+              - Rocky
+              test_on:
+              - host4dhcp
+              - host6dhcp
+              - host4and6dhcp
+              - host4static
+              - host6static
+              - rhel9_dhcp
+              description: |
+                The provisioning template for kickstart based distributions. The output is fetched by Anaconda installer during
+                the network based installation. To customize the installation, modify the host parameters.
+
+                This template accepts the following parameters:
+                - lang: string (default="en_US.UTF-8")
+                - selinux-mode: string (default="enforcing")
+                - keyboard: string (default="us")
+                - time-zone: string (default="UTC")
+                - http-proxy: string (default="")
+                - http-proxy-port: string (default="")
+                - force-puppet: boolean (default=false)
+                - enable-epel: boolean (default=false)
+                - enable-puppetlabs-repo: boolean (default=false)
+                - enable-puppetlabs-puppet5-repo: boolean (default=false)
+                - enable-puppetlabs-puppet6-repo: boolean (default=false)
+                - enable-official-puppet7-repo: boolean (default=false)
+                - enable-official-puppet8-repo: boolean (default=false)
+                - skip-puppet-setup: boolean (default=false)
+                - salt_master: string (default=undef)
+                - ntp-server: string (default=undef)
+                - bootloader-append: string (default="nofb quiet splash=quiet")
+                - disable-firewall: boolean (default=false)
+                - package_upgrade: boolean (default=true)
+                - disable-uek: boolean (default=false)
+                - use-ntp: boolean (default depends on OS release)
+                - fips_enabled: boolean (default=false)
+                - encrypt_grub: boolean (default=false)
+                - use_graphical_installer: boolean (default=false)
+                - enable-remote-execution-pull: boolean (default=false)
+                - additional-packages: string (default=undef)
+
+                Reference links:
+                - https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/installation_guide/s1-kickstart2-options
+                - https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/installation_guide/sect-kickstart-syntax
+                - https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/performing_an_advanced_rhel_installation/kickstart-commands-and-options-reference_installing-rhel-as-an-experienced-user
+              -%>
+              <%
+                rhel_compatible = @host.operatingsystem.family == 'Redhat' && @host.operatingsystem.name != 'Fedora'
+                is_fedora = @host.operatingsystem.name == 'Fedora'
+                os_major = @host.operatingsystem.major.to_i
+                os_minor = @host.operatingsystem.minor.to_i
+                realm_compatible = (@host.operatingsystem.name == 'Fedora' && os_major >= 20) || (rhel_compatible && os_major >= 7)
+                # safemode renderer does not support unary negation
+                proxy_uri = host_param('http-proxy') ? "http://#{host_param('http-proxy')}:#{host_param('http-proxy-port')}" : nil
+                proxy_string = proxy_uri ? " --proxy=#{proxy_uri}" : ''
+                puppet_enabled = !host_param_true?('skip-puppet-setup') && (host_puppet_server.present? || host_param_true?('force-puppet'))
+                salt_enabled = host_param('salt_master') ? true : false
+                chef_enabled = @host.respond_to?(:chef_proxy) && @host.chef_proxy
+                section_end = (rhel_compatible && os_major <= 5) ? '' : '%end'
+                use_ntp = host_param_true?('use-ntp', (is_fedora && os_major < 16) || (rhel_compatible && os_major <= 6))
+                iface = @host.provision_interface
+                appstream_present = false
+              -%>
+              # This kickstart file was rendered from the Foreman provisioning template "<%= @template_name %>".
+              # for <%= @host %> running <%= @host.operatingsystem.name %> <%= os_major %> <%= @arch %>
+              # Organization: <%= @host.organization %>
+              # Location: <%= @host.location %>
+              <%
+              if plugin_present?('katello')
+              -%>
+              # Lifecycle environment: <%= @host.single_lifecycle_environment %>
+              # Content View: <%= @host.single_content_view %>
+              # Content Source: <%= @host.content_source %>
+              <% end -%>
+
+              <% if (is_fedora && os_major < 29) || (rhel_compatible && os_major <= 7) -%>
+              install
+              <% end -%>
+              <%
+              if host_param('kickstart_liveimg')
+                img_name = host_param('kickstart_liveimg')
+                liveimg_url = if host_param('kt_activation_keys')
+                  repository_url(img_name, 'isos')
+                else
+                  if img_name.match(%r|^([\w\-\+]+)://|)
+                    img_name
+                  else
+                    "#{medium_uri}/#{img_name}"
+                  end
+                end
+              %>
+              liveimg --url=<%= liveimg_url %> <%= proxy_string %>
+              <% else %>
+              <%= @mediapath %><%= proxy_string %>
+              <% @additional_media.each do |medium| -%>
+              repo --name <%= medium[:name] %> --baseurl <%= medium[:url] %> <%= medium[:install] ? ' --install' : '' %><%= proxy_string %>
+              <% end -%>
+              <%= snippet_if_exists(template_name + " custom repositories") %>
+              <% end %>
+              lang <%= host_param('lang') || 'en_US.UTF-8' %>
+              selinux --<%= host_param('selinux-mode') || host_param('selinux') || 'enforcing' %>
+              keyboard <%= host_param('keyboard') || 'us' %>
+
+              <%
+                network_options = []
+                nameservers = []
+                subnet4 = iface.subnet
+                subnet6 = iface.subnet6
+
+                # device and hostname
+                if iface.bond? && rhel_compatible && os_major >= 6
+                  network_options.push("--device=#{iface.identifier}")
+                else
+                  network_options.push("--device=#{iface.mac || iface.identifier}")
+                end
+                network_options.push("--hostname #{@host.name}")
+
+                # single stack
+                if subnet4 && !subnet6
+                  network_options.push("--noipv6")
+                elsif !subnet4 && subnet6
+                  network_options.push("--noipv4")
+                end
+
+                # dual stack MTU check
+                raise("IPv4 and IPv6 subnets have different MTU") if subnet4 && subnet6 && subnet4.mtu.present? && subnet6.mtu.present? && subnet4.mtu != subnet6.mtu
+
+                # IPv4
+                if (subnet4 && !subnet4.dhcp_boot_mode?) || @static
+                  network_options.push("--bootproto static")
+                  network_options.push("--ip=#{iface.ip}")
+                  network_options.push("--netmask=#{subnet4.mask}")
+                  network_options.push("--gateway=#{subnet4.gateway}")
+                elsif subnet4 && subnet4.dhcp_boot_mode?
+                  network_options.push("--bootproto dhcp")
+                end
+                if subnet4
+                  nameservers.concat(subnet4.dns_servers)
+                  network_options.push("--mtu=#{subnet4.mtu}") if subnet4.mtu.present?
+                end
+
+                # IPv6
+                if rhel_compatible && os_major >= 6
+                  if (subnet6 && !subnet6.dhcp_boot_mode?) || @static6
+                    network_options.push("--ipv6=#{iface.ip6}/#{subnet6.cidr}")
+                    network_options.push("--ipv6gateway=#{subnet6.gateway}")
+                  elsif subnet6 && subnet6.dhcp_boot_mode?
+                    if host_param_true?('use-slaac')
+                      network_options.push("--ipv6 auto")
+                    else
+                      network_options.push("--ipv6 dhcp")
+                    end
+                  end
+                  if subnet6
+                    nameservers.concat(subnet6.dns_servers)
+                    network_options.push("--mtu=#{subnet6.mtu}") if subnet6.mtu.present?
+                  end
+                end
+
+                # bond
+                if iface.bond? && rhel_compatible && os_major >= 6
+                  bond_slaves = iface.attached_devices_identifiers.join(',')
+                  network_options.push("--bondslaves=#{bond_slaves}")
+                  network_options.push("--bondopts=mode=#{iface.mode},#{iface.bond_options.tr(' ', ',')}")
+                end
+
+                # VLAN (only on physical is recognized)
+                if iface.virtual? && iface.tag.present? && iface.attached_to.present?
+                  if rhel_compatible && os_major == 6
+                    network_options.push("--vlanid=#{iface.tag}")
+                  else
+                    network_options.push("--interfacename=vlan#{iface.tag}")
+                  end
+                end
+
+                # DNS
+                if nameservers.size > 0
+                  network_options.push("--nameserver=#{nameservers.join(',')}")
+                else
+                  network_options.push("--nodns")
+                end
+              -%>
+              network <%= network_options.join(' ') %>
+
+              rootpw --iscrypted <%= root_pass %>
+              <% if host_param_true?('disable-firewall') -%>
+              firewall --disable
+              <% else -%>
+              firewall --<%= os_major >= 6 ? 'service=' : '' %>ssh
+              <% end -%>
+              <% if (is_fedora && os_major >= 28) || (rhel_compatible && os_major > 7) -%>
+              authselect --useshadow --passalgo=<%= @host.operatingsystem.password_hash.downcase || 'sha256' %> --kickstart
+              <% else -%>
+              authconfig --useshadow --passalgo=<%= @host.operatingsystem.password_hash.downcase || 'sha256' %> --kickstart
+              <% end -%>
+              timezone --utc <%= host_param('time-zone') || 'UTC' %> <%= host_param('ntp-server') ? "--ntpservers #{host_param('ntp-server')}" : '' %>
+
+              <% if rhel_compatible -%>
+              services --disabled gpm,sendmail,cups,pcmcia,isdn,rawdevices,hpoj,bluetooth,openibd,avahi-daemon,avahi-dnsconfd,hidd,hplip,pcscd
+              <% end -%>
+
+              <% if realm_compatible && host_enc['parameters']['realm'] && @host.realm && @host.realm.realm_type == 'Active Directory' -%>
+              # One-time password will be requested at install time. Otherwise, $HOST[OTP] is used as a placeholder value.
+              realm join --one-time-password='<%= @host.otp || "$HOST[OTP]" %>' <%= @host.realm %>
+              <% end -%>
+
+              <% if @host.operatingsystem.name == 'OracleLinux' && os_major == 7 && os_minor < 5 -%>
+              repo --name="Server-Mysql"
+              <% end -%>
+
+              <% if @host.operatingsystem.name == 'Fedora' && os_major <= 16 -%>
+              # Bootloader exception for Fedora 16:
+              bootloader --append="<%= host_param('bootloader-append') || 'nofb quiet splash=quiet' %> <%= ks_console %>" <%= grub_pass %>
+              part biosboot --fstype=biosboot --size=1
+              <% else -%>
+              bootloader --location=mbr --append="<%= host_param('bootloader-append') || 'nofb quiet splash=quiet' %>" <%= grub_pass %>
+              <% if os_major == 5 -%>
+              key --skip
+              <% end -%>
+              <% end -%>
+
+              <% if @dynamic -%>
+              %include /tmp/diskpart.cfg
+              <% else -%>
+              <%= @host.diskLayout %>
+              <% end -%>
+              <%= snippet('kickstart_rhsm') if rhel_compatible && os_major >= 9 -%>
+
+              <% if host_param_true?('use_graphical_installer') -%>
+              graphical
+              <% else -%>
+              skipx
+              text
+              <% end -%>
+              reboot<% if host_param_true?('install_reboot_kexec') %> --kexec<% end %>
+
+              %packages
+              <%= snippet_if_exists(template_name + " custom packages") %>
+              subscription-manager
+              yum
+              <% if os_major < 8 -%>
+              dhclient
+              <% end -%>
+              <% if use_ntp -%>
+              ntp
+              -chrony
+              <% else -%>
+              chrony
+              -ntp
+              <% end -%>
+              <% if rhel_compatible && os_major < 9 -%>
+              wget
+              <% end -%>
+              <% if host_param_true?('fips_enabled') -%>
+              <%=   snippet 'fips_packages' %>
+              <% end -%>
+              <% if host_param('additional-packages').present? -%>
+              <%= host_param('additional-packages').split(" ").join("\n") %>
+              <% end -%>
+              <%= section_end %>
+
+              <% if @dynamic -%>
+              %pre --log=/tmp/install.pre.dynamic.log
+              <%= snippet_if_exists(template_name + " custom pre") %>
+              <%= @host.diskLayout %>
+              <%= section_end %>
+              <% end -%>
+
+              %post --nochroot
+              exec < /dev/tty3 > /dev/tty3
+              chvt 3
+              (
+
+              <% if host_param_false?('no-resolv-override') -%>
+              cp -va /etc/resolv.conf /mnt/sysimage/etc/resolv.conf
+              <% end -%>
+
+              <%= snippet_if_exists(template_name + " custom postnochroot") -%>
+
+              chvt 1
+              ) 2>&1 | tee /mnt/sysimage/root/install.postnochroot.log
+              <%= section_end %>
+
+              <%#
+              Main post script, if it fails the last post is still executed.
+              %>
+              %post
+              exec < /dev/tty3 > /dev/tty3
+              chvt 3
+              (
+              logger "Starting anaconda <%= @host %> postinstall"
+              <%= snippet 'kickstart_networking_setup' %>
+
+              <%= snippet 'ntp' %>
+
+              <%= snippet 'yum_proxy' %>
+
+              <% if rhel_compatible && host_param_true?('enable-epel') -%>
+              <%= snippet 'epel' -%>
+              <% end -%>
+
+              <%= snippet 'redhat_register' if rhel_compatible && os_major <= 9 -%>
+
+              <% if host_enc['parameters']['realm'] && @host.realm && (@host.realm.realm_type == 'FreeIPA' || @host.realm.realm_type == 'Red Hat Identity Management') -%>
+              <%= snippet 'freeipa_register' %>
+              <% end -%>
+
+              <% unless host_param_false?('package_upgrade') -%>
+              # update all the base packages from the updates repository
+              if [ -f /usr/bin/dnf ]; then
+                dnf -y update
+              else
+                yum -t -y update
+              fi
+              <% end -%>
+
+              <%= snippet('remote_execution_ssh_keys') %>
+
+              <% if plugin_present?('katello') && host_param_true?('enable-remote-execution-pull') -%>
+              <%= save_to_file('/root/remote_execution_pull_setup.sh', snippet('remote_execution_pull_setup'), verbatim: true) %>
+              chmod +x /root/remote_execution_pull_setup.sh
+              /root/remote_execution_pull_setup.sh
+              <% end -%>
+
+              <%= snippet "blacklist_kernel_modules" %>
+
+              <% if chef_enabled %>
+              <%= snippet 'chef_client' %>
+              <% end -%>
+
+              <% if puppet_enabled %>
+              <% if host_param_true?('enable-puppetlabs-repo') || host_param_true?('enable-official-puppet8-repo') || host_param_true?('enable-official-puppet7-repo') || host_param_true?('enable-puppetlabs-puppet6-repo')|| host_param_true?('enable-puppetlabs-puppet5-repo') -%>
+              <%= snippet 'puppetlabs_repo' %>
+              <% end -%>
+              <%= snippet 'puppet_setup' %>
+              <% end -%>
+
+              <% if salt_enabled %>
+              <%= snippet 'saltstack_setup' %>
+              <% end -%>
+
+              <% if @host.operatingsystem.name == 'OracleLinux' && host_param_true?('disable-uek') -%>
+              # Uninstall the Oracle Unbreakable Kernel packages
+              yum -t -y remove kernel-uek*
+              sed -e 's/DEFAULTKERNEL=kernel-uek/DEFAULTKERNEL=kernel/g' -i /etc/sysconfig/kernel
+              <% end -%>
+
+              <%= snippet('ansible_provisioning_callback') %>
+
+              <%= snippet 'efibootmgr_netboot' %>
+
+              <%= snippet_if_exists(template_name + " custom post") %>
+
+              <%= snippet 'insights' if host_param_true?('host_registration_insights') && os_major < 9 -%>
+
+              touch /tmp/foreman_built
+
+              <% if host_param_true?('use_graphical_installer') -%>
+              chvt 6
+              <% else -%>
+              chvt 1
+              <% end -%>
+              ) 2>&1 | tee /root/install.post.log
+              <%= section_end %>
+
+              # copy %pre log files into chroot
+              %post --nochroot
+              cp -vf /tmp/*.pre.*.log /mnt/sysimage/root/
+              <%= section_end %>
+
+              <%#
+              The last post section halts Anaconda to prevent endless loop in case HTTP request fails
+              %>
+              <% if (is_fedora && os_major < 20) || (rhel_compatible && os_major < 7) -%>
+              %post
+              <% else -%>
+              %post --erroronfail --log=/root/install-callhome.post.log
+              <% end -%>
+
+              <%= snippet 'eject_cdrom' -%>
+
+              if test -f /tmp/foreman_built; then
+                echo "calling home: build is done!"
+                <%= indent(2, skip1: true) { snippet('built', :variables => { :endpoint => 'built', :method => 'POST', :body_file => '/root/install.post.log' }) } -%>
+              else
+                echo "calling home: build failed!"
+                <%= indent(2, skip1: true) { snippet('built', :variables => { :endpoint => 'failed', :method => 'POST', :body_file => '/root/install.post.log' }) } -%>
+              fi
+
+              sync
+              <%= section_end %>
+          - name: rabe_subscription_manager_setup
+            kind: snippet
+            state: present
+            template: |
+              <%#
+              kind: snippet
+              name: rabe_subscription_manager_setup
+              model: ProvisioningTemplate
+              snippet: true
+              description: |
+                This snippet installs and configures subscription-manager that is required for host registration.
+                The snippet is included in the "global_registration" template and in the "redhat_register" snippet.
+                The latter ensures host registration during the provisioning process.
+              -%>
+
+              # Select package manager for the OS (sets the $PKG_MANAGER* variables)
+              if [ -z "$PKG_MANAGER" ]; then
+              <%= snippet 'pkg_manager' -%>
+              fi
+
+              # Define the path to rhsm.conf
+              RHSM_CFG=/etc/rhsm/rhsm.conf
+
+              <% if @subman_setup_scenario == 'registration' -%>
+                # Backup the original rhsm.conf file
+                if [ -f $RHSM_CFG ] ; then
+                  test -f $RHSM_CFG.bak || cp $RHSM_CFG $RHSM_CFG.bak
+                fi
+              <% end -%>
+
+              <% if plugin_present?('katello') -%>
+                # Define the path to the Katello server CA certificate
+                KATELLO_SERVER_CA_CERT=/etc/rhsm/ca/katello-server-ca.pem
+
+                # If SSL_CA_CERT is not set, create a temporary file for it
+                if [ -z "$SSL_CA_CERT" ]; then
+                  SSL_CA_CERT=$(mktemp)
+                  cat << EOF > "$SSL_CA_CERT"
+              <%= foreman_server_ca_cert %>
+              EOF
+                # dirty hack to remove snippet import indentation
+                sed -i 's/^\s*//g' "$SSL_CA_CERT"
+                fi
+
+                <% if @subman_setup_scenario == 'registration' -%>
+                  # rhn-client-tools conflicts with subscription-manager package
+                  # since rhn tools replaces subscription-manager, we need to explicitly
+                  # install subscription-manager after the rhn tools cleanup
+                  if [ x$ID = xol ]; then
+                    $PKG_MANAGER_REMOVE rhn-client-tools
+                    $PKG_MANAGER_INSTALL --setopt=obsoletes=0 subscription-manager
+                  fi
+
+                  <% if truthy?(@force) -%>
+                    # Unregister host and remove all local system and subscription data
+                    if [ -x "$(command -v subscription-manager)" ] ; then
+                      subscription-manager unregister || true
+                      subscription-manager clean
+                    fi
+
+                    $PKG_MANAGER_REMOVE katello-ca-consumer\* > /dev/null 2>&1
+                  <% end -%>
+                <% end -%>
+
+                # Prepare the SSL certificate
+                mkdir -p /etc/rhsm/ca
+                cp -f $SSL_CA_CERT $KATELLO_SERVER_CA_CERT
+                chmod 644 $KATELLO_SERVER_CA_CERT
+              <% end -%>
+
+              # Prepare subscription-manager
+              if ! [ -x "$(command -v subscription-manager)" ] ; then
+                $PKG_MANAGER_INSTALL subscription-manager
+              else
+                echo "subscription-manager is already installed!"
+                <% if @subman_setup_scenario == 'registration' -%>
+                  $PKG_MANAGER_UPGRADE subscription-manager > /dev/null 2>&1
+                <% end %>
+              fi
+
+              # Check if rhsm.conf exists
+              if ! [ -f $RHSM_CFG ] ; then
+                echo "'$RHSM_CFG' not found, cannot configure subscription-manager"
+                <% if plugin_present?('katello') -%>
+                  rm -f $SSL_CA_CERT
+                <% end -%>
+                exit 1
+              fi
+
+              <% if @subman_setup_scenario == 'registration'
+                  if plugin_present?('katello')
+                    server_hostname = @rhsm_url.host if @rhsm_url
+                    server_port = @rhsm_url.port if @rhsm_url
+                    server_prefix = @rhsm_url.path if @rhsm_url
+                    repo_ca_cert = "$KATELLO_SERVER_CA_CERT"
+                    rhsm_baseurl = @pulp_content_url
+                  end
+                elsif @subman_setup_scenario == 'provisioning'
+                  if plugin_present?('katello')
+                    server_hostname = @host.content_source
+                    server_port = @host.content_source.rhsm_url.port
+                    server_prefix = @host.content_source.rhsm_url.path
+                    repo_ca_cert = "$KATELLO_SERVER_CA_CERT"
+                    rhsm_baseurl = @host.content_source.pulp_content_url
+                  else
+                    server_hostname = "subscription.rhsm.redhat.com"
+                    server_port = "443"
+                    server_prefix = "/subscription"
+                    repo_ca_cert = "/etc/rhsm/ca/redhat-uep.pem"
+                    rhsm_baseurl = "https://cdn.redhat.com"
+                  end
+                end
+              %>
+
+              # Configure subscription-manager
+              test -f $RHSM_CFG.bak || cp $RHSM_CFG $RHSM_CFG.bak
+              subscription-manager config \
+                --server.hostname="<%= server_hostname %>" \
+                --server.port="<%= server_port %>" \
+                --server.prefix="<%= server_prefix %>" \
+                --rhsm.repo_ca_cert="<%= repo_ca_cert %>" \
+                --rhsm.baseurl="<%= rhsm_baseurl %>"
+
+              # Older versions of subscription manager may not recognize
+              # report_package_profile and package_profile_on_trans options.
+              # So set them separately and redirect out & error to /dev/null
+              # to fail silently.
+              subscription-manager config --rhsm.package_profile_on_trans=1 > /dev/null 2>&1 || true
+              subscription-manager config --rhsm.report_package_profile=1 > /dev/null 2>&1 || true
+
+              # Configuration for EL6
+              if grep --quiet full_refresh_on_yum $RHSM_CFG; then
+                sed -i "s/full_refresh_on_yum\s*=.*$/full_refresh_on_yum = 1/g" $RHSM_CFG
+              else
+                full_refresh_config="#config for on-premise management\nfull_refresh_on_yum = 1"
+                sed -i "/baseurl/a $full_refresh_config" $RHSM_CFG
+              fi
+
+              <% if @subman_setup_scenario == 'provisioning' && plugin_present?('katello') -%>
+                CA_TRUST_ANCHORS=/etc/pki/ca-trust/source/anchors
+
+                # Add the Katello CA certificate to the system-wide CA certificate store
+                if [ -d $CA_TRUST_ANCHORS ]; then
+                  update-ca-trust enable
+                  cp $KATELLO_SERVER_CA_CERT $CA_TRUST_ANCHORS
+                  update-ca-trust
+                fi
+              <% end -%>
+
+              # Restart yggdrasild if installed and running
+              systemctl try-restart yggdrasil >/dev/null 2>&1 || true
+  always:
+    - name: "RaBe Foreman Config : Lock All Provisioning Templates and assign them to RaBe organization"
+      ansible.builtin.include_role:
+        name: radiorabe.foreman.provisioning_templates
+      vars:
+        foreman_provisioning_templates:
+          - name: "*"
+            locked: true
+            organizations:
+              - RaBe
+            locations:
+              - Randweg
+            operatingsystems:
+              - AlmaLinux 9
+              - AlmaLinux 9.1
+              - AlmaLinux 9.2
+              - AlmaLinux 9.3
+              - AlmaLinux 9.4
+              - AlmaLinux 9.5
+      when: not ansible_check_mode
