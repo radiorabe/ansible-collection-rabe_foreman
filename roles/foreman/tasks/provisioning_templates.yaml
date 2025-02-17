@@ -81,7 +81,8 @@
                   DNS1=<%=@host.interfaces[0].subnet.dns_primary %>
                   DNS2=<%=@host.interfaces[0].subnet.dns_secondary  %>
               - content: |
-                  network: {config: disabled}
+                  network:
+                    config: disabled
                 path: /etc/cloud/cloud.cfg.d/99_disable-network-config.cfg
 
               runcmd:
