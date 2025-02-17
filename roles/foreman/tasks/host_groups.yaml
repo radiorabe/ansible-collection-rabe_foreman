@@ -134,7 +134,6 @@
               - onlyoffice.rabe.ch
               - share.rabe.ch
               - songticker.rabe.ch
-              - sso.rabe.ch
               - studiomail.rabe.ch
               - wiki.rabe.ch
           - name: certbot_remote_hosts
