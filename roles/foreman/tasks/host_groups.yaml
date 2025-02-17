@@ -127,7 +127,7 @@
             parameter_type: yaml
             value:
               - archiv.rabe.ch
-              - default.rabe.ch
+              - default.rabe.ch,sso.rabe.ch
               - dmz-rev-proxy.ewb.rabe.ch
               - intranet.rabe.ch
               - my.rabe.ch
