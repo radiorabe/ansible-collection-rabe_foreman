@@ -118,6 +118,7 @@
         location: Randweg
         ansible_roles:
           - radiorabe.certbot.certbot
+          - redhat.rhel_system_roles.systemd
         parameters:
           - name: certbot_acme_account_mail
             parameter_type: string
@@ -156,6 +157,10 @@
               - set_default_zone: drop
                 permanent: true
                 immediate: true
+          - name: systemd_enabled_units
+            parameter_type: array
+            value:
+              - certbot-renew.timer
       - name: AlmaLinux 9 DMZ Virtualization Server
         description: AlmaLinux 9 general purpose virtual machines.
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
@@ -270,7 +275,7 @@
                         image: ghcr.io/radiorabe/httpd:0.5.4
                         env:
                           - name: PODMAN_HOST
-                            value: "{{ ansible_host }}"
+                            value: "{{'{{ ansible_host }}'}}"
                         ports:
                           - containerPort: 8080
                             hostPort: 8080
@@ -315,6 +320,8 @@
             value:
               containers:
                 log_size_max: 1073741824 # 1Gib in bytes
+              network:
+                default_rootless_network_cmd: slirp4netns
           - name: radiorabe_git_local_clone
             parameter_type: boolean
             value: true
@@ -402,7 +409,7 @@
                         image: ghcr.io/radiorabe/httpd:0.5.4
                         env:
                           - name: PODMAN_HOST
-                            value: "{{ ansible_host }}"
+                            value: "{{'{{ ansible_host }}'}}"
                         ports:
                           - containerPort: 8080
                             hostPort: 8080
@@ -447,6 +454,8 @@
             value:
               containers:
                 log_size_max: 1073741824 # 1Gib in bytes
+              network:
+                default_rootless_network_cmd: slirp4netns
           - name: radiorabe_git_local_clone
             parameter_type: boolean
             value: true
