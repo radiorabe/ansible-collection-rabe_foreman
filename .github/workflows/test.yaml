@@ -7,4 +7,4 @@ on:
 
 jobs:
   call-workflow:
-    uses: radiorabe/actions/.github/workflows/test-ansible-collection.yaml@v0.30.0
+    uses: radiorabe/actions/.github/workflows/test-ansible-collection.yaml@v0.30.1
