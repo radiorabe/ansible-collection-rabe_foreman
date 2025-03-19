@@ -111,6 +111,13 @@
         organization: RaBe
         location: Randweg
         compute_resource: ovirt
+        compute_profile: 1-Small
+        domain: service.int.rabe.ch
+        subnet: service
+        parameters:
+          - name: kdump_reboot_ok
+            parameter_type: boolean
+            value: true
       - name: vm-0043.service.int.rabe.ch
         description: AlmaLinux 9 VM for Letsencrypt certificate renewal on reverse proxies
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
