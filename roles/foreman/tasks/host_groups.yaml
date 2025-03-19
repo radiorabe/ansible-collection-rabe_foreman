@@ -227,6 +227,7 @@
         ansible_roles:
           - radiorabe.common.local_user
           - radiorabe.common.git_clone
+          - radiorabe.common.files
           - redhat.rhel_system_roles.podman
         parameters:
           - name: firewall
@@ -336,6 +337,13 @@
           - name: radiorabe_git_clone_remote_dest
             parameter_type: string
             value: /home/revproxy
+          - name: radiorabe_files
+            parameter_type: yaml
+            value:
+              - path: "/home/revproxy"
+                recurse: true
+                owner: revproxy
+                group: revproxy
       - name: AlmaLinux 9 DMZ server-009 VMs
         description: AlmaLinux 9 virtual machines to be run on server-009
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
@@ -353,6 +361,7 @@
         ansible_roles:
           - radiorabe.common.local_user
           - radiorabe.common.git_clone
+          - radiorabe.common.files
           - redhat.rhel_system_roles.podman
         parameters:
           - name: firewall
@@ -462,3 +471,10 @@
           - name: radiorabe_git_clone_remote_dest
             parameter_type: string
             value: /home/revproxy
+          - name: radiorabe_files
+            parameter_type: yaml
+            value:
+              - path: "/home/revproxy"
+                recurse: true
+                owner: revproxy
+                group: revproxy
