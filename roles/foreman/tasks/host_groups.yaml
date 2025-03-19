@@ -126,8 +126,17 @@
           - name: certbot_certificates
             parameter_type: yaml
             value:
-              - letest.rabe.ch
+              - archiv.rabe.ch
+              - default.rabe.ch,sso.rabe.ch
               - dmz-rev-proxy.ewb.rabe.ch
+              - dmz-rev-proxy.upc.rabe.ch
+              - intranet.rabe.ch
+              - my.rabe.ch
+              - onlyoffice.rabe.ch
+              - share.rabe.ch
+              - songticker.rabe.ch
+              - studiomail.rabe.ch
+              - wiki.rabe.ch
           - name: certbot_remote_hosts
             parameter_type: yaml
             value:
