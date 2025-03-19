@@ -39,3 +39,8 @@
   tags:
     - role::rabe_foreman.foreman
     - role::rabe_foreman.foreman:job_templates
+- name: "RaBe Foreman Config : Provisioning Templates"
+  ansible.builtin.import_tasks: provisioning_templates.yaml
+  tags:
+    - role::rabe_foreman.foreman
+    - role::rabe_foreman.foreman:provisioning_templates
