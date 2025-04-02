@@ -328,6 +328,7 @@
             parameter_type: yaml
             value:
               containers:
+                log_driver: k8s-file # log to `podman logs`
                 log_size_max: 1073741824 # 1Gib in bytes
               network:
                 default_rootless_network_cmd: slirp4netns
@@ -462,6 +463,7 @@
             parameter_type: yaml
             value:
               containers:
+                log_driver: k8s-file # log to `podman logs`
                 log_size_max: 1073741824 # 1Gib in bytes
               network:
                 default_rootless_network_cmd: slirp4netns
