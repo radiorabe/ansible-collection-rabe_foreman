@@ -281,7 +281,7 @@
                   spec:
                     containers:
                       - name: revproxy
-                        image: ghcr.io/radiorabe/httpd:0.5.4
+                        image: ghcr.io/radiorabe/httpd:0.6.2
                         env:
                           - name: PODMAN_HOST
                             value: "{{'{{ ansible_host }}'}}"
@@ -416,7 +416,7 @@
                   spec:
                     containers:
                       - name: revproxy
-                        image: ghcr.io/radiorabe/httpd:0.5.4
+                        image: ghcr.io/radiorabe/httpd:0.6.2
                         env:
                           - name: PODMAN_HOST
                             value: "{{'{{ ansible_host }}'}}"
