@@ -112,3 +112,75 @@
                   type: bridge
                   network: dmz
                   model: virtio
+      - name: 1-Small
+        compute_attributes:
+          - compute_resource: ovirt
+            vm_attrs:
+              cluster: ee26f4bd-0f5b-4b9b-9074-7ca55db80ffc # cluster-01
+              template: 29853db1-0097-4061-b9eb-afe7ee63a036 # AlmaLinux-9-GenericCloud-9.5-20241120
+              instance_type: 00000005-0005-0005-0005-0000000002e6 # Small
+              display:
+                type: spice
+                keyboard_layout: en-us
+              volumes_attributes:
+                0:
+                  storage_domain: a047cdc3-1138-406f-89c8-efdc3924ce67 # tier1-ovirt-data-01
+                  preallocate: 0
+                  size_gb: 10
+                  wipe_after_delete: 0
+                  interface: virtio_scsi
+                  bootable: true
+              interfaces_attributes:
+                0:
+                  name: nic1
+                  vnic_profile: dbd7f37d-50e9-4d29-96f8-72a98a736789 # service
+                  network: 28726d49-a763-46c8-abda-d8c4713667ea # service
+                  interface: virtio
+      - name: 2-Medium
+        compute_attributes:
+          - compute_resource: server-008.dmz-admin.int.rabe.ch
+            vm_attrs:
+              cluster: ee26f4bd-0f5b-4b9b-9074-7ca55db80ffc # cluster-01
+              template: 29853db1-0097-4061-b9eb-afe7ee63a036 # AlmaLinux-9-GenericCloud-9.5-20241120
+              instance_type: 00000007-0007-0007-0007-00000000010a # Medium
+              display:
+                type: spice
+                keyboard_layout: en-us
+              volumes_attributes:
+                0:
+                  storage_domain: a047cdc3-1138-406f-89c8-efdc3924ce67 # tier1-ovirt-data-01
+                  preallocate: 0
+                  size_gb: 10
+                  wipe_after_delete: 0
+                  interface: virtio_scsi
+                  bootable: true
+              interfaces_attributes:
+                0:
+                  name: nic1
+                  vnic_profile: dbd7f37d-50e9-4d29-96f8-72a98a736789 # service
+                  network: 28726d49-a763-46c8-abda-d8c4713667ea # service
+                  interface: virtio
+      - name: 3-Large
+        compute_attributes:
+          - compute_resource: server-008.dmz-admin.int.rabe.ch
+            vm_attrs:
+              cluster: ee26f4bd-0f5b-4b9b-9074-7ca55db80ffc # cluster-01
+              template: 29853db1-0097-4061-b9eb-afe7ee63a036 # AlmaLinux-9-GenericCloud-9.5-20241120
+              instance_type: 00000009-0009-0009-0009-0000000000f1 # Large
+              display:
+                type: spice
+                keyboard_layout: en-us
+              volumes_attributes:
+                0:
+                  storage_domain: a047cdc3-1138-406f-89c8-efdc3924ce67 # tier1-ovirt-data-01
+                  preallocate: 0
+                  size_gb: 10
+                  wipe_after_delete: 0
+                  interface: virtio_scsi
+                  bootable: true
+              interfaces_attributes:
+                0:
+                  name: nic1
+                  vnic_profile: dbd7f37d-50e9-4d29-96f8-72a98a736789 # service
+                  network: 28726d49-a763-46c8-abda-d8c4713667ea # service
+                  interface: virtio
