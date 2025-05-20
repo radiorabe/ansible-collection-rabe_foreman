@@ -518,7 +518,7 @@
           - name: Trivy for EL9 (x84_64)
             label: trivy_el9_x86_64
             content_type: yum
-            url: https://aquasecurity.github.io/trivy-repo/rpm/releases/8/x86_64
+            url: https://aquasecurity.github.io/trivy-repo/rpm/releases/9/x86_64
             download_policy: on_demand
             auto_enabled: false
       - name: AlmaLinux OS Generic Cloud (Cloud-init) image
