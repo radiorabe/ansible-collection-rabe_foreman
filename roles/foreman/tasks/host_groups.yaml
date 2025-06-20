@@ -153,6 +153,7 @@
         ansible_roles:
           - radiorabe.certbot.certbot
           - redhat.rhel_system_roles.systemd
+          - redhat.thel_system_roles.certificate
         parameters:
           - name: certbot_acme_account_mail
             parameter_type: string
@@ -205,6 +206,23 @@
             parameter_type: array
             value:
               - certbot-renew.timer
+          - name: certificate_requests
+            paramemer_type: yaml
+            value:
+              - name: vm-2001-cert
+                dns: vm-2001.dmz.int.rabe.ch
+                ca: ipa
+                run_after: |
+                  mkdir /etc/letsencrypt/live/vm-2001.dmz.int.rabe.ch/;
+                  cp /etc/pki/tls/certs/vm-2001-cert.crt /etc/letsencrypt/live/vm-2001.dmz.int.rabe.ch/cert.pem;
+                  cp /etc/pki/tls/private/vm-2001-cert.cert /etc/letsencrypt/live/vm-2001.dmz.int.rabe.ch/privkey.pem
+              - name: vm-2002-cert
+                dns: vm-2002.dmz.int.rabe.ch
+                ca: ipa
+                run_after: |
+                  mkdir /etc/letsencrypt/live/vm-2002.dmz.int.rabe.ch/;
+                  cp /etc/pki/tls/certs/vm-2002-cert.crt /etc/letsencrypt/live/vm-2002.dmz.int.rabe.ch/cert.pem;
+                  cp /etc/pki/tls/private/vm-2002-cert.cert /etc/letsencrypt/live/vm-2002.dmz.int.rabe.ch/privkey.pem
       - name: AlmaLinux 9 DMZ Virtualization Server
         description: AlmaLinux 9 general purpose virtual machines.
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
