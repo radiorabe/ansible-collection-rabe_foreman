@@ -86,7 +86,7 @@
         mask: 255.255.0.0
         gateway: 10.134.0.1
         boot_mode: "Static"
-        vlanid: 138
+        vlanid: 134
         mtu: 1500
         domains:
           - guest.int.rabe.ch
@@ -101,7 +101,7 @@
         mask: 255.255.0.0
         gateway: 10.136.0.1
         boot_mode: "Static"
-        vlanid: 138
+        vlanid: 136
         mtu: 1500
         domains:
           - vm-admin.int.rabe.ch
