@@ -7,14 +7,14 @@
       - name: RaBe Core
         description: RaBe Core contains roles that set facts and sets settings that don't rely on anything and are not OS specific.
         organization: RaBe
-        location: Randweg
+        location: Sulgenrain
         ansible_roles:
           - radiorabe.common.core
       - name: RaBe Base
         description: RaBe Core configures the bare minimum of non OS specific things.
         parent: RaBe Core
         organization: RaBe
-        location: Randweg
+        location: Sulgenrain
         architecture: x86_64
         ansible_roles:
           - radiorabe.common.base
@@ -66,23 +66,23 @@
         description: EL7 configures our EL7 baseline.
         parent: RaBe Core/RaBe Base
         organization: RaBe
-        location: Randweg
+        location: Sulgenrain
       - name: CentOS 7
         description: CentOS 7 configures the RaBe CentOS 7 baseline and serves as a catch-all for imported CentOS 7 infrastructure.
         parent: RaBe Core/RaBe Base/EL7
         organization: RaBe
-        location: Randweg
+        location: Sulgenrain
         operatingsystem: CentOS 7
       - name: EL8
         description: EL8 configures our EL8 baseline.
         parent: RaBe Core/RaBe Base
         organization: RaBe
-        location: Randweg
+        location: Sulgenrain
       - name: EL9
         description: EL9 configures our EL9 baseline
         parent: RaBe Core/RaBe Base
         organization: RaBe
-        location: Randweg
+        location: Sulgenrain
         ansible_roles:
           - radiorabe.rabe_foreman.client
           - redhat.rhel_system_roles.timesync
@@ -97,7 +97,7 @@
         description: AlmaLinux 9.
         parent: RaBe Core/RaBe Base/EL9
         organization: RaBe
-        location: Randweg
+        location: Sulgenrain
         operatingsystem: AlmaLinux 9
         lifecycle_environment: Prod
         content_view: AlmaLinux 9 x86_64
@@ -109,13 +109,13 @@
         description: AlmaLinux 9 general purpose virtual machines.
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
         organization: RaBe
-        location: Randweg
+        location: Sulgenrain
         compute_resource: ovirt
       - name: vm-0043.service.int.rabe.ch
         description: AlmaLinux 9 VM for Letsencrypt certificate renewal on reverse proxies
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
         organization: RaBe
-        location: Randweg
+        location: Sulgenrain
         ansible_roles:
           - radiorabe.certbot.certbot
           - redhat.rhel_system_roles.systemd
@@ -174,7 +174,7 @@
         description: AlmaLinux 9 general purpose virtual machines.
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
         organization: RaBe
-        location: Randweg
+        location: Sulgenrain
         domain: dmz-admin.int.rabe.ch
         subnet: dmz-admin
         ansible_roles:
@@ -214,7 +214,7 @@
         description: AlmaLinux 9 virtual machines to be run on server-008
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
         organization: RaBe
-        location: Randweg
+        location: Sulgenrain
         domain: dmz.int.rabe.ch
         subnet: dmz
         compute_resource: server-008.dmz-admin.int.rabe.ch
@@ -223,7 +223,7 @@
         description: AlmaLinux 9 DMZ virtual machine vm-2001 for running reverse-proxy container
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-008 VMs
         organization: RaBe
-        location: Randweg
+        location: Sulgenrain
         ansible_roles:
           - radiorabe.common.local_user
           - radiorabe.common.git_clone
@@ -349,7 +349,7 @@
         description: AlmaLinux 9 virtual machines to be run on server-009
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
         organization: RaBe
-        location: Randweg
+        location: Sulgenrain
         domain: dmz.int.rabe.ch
         subnet: dmz
         compute_resource: server-009.dmz-admin.int.rabe.ch
@@ -358,7 +358,7 @@
         description: AlmaLinux 9 DMZ virtual machine vm-2002 for running reverse-proxy container
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-009 VMs
         organization: RaBe
-        location: Randweg
+        location: Sulgenrain
         ansible_roles:
           - radiorabe.common.local_user
           - radiorabe.common.git_clone

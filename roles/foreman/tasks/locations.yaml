@@ -4,6 +4,6 @@
     name: radiorabe.foreman.locations
   vars:
     foreman_locations:
-      - name: Randweg
+      - name: Sulgenrain
         organizations:
           - RaBe
