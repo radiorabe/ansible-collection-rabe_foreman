@@ -111,6 +111,160 @@
         organization: RaBe
         location: Randweg
         compute_resource: ovirt
+      - name: vm-0041.service.int.rabe.ch
+        description: AlmaLinux 9 VM for Letsencrypt certificate renewal on reverse proxies
+        parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
+        organization: RaBe
+        location: Randweg
+        ansible_roles:
+          - redhat.rhel_system_roles.kernel_settings
+          - redhat.rhel_system_roles.certificate
+          - radiorabe.common.local_user
+          - redhat.rhel_system_roles.podman
+          - redhat.rhel_system_roles.selinux
+        parameters:
+          - name: certificate_requests
+            parameter_type: yaml
+            value:
+              - name: kanboard
+                dns:
+                - kanboard-new.service.int.rabe.ch
+                ca: ipa
+                principal: HTTP/kanboard-new.service.int.rabe.ch@INT.RABE.CH
+                run_after: "/usr/bin/cp /etc/pki/tls/*/kanboard.* /home/kanboard/ssl/ \n/usr/bin/chown
+                  kanboard: /home/kanboard/ssl/*\ncd /home/kanboard\n/usr/bin/sudo -u kanboard /usr/bin/podman
+                  pod restart kanboard\n"
+          - name: kernel_settings_sysctl
+            parameter_type: yaml
+            value:
+              - name: net.ipv4.ip_unprivileged_port_start
+                value: 80
+          - name: local_user_username
+            parameter_type: string
+            value: kanboard
+          - name: podman_firewall
+            parameter_type: yaml
+            value:
+              - zone: service
+                service:
+                  - http
+                  - https
+                state: enabled
+                permanent: true
+                immediate: true
+          - name: podman_kube_specs
+            parameter_type: yaml
+            value:
+              - state: started
+                kube_file_content:
+                  apiVersion: v1
+                  kind: Pod
+                  metadata:
+                    name: kanboard
+                  spec:
+                    containers:
+                    - name: kanboard
+                      restart: always
+                      image: quay.io/kanboard/kanboard:latest
+                      ports:
+                      - containerPort: 80
+                        hostPort: 80
+                      - containerPort: 443
+                        hostPort: 443
+                      volumeMounts:
+                      - mountPath: "/var/www/app/data:Z"
+                        name: kanboard_data
+                      - mountPath: "/var/www/app/plugins:Z"
+                        name: kanboard_plugins
+                      - mountPath: "/etc/nginx/ssl:Z"
+                        name: kanboard_ssl
+                      env:
+                      - name: DEBUG
+                        value: true
+                      - name: LOG_DRIVER
+                        value: system
+                      - name: DB_DRIVER
+                        value: postgres
+                      - name: DB_USERNAME
+                        value: kanboard
+                      - name: DB_PASSWORD
+                        value: <password>
+                      - name: DB_HOSTNAME
+                        value: postgresql.service.int.rabe.ch
+                      - name: DB_NAME
+                        value: kanboard-new
+                      - name: DATABASE_URL
+                        value: postgres://kanboard:<password>@postgresql.service.int.rabe.ch/kanboard-new
+                      - name: PLUGIN_INSTALLER
+                        value: true
+                      - name: MAIL_FROM
+                        value: kanboard@service.int.rabe.ch
+                      - name: MAIL_TRANSPORT
+                        value: smtp
+                      - name: MAIL_SMTP_HOSTNAME
+                        value: 217.26.49.65
+                      - name: MAIL_SMTP_USERNAME
+                        value: smtp-submit@rabe.ch
+                      - name: MAIL_SMTP_PASSWORD
+                        value: <password>
+                      - name: LDAP_SERVER
+                        value: ldaps://ipa-01.service.int.rabe.ch ldaps://ipa-02.service.int.rabe.ch
+                          ldaps://ipa-03.service.int.rabe.ch
+                      - name: LDAP_BIND_TYPE
+                        value: proxy
+                      - name: LDAP_USERNAME
+                        value: uid=svc-kanboard-ldap-auth,cn=users,cn=accounts,dc=int,dc=rabe,dc=ch
+                      - name: LDAP_PASSWORD
+                        value: <ldap_password>
+                      - name: LDAP_USER_BASE_DN
+                        value: cn=users,cn=accounts,dc=int,dc=rabe,dc=ch
+                      - name: LDAP_USER_FILTER
+                        value: uid=%s
+                      - name: LDAP_GROUP_ADMIN_DN
+                        value: cn=kanboard-admins,cn=groups,cn=accounts,dc=int,dc=rabe,dc=ch
+                      - name: LDAP_GROUP_MANAGER_DN
+                        value: cn=kanboard-managers,cn=groups,cn=accounts,dc=int,dc=rabe,dc=ch
+                      - name: LDAP_GROUP_PROVIDER
+                        value: true
+                      - name: LDAP_GROUP_BASE_DN
+                        value: cn=groups,cn=accounts,dc=int,dc=rabe,dc=ch
+                      - name: LDAP_GROUP_FILTER
+                        value: "(&(objectClass=groupofnames)(cn=%s*))"
+                      - name: REVERSE_PROXY_AUTH
+                        value: true
+                      - name: REVERSE_PROXY_DEFAULT_ADMIN
+                        value: simon.nussbaum
+                      - name: REMEMBER_ME_AUTH
+                        value: false
+                      - name: ENABLE_URL_REWRITE
+                        value: true
+                      - name: HIDE_LOGIN_FORM
+                        value: true
+                      - name: DISABLE_LOGOUT
+                        value: true
+                    volumes:
+                    - name: kanboard_data
+                      hostPath:
+                        path: "/home/kanboard/data"
+                    - name: kanboard_plugins
+                      hostPath:
+                        path: "/home/kanboard/plugins"
+                    - name: kanboard_ssl
+                      hostPath:
+                        path: "/home/kanboard/ssl"
+          - name: podman_run_as_group
+            parameter_type: string
+            value: kanboard
+          - name: podman_run_as_user
+            parameter_type: string
+            value: kanboard
+          - name: podman_selinux_ports
+            parameter_type: yaml
+            value:
+              - ports: 80
+                setype: http_port_t
+              - ports: 443
+                setype: http_port_t
       - name: vm-0043.service.int.rabe.ch
         description: AlmaLinux 9 VM for Letsencrypt certificate renewal on reverse proxies
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
