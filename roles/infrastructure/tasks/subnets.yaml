@@ -4,6 +4,113 @@
     name: theforeman.foreman.subnets
   vars:
     foreman_subnets:
+      - name: admin
+        network: 10.128.0.0
+        mask: 255.255.0.0
+        gateway: 10.128.0.1
+        boot_mode: "Static"
+        vlanid: 128
+        mtu: 1500
+        domains:
+          - admin.int.rabe.ch
+        organizations:
+          - RaBe
+        locations:
+          - Sulgenrain
+        dns_primary: 10.131.0.1
+        dns_secondary: 10.131.0.2
+      - name: office
+        network: 10.129.0.0
+        mask: 255.255.0.0
+        gateway: 10.129.0.1
+        boot_mode: "Static"
+        vlanid: 129
+        mtu: 1500
+        domains:
+          - office.int.rabe.ch
+        organizations:
+          - RaBe
+        locations:
+          - Sulgenrain
+        dns_primary: 10.131.0.1
+        dns_secondary: 10.131.0.2
+      - name: audio
+        network: 10.130.0.0
+        mask: 255.255.0.0
+        gateway: 10.130.0.1
+        boot_mode: "Static"
+        vlanid: 130
+        mtu: 1500
+        domains:
+          - audio.int.rabe.ch
+        organizations:
+          - RaBe
+        locations:
+          - Sulgenrain
+        dns_primary: 10.131.0.1
+        dns_secondary: 10.131.0.2
+        tftp_proxy: foreman.service.int.rabe.ch
+      - name: service
+        network: 10.131.0.0
+        mask: 255.255.0.0
+        gateway: 10.131.0.1
+        boot_mode: "Static"
+        vlanid: 131
+        mtu: 1500
+        domains:
+          - service.int.rabe.ch
+        organizations:
+          - RaBe
+        locations:
+          - Sulgenrain
+        dns_primary: 10.131.0.1
+        dns_secondary: 10.131.0.2
+        tftp_proxy: foreman.service.int.rabe.ch
+      - name: storage
+        network: 10.132.0.0
+        mask: 255.255.0.0
+        gateway: 10.132.0.1
+        boot_mode: "Static"
+        vlanid: 132
+        mtu: 1500
+        domains:
+          - storae.int.rabe.ch
+        organizations:
+          - RaBe
+        locations:
+          - Sulgenrain
+        dns_primary: 10.131.0.1
+        dns_secondary: 10.131.0.2
+      - name: guest
+        network: 10.134.0.0
+        mask: 255.255.0.0
+        gateway: 10.134.0.1
+        boot_mode: "Static"
+        vlanid: 138
+        mtu: 1500
+        domains:
+          - guest.int.rabe.ch
+        organizations:
+          - RaBe
+        locations:
+          - Sulgenrain
+        dns_primary: 10.131.0.1
+        dns_secondary: 10.131.0.2
+      - name: vm-admin
+        network: 10.136.0.0
+        mask: 255.255.0.0
+        gateway: 10.136.0.1
+        boot_mode: "Static"
+        vlanid: 138
+        mtu: 1500
+        domains:
+          - vm-admin.int.rabe.ch
+        organizations:
+          - RaBe
+        locations:
+          - Sulgenrain
+        dns_primary: 10.131.0.1
+        dns_secondary: 10.131.0.2
       - name: dmz-admin
         network: 10.138.0.0
         mask: 255.255.0.0
@@ -16,7 +123,7 @@
         organizations:
           - RaBe
         locations:
-          - Randweg
+          - Sulgenrain
         dns_primary: 10.131.0.1
         dns_secondary: 10.131.0.2
       - name: dmz
@@ -31,6 +138,6 @@
         organizations:
           - RaBe
         locations:
-          - Randweg
+          - Sulgenrain
         dns_primary: 10.131.0.1
         dns_secondary: 10.131.0.2
