@@ -10,7 +10,7 @@
         organizations:
           - RaBe
         locations:
-          - Randweg
+          - Sulgenrain
         provider: ovirt
         provider_params:
           url: https://ovirt-engine-01.admin.int.rabe.ch/ovirt-engine/api
@@ -29,7 +29,7 @@
         organizations:
           - RaBe
         locations:
-          - Randweg
+          - Sulgenrain
         provider: libvirt
         provider_params:
           url: qemu+ssh://root@server-008.dmz-admin.int.rabe.ch/system
@@ -46,7 +46,7 @@
         organizations:
           - RaBe
         locations:
-          - Randweg
+          - Sulgenrain
         provider: libvirt
         provider_params:
           url: qemu+ssh://root@server-009.dmz-admin.int.rabe.ch/system
