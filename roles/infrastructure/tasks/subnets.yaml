@@ -16,7 +16,7 @@
         organizations:
           - RaBe
         locations:
-          - Randweg
+          - Sulgenrain
         dns_primary: 10.131.0.1
         dns_secondary: 10.131.0.2
       - name: dmz
@@ -31,6 +31,6 @@
         organizations:
           - RaBe
         locations:
-          - Randweg
+          - Sulgenrain
         dns_primary: 10.131.0.1
         dns_secondary: 10.131.0.2
