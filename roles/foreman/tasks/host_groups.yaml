@@ -121,7 +121,6 @@
           - redhat.rhel_system_roles.certificate
           - radiorabe.common.local_user
           - redhat.rhel_system_roles.podman
-          - redhat.rhel_system_roles.selinux
         parameters:
           - name: certificate_requests
             parameter_type: yaml
@@ -131,6 +130,7 @@
                 - kanboard-new.service.int.rabe.ch
                 ca: ipa
                 principal: HTTP/kanboard-new.service.int.rabe.ch@INT.RABE.CH
+                key_size: 4096
                 run_after: "/usr/bin/cp /etc/pki/tls/*/kanboard.* /home/kanboard/ssl/ \n/usr/bin/chown
                   kanboard: /home/kanboard/ssl/*\ncd /home/kanboard\n/usr/bin/sudo -u kanboard /usr/bin/podman
                   pod restart kanboard\n"
@@ -142,16 +142,16 @@
           - name: local_user_username
             parameter_type: string
             value: kanboard
+          - name: podman_create_host_directories
+            parameter_type: boolean
+            value: true
           - name: podman_firewall
             parameter_type: yaml
             value:
-              - zone: service
-                service:
+              - service:
                   - http
                   - https
                 state: enabled
-                permanent: true
-                immediate: true
           - name: podman_kube_specs
             parameter_type: yaml
             value:
