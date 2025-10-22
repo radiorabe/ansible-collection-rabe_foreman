@@ -28,8 +28,8 @@
             value:
               - name: monger-cockpit
                 dns:
-                - "{{ ansible_host }}"
-                principal: HTTP/{{ ansible_host }}@INT.RABE.CH
+                - "{{'{{ ansible_host }}'}}"
+                principal: "HTTP/{{'{{ ansible_host }}'}}@INT.RABE.CH"
                 ca: ipa
                 key_size: 4096
           - name: cockpit_packages
