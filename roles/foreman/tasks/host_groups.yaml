@@ -18,10 +18,38 @@
         architecture: x86_64
         ansible_roles:
           - radiorabe.common.base
+          - redhat.rhel_system_roles.firewall
+          - redhat.rhel_system_roles.cockpit
+          - redhat.rhel_system_roles.selinux
+          - radiorabe.common.rabe_backup
         parameters:
+          - name: cockpit_certificates
+            parameter_type: yaml
+            value:
+              - name: monger-cockpit
+                dns:
+                - "{{ ansible_host }}"
+                principal: HTTP/{{ ansible_host }}@INT.RABE.CH
+                ca: ipa
+                key_size: 4096
+          - name: cockpit_packages
+            parameter_type: yaml
+            value:
+              - cockpit
+              - cockpit-networkmanager
+              - cockpit-packagekit
+              - cockpit-selinux
+              - cockpit-storaged
+              - cockpit-podman
           - name: foreman_scap_client_server
             parameter_type: string
             value: foreman.service.int.rabe.ch
+          - name: only_subscription_manager_repos
+            parameter_type: boolean
+            value: true
+          - name: package_upgrade
+            parameter_type: boolean
+            value: false
           # base options for [radiorabe.rabe_zabbix.agent](https://github.com/radiorabe/ansible-collection-rabe_zabbix/tree/main/roles/agent)
           # TODO: remove override once we are fully migrated to agent2 and we can use the default from the role
           - name: radiorabe_zabbix_agent_server
@@ -30,6 +58,15 @@
           - name: radiorabe_zabbix_agent_serveractive
             parameter_type: string
             value: vm-0040.service.int.rabe.ch
+          - name: selinux_policy
+            parameter_type: string
+            value: targeted
+          - name: selinux_state
+            parameter_type: string
+            value: enforcing
+          - name: subscription_manager
+            parameter_type: boolean
+            value: true
           # base options for [timesync](https://github.com/linux-system-roles/timesync) role
           - name: timesync_ntp_servers
             parameter_type: yaml
@@ -48,20 +85,6 @@
             parameter_type: string
             value: "Europe/Zurich"
           # base options for [selinux](https://github.com/linux-system-roles/selinux) role
-          - name: selinux_policy
-            parameter_type: string
-            value: targeted
-          - name: selinux_state
-            parameter_type: string
-            value: enforcing
-          - name: subscription_manager
-            parameter_type: boolean
-            value: true
-          - name: only_subscription_manager_repos
-            parameter_type: boolean
-            value: true
-          - name: package_upgrade
-            value: false
       - name: EL7
         description: EL7 configures our EL7 baseline.
         parent: RaBe Core/RaBe Base
@@ -85,14 +108,25 @@
         location: Sulgenrain
         ansible_roles:
           - radiorabe.rabe_foreman.client
-          - redhat.rhel_system_roles.timesync
           - redhat.rhel_system_roles.journald
+          - redhat.rhel_system_roles.timesync
           - redhat.rhel_system_roles.kdump
           - redhat.rhel_system_roles.logging
+          - redhat.rhel_system_roles.metrics
+          - redhat.rhel_system_roles.crypto_policies
         parameters:
           - name: journald_persistent
             parameter_type: boolean
             value: true
+          - name: metrics_manage_firewall
+            parameter_type: boolean
+            value: true
+          - name: metrics_manage_selinux
+            parameter_type: boolean
+            value: true
+          - name: metrics_retention_days
+            parameter_type: integer
+            value: 30
       - name: AlmaLinux 9
         description: AlmaLinux 9.
         parent: RaBe Core/RaBe Base/EL9
