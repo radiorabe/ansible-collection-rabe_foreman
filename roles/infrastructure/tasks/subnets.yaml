@@ -19,6 +19,25 @@
           - Sulgenrain
         dns_primary: 10.131.0.1
         dns_secondary: 10.131.0.2
+        parameters:
+          - name: firewall
+            parameter_type: yaml
+            value:
+              - zone: admin
+                state: present
+                permanent: true
+              - zone: admin
+                interface: enp1s0
+                state: enabled
+                permanent: true
+              - zone: admin
+                service:
+                - ssh
+                - cockpit
+                state: enabled
+                permanent: true
+              - set_default_zone: admin
+                permanent: true
       - name: office
         network: 10.129.0.0
         mask: 255.255.0.0
@@ -34,6 +53,25 @@
           - Sulgenrain
         dns_primary: 10.131.0.1
         dns_secondary: 10.131.0.2
+        parameters:
+          - name: firewall
+            parameter_type: yaml
+            value:
+              - zone: office
+                state: present
+                permanent: true
+              - zone: office
+                interface: enp1s0
+                state: enabled
+                permanent: true
+              - zone: office
+                service:
+                - ssh
+                - cockpit
+                state: enabled
+                permanent: true
+              - set_default_zone: office
+                permanent: true
       - name: audio
         network: 10.130.0.0
         mask: 255.255.0.0
@@ -50,6 +88,25 @@
         dns_primary: 10.131.0.1
         dns_secondary: 10.131.0.2
         tftp_proxy: foreman.service.int.rabe.ch
+        parameters:
+          - name: firewall
+            parameter_type: yaml
+            value:
+              - zone: audio
+                state: present
+                permanent: true
+              - zone: audio
+                interface: enp1s0
+                state: enabled
+                permanent: true
+              - zone: audio
+                service:
+                - ssh
+                - cockpit
+                state: enabled
+                permanent: true
+              - set_default_zone: audio
+                permanent: true
       - name: service
         network: 10.131.0.0
         mask: 255.255.0.0
@@ -66,6 +123,25 @@
         dns_primary: 10.131.0.1
         dns_secondary: 10.131.0.2
         tftp_proxy: foreman.service.int.rabe.ch
+        parameters:
+          - name: firewall
+            parameter_type: yaml
+            value:
+              - zone: service
+                state: present
+                permanent: true
+              - zone: service
+                interface: enp1s0
+                state: enabled
+                permanent: true
+              - zone: service
+                service:
+                - ssh
+                - cockpit
+                state: enabled
+                permanent: true
+              - set_default_zone: service
+                permanent: true
       - name: storage
         network: 10.132.0.0
         mask: 255.255.0.0
@@ -81,6 +157,25 @@
           - Sulgenrain
         dns_primary: 10.131.0.1
         dns_secondary: 10.131.0.2
+        parameters:
+          - name: firewall
+            parameter_type: yaml
+            value:
+              - zone: storage
+                state: present
+                permanent: true
+              - zone: storage
+                interface: enp1s0
+                state: enabled
+                permanent: true
+              - zone: storage
+                service:
+                - ssh
+                - cockpit
+                state: enabled
+                permanent: true
+              - set_default_zone: storage
+                permanent: true
       - name: guest
         network: 10.134.0.0
         mask: 255.255.0.0
@@ -96,6 +191,25 @@
           - Sulgenrain
         dns_primary: 10.131.0.1
         dns_secondary: 10.131.0.2
+        parameters:
+          - name: firewall
+            parameter_type: yaml
+            value:
+              - zone: guest
+                state: present
+                permanent: true
+              - zone: guest
+                interface: enp1s0
+                state: enabled
+                permanent: true
+              - zone: guest
+                service:
+                - ssh
+                - cockpit
+                state: enabled
+                permanent: true
+              - set_default_zone: guest
+                permanent: true
       - name: vm-admin
         network: 10.136.0.0
         mask: 255.255.0.0
@@ -111,6 +225,25 @@
           - Sulgenrain
         dns_primary: 10.131.0.1
         dns_secondary: 10.131.0.2
+        parameters:
+          - name: firewall
+            parameter_type: yaml
+            value:
+              - zone: vm-admin
+                state: present
+                permanent: true
+              - zone: vm-admin
+                interface: enp1s0
+                state: enabled
+                permanent: true
+              - zone: vm-admin
+                service:
+                - ssh
+                - cockpit
+                state: enabled
+                permanent: true
+              - set_default_zone: vm-admin
+                permanent: true
       - name: dmz-admin
         network: 10.138.0.0
         mask: 255.255.0.0
@@ -126,6 +259,25 @@
           - Sulgenrain
         dns_primary: 10.131.0.1
         dns_secondary: 10.131.0.2
+        parameters:
+          - name: firewall
+            parameter_type: yaml
+            value:
+              - zone: dmz-admin
+                state: present
+                permanent: true
+              - zone: dmz-admin
+                interface: enp1s0
+                state: enabled
+                permanent: true
+              - zone: dmz-admin
+                service:
+                - ssh
+                - cockpit
+                state: enabled
+                permanent: true
+              - set_default_zone: dmz-admin
+                permanent: true
       - name: dmz
         network: 10.133.0.0
         mask: 255.255.0.0
@@ -141,3 +293,22 @@
           - Sulgenrain
         dns_primary: 10.131.0.1
         dns_secondary: 10.131.0.2
+        parameters:
+          - name: firewall
+            parameter_type: yaml
+            value:
+              - zone: dmz
+                state: present
+                permanent: true
+              - zone: dmz
+                interface: enp1s0
+                state: enabled
+                permanent: true
+              - zone: dmz
+                service:
+                - ssh
+                - cockpit
+                state: enabled
+                permanent: true
+              - set_default_zone: dmz
+                permanent: true
