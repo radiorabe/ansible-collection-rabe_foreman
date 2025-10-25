@@ -142,6 +142,12 @@
           - name: local_user_username
             parameter_type: string
             value: kanboard
+          - name: podman_containers_conf
+            parameter_type: yaml
+            value:
+              containers:
+                log_driver: k8s-file
+                log_size_max: 1073741824
           - name: podman_create_host_directories
             parameter_type: boolean
             value: true
