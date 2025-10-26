@@ -1,0 +1,229 @@
+---
+# Dump our hostgroups in the format that matches what this repo requires
+#
+# This script has several limitation
+# * it's format isn't the best (see below for caveats)
+# * there are a few other quirks in both the tooling as well as our setup
+# * it's as hacky as can be
+#
+# The output template implements a naive approach to generate "nice"
+# output where it makes sense.
+#
+# The resulting file needs to be compared with the actual role and some
+# parts aren't fully automated yet.
+#
+# You can run this play along these lines:
+#
+#   ansible-playbook -e foreman_server_url=<SERVER> -e foreman_username=<USER> -e foreman_password=<TOKEN> hack/plays/dump_host_groups.yaml
+#
+# The output needs some work, some of which can be done as so:
+#
+#   # Optional/manual only (may increase review noise):
+#   yamlfmt -formatter force_array_style=block,force_quote_style=double,pad_line_comments=2,trim_trailing_whitespace=true,eof_newline=true roles/foreman/vars/hostgroups/*.yaml
+#
+# Use git to analyse the resulting diff:
+#
+#   git diff roles/foreman/vars/hostgroups
+#
+- name: Dump hostgroups from Foreman
+  hosts: localhost
+  connection: local
+  vars:
+    repo_root: "{{ playbook_dir | dirname | dirname }}"
+    hostgroups_vars_dir: "{{ playbook_dir }}/../../roles/foreman/vars/hostgroups"
+  tasks:
+    - name: "List hostgroup variable files"
+      ansible.builtin.set_fact:
+        hostgroup_var_files: "{{ query('fileglob', hostgroups_vars_dir ~ '/*.yaml') | sort }}"
+
+    - name: "Build existing hostgroup dump plan"
+      ansible.builtin.set_fact:
+        existing_hostgroups_to_dump: "{{ (existing_hostgroups_to_dump | default([])) + [{ 'name': _hostgroup_name, 'query_name': _hostgroup_query_name, 'dest': item }] }}"
+      vars:
+        _hostgroup_data: "{{ (lookup('ansible.builtin.file', item) | from_yaml).foreman_hostgroup }}"
+        _hostgroup_name: "{{ _hostgroup_data.name }}"
+        _hostgroup_parent: "{{ _hostgroup_data.parent | default('') }}"
+        _hostgroup_query_name: "{{ (_hostgroup_parent ~ '/' if _hostgroup_parent else '') ~ _hostgroup_name }}"
+      loop: "{{ hostgroup_var_files }}"
+
+    - name: "Build depth to filename prefix map"
+      ansible.builtin.set_fact:
+        depth_prefix_map: "{{ (depth_prefix_map | default({})) | combine({ (_query_depth | string): _file_prefix }) }}"
+      vars:
+        _query_depth: "{{ (item.query_name.split('/')) | length }}"
+        _file_basename: "{{ item.dest | basename }}"
+        _file_prefix: "{{ _file_basename | regex_replace('^([0-9]{2})_.*$', '\\1') }}"
+      when:
+        - (item.dest | basename) is match('^[0-9]{2}_.+')
+        - (_query_depth | string) not in (depth_prefix_map | default({}))
+      loop: "{{ existing_hostgroups_to_dump | default([]) }}"
+      loop_control:
+        label: "{{ item.dest | basename }}"
+
+    - name: "Read all hostgroups from Foreman"
+      theforeman.foreman.hostgroup_info:
+        username: "{{ foreman_username }}"
+        password: "{{ foreman_password }}"
+        server_url: "{{ foreman_server_url }}"
+        validate_certs: "{{ foreman_validate_certs }}"
+      register: all_hostgroups_info
+
+    - name: "Build complete hostgroup dump plan"
+      ansible.builtin.set_fact:
+        hostgroups_to_dump: "{{ (hostgroups_to_dump | default([])) + [{ 'name': item.name, 'query_name': item.title, 'dest': _dest_path }] }}"
+      vars:
+        _existing_matches: "{{ (existing_hostgroups_to_dump | default([])) | selectattr('query_name', 'equalto', item.title) | list }}"
+        _existing_dest: "{{ _existing_matches[0].dest if (_existing_matches | length > 0) else None }}"
+        _depth: "{{ (item.title.split('/')) | length }}"
+        _depth_key: "{{ _depth | string }}"
+        _depth_prefix: "{{ (depth_prefix_map[_depth_key] if (_depth_key in (depth_prefix_map | default({}))) else ('%02d' | format((_depth - 1) | int))) }}"
+        _generated_name: "{{ item.name | lower | regex_replace('[^a-z0-9._-]+', '_') | regex_replace('^_+|_+$', '') }}"
+        _dest_path: "{{ _existing_dest if _existing_dest else (hostgroups_vars_dir ~ '/' ~ _depth_prefix ~ '_' ~ _generated_name ~ '.yaml') }}"
+      loop: "{{ all_hostgroups_info.hostgroups | default([]) | sort(attribute='title') }}"
+      loop_control:
+        label: "{{ item.title }}"
+
+    - name: "Read hostgroups"
+      theforeman.foreman.hostgroup_info:
+        username: "{{ foreman_username }}"
+        password: "{{ foreman_password }}"
+        server_url: "{{ foreman_server_url }}"
+        validate_certs: "{{ foreman_validate_certs }}"
+        name: "{{ item.query_name }}"
+      loop: "{{ hostgroups_to_dump }}"
+      register: hostgroup_infos
+
+    - name: "Ensure hostgroups were found in Foreman"
+      ansible.builtin.assert:
+        that:
+          - item.hostgroup is not none
+        fail_msg: "Foreman hostgroup '{{ item.item.query_name }}' from '{{ item.item.dest | basename }}' was not found"
+      loop: "{{ hostgroup_infos.results }}"
+      loop_control:
+        label: "{{ item.item.query_name }}"
+
+    - name: "Read hostgroup ansible roles"
+      ansible.builtin.uri:
+        url: "{{ foreman_server_url }}/api/hostgroups/{{ item.hostgroup.id }}/ansible_roles"
+        method: GET
+        user: "{{ foreman_username }}"
+        password: "{{ foreman_password }}"
+        force_basic_auth: true
+        validate_certs: "{{ foreman_validate_certs }}"
+        headers:
+          Accept: "application/json;version=2"
+        return_content: true
+        status_code: 200
+      loop: "{{ hostgroup_infos.results }}"
+      register: hostgroup_ansible_roles
+      loop_control:
+        label: "{{ item.item.query_name }}"
+
+    - name: "Dump YAML to hostgroup variable files"
+      ansible.builtin.copy:
+        content: |
+          {% set relative_dest = item.item.dest | replace(repo_root ~ '/', '') %}
+          {% set existing_file_content = lookup('ansible.builtin.pipe', 'git -C ' ~ repo_root ~ ' --no-pager show HEAD:' ~ relative_dest ~ ' 2>/dev/null || cat ' ~ item.item.dest ~ ' 2>/dev/null || true') %}
+          {% set existing_file_trimmed = existing_file_content | trim %}
+          {% set existing_file_data = (existing_file_trimmed | from_yaml) if (existing_file_trimmed | length > 0) else {} %}
+          {% set existing_hostgroup = existing_file_data.foreman_hostgroup | default({}) %}
+          {% set source_params = item.hostgroup.parameters | default([]) %}
+          {% set role_result_matches = hostgroup_ansible_roles.results | selectattr('item.hostgroup.id', 'equalto', item.hostgroup.id) | list %}
+          {% set role_entries = role_result_matches[0].json | default([]) if (role_result_matches | length > 0) else [] %}
+          {% set fetched_ansible_roles = role_entries | rejectattr('inherited', 'equalto', true) | map(attribute='name') | list %}
+          {% set dumped_ansible_roles = (fetched_ansible_roles if (fetched_ansible_roles | length > 0) else None) %}
+          {% set existing_ansible_roles = existing_hostgroup.ansible_roles | default([]) %}
+          {% set merged_architecture = item.hostgroup.architecture_name | default(existing_hostgroup.architecture | default(None)) %}
+          {% set dumped_architecture = (None if merged_architecture == 'x86_64' else merged_architecture) %}
+          {% set existing_params = existing_hostgroup.parameters | default([]) %}
+          {% set ns = namespace(params=[], names=[]) %}
+          {% for existing_param in existing_params %}
+          {% set source_param_matches = source_params | selectattr('name', 'equalto', existing_param.name) | list %}
+          {% set source_param = (source_param_matches[0] if (source_param_matches | length > 0) else None) %}
+          {% if source_param is mapping %}
+          {% set source_hidden = source_param['hidden_value?'] | default(source_param.hidden_value | default(false)) %}
+          {% set source_param_type = source_param.parameter_type | default(existing_param.parameter_type | default('string')) %}
+          {% set source_value = source_param.value | default(None) %}
+          {% if source_hidden and (existing_param.hidden_value | default(false)) %}
+          {% set chosen_value = existing_param.value | default(source_value) %}
+          {% elif (source_param_type == 'yaml') and (existing_param.value is defined) %}
+          {% set chosen_value = existing_param.value %}
+          {% elif (existing_param.value is defined) and (source_value is not none) and ((source_value | to_json) == (existing_param.value | to_json)) %}
+          {% set chosen_value = existing_param.value %}
+          {% else %}
+          {% set chosen_value = source_value %}
+          {% endif %}
+          {% set normalized_param = {'name': source_param.name, 'parameter_type': source_param_type, 'value': chosen_value} %}
+          {% if source_hidden or (existing_param.hidden_value | default(false)) %}
+          {% set normalized_param = normalized_param | combine({'hidden_value': true}) %}
+          {% endif %}
+          {% set ns.params = ns.params + [normalized_param] %}
+          {% set ns.names = ns.names + [source_param.name] %}
+          {% else %}
+          {% set fallback_param = {'name': existing_param.name, 'parameter_type': existing_param.parameter_type | default('string'), 'value': existing_param.value | default(None)} %}
+          {% if existing_param.hidden_value | default(false) %}
+          {% set fallback_param = fallback_param | combine({'hidden_value': true}) %}
+          {% endif %}
+          {% set ns.params = ns.params + [fallback_param] %}
+          {% set ns.names = ns.names + [existing_param.name] %}
+          {% endif %}
+          {% endfor %}
+          {% for source_param in source_params %}
+          {% if source_param.name not in ns.names %}
+          {% set source_hidden = source_param['hidden_value?'] | default(source_param.hidden_value | default(false)) %}
+          {% set normalized_param = {'name': source_param.name, 'parameter_type': source_param.parameter_type | default('string'), 'value': source_param.value | default(None)} %}
+          {% if source_hidden %}
+          {% set normalized_param = normalized_param | combine({'hidden_value': true}) %}
+          {% endif %}
+          {% set ns.params = ns.params + [normalized_param] %}
+          {% endif %}
+          {% endfor %}
+          {% set hostgroup_updates = {
+            'name': item.hostgroup.name,
+            'description': item.hostgroup.description | default(existing_hostgroup.description | default(None)),
+            'parent': item.hostgroup.parent_name | default(existing_hostgroup.parent | default(None)),
+            'organization': (item.hostgroup.organizations[0].name if (item.hostgroup.organizations | length > 0) else (existing_hostgroup.organization | default(None))),
+            'locations': (item.hostgroup.locations | map(attribute='name') | list if (item.hostgroup.locations | length > 0) else (existing_hostgroup.locations | default(None))),
+            'domain': item.hostgroup.domain_name | default(existing_hostgroup.domain | default(None)),
+            'subnet': item.hostgroup.subnet_name | default(existing_hostgroup.subnet | default(None)),
+            'architecture': dumped_architecture,
+            'operatingsystem': item.hostgroup.operatingsystem_name | default(existing_hostgroup.operatingsystem | default(None)),
+            'lifecycle_environment': item.hostgroup.lifecycle_environment_name | default(existing_hostgroup.lifecycle_environment | default(None)),
+            'content_view': item.hostgroup.content_view_name | default(existing_hostgroup.content_view | default(None)),
+            'compute_resource': item.hostgroup.compute_resource_name | default(existing_hostgroup.compute_resource | default(None)),
+            'compute_profile': item.hostgroup.compute_profile_name | default(existing_hostgroup.compute_profile | default(None)),
+            'ansible_roles': (existing_ansible_roles if ((fetched_ansible_roles | length > 0) and ((existing_ansible_roles | to_json) == (fetched_ansible_roles | to_json))) else dumped_ansible_roles),
+            'parameters': (ns.params if (ns.params | length > 0) else None)
+          } %}
+          {% set merged_hostgroup = existing_hostgroup | combine(hostgroup_updates, recursive=True) %}
+          {% set ordered_keys = existing_hostgroup | dict2items | map(attribute='key') | list %}
+          {% set ns_keys = namespace(v=ordered_keys) %}
+          {% for key in hostgroup_updates | dict2items | map(attribute='key') | list %}
+          {% if key not in ns_keys.v %}
+          {% set ns_keys.v = ns_keys.v + [key] %}
+          {% endif %}
+          {% endfor %}
+          {% set ns_order = namespace(out={}) %}
+          {% for key in ns_keys.v %}
+          {% if merged_hostgroup[key] is not none %}
+          {% set ns_order.out = ns_order.out | combine({key: merged_hostgroup[key]}) %}
+          {% endif %}
+          {% endfor %}
+          {% if (existing_hostgroup | length > 0) and ((ns_order.out | to_json) == (existing_hostgroup | to_json)) %}
+          {{ existing_file_content | regex_replace('(?s)^(---\\s*\\n)+', '---\\n') | trim }}
+          {% else %}
+          ---
+          {{ {
+            'foreman_hostgroup': ns_order.out
+          } | to_nice_yaml(indent=2, sort_keys=False)
+            | trim }}
+          {% endif %}
+        dest: "{{ item.item.dest }}"
+        mode: preserve
+      loop: "{{ hostgroup_infos.results }}"
+      loop_control:
+        label: "{{ item.item.dest | basename }}"
+
+    - name: "Normalize multiline YAML scalars in dumped hostgroup files"
+      normalize_multiline_yaml:
+        file_paths: "{{ hostgroups_to_dump | map(attribute='dest') | list }}"
