@@ -115,7 +115,7 @@
         description: AlmaLinux 9 VM for Letsencrypt certificate renewal on reverse proxies
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
         organization: RaBe
-        location: Randweg
+        location: Sulgenrain
         ansible_roles:
           - redhat.rhel_system_roles.kernel_settings
           - redhat.rhel_system_roles.certificate
