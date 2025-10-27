@@ -251,13 +251,13 @@
                     volumes:
                     - name: kanboard_data
                       hostPath:
-                        path: "/home/kanboard/data"
+                        path: /home/kanboard/data
                     - name: kanboard_plugins
                       hostPath:
-                        path: "/home/kanboard/plugins"
+                        path: /home/kanboard/plugins
                     - name: kanboard_ssl
                       hostPath:
-                        path: "/home/kanboard/ssl"
+                        path: /home/kanboard/ssl
           - name: podman_run_as_group
             parameter_type: string
             value: kanboard
