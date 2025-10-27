@@ -186,7 +186,7 @@
                         name: kanboard_ssl
                       env:
                       - name: DEBUG
-                        value: true
+                        value: false
                       - name: LOG_DRIVER
                         value: system
                       - name: DB_DRIVER
