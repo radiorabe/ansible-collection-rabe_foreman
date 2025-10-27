@@ -178,11 +178,11 @@
                       - containerPort: 443
                         hostPort: 443
                       volumeMounts:
-                      - mountPath: "/var/www/app/data:Z"
+                      - mountPath: /var/www/app/data:Z
                         name: kanboard_data
-                      - mountPath: "/var/www/app/plugins:Z"
+                      - mountPath: /var/www/app/plugins:Z
                         name: kanboard_plugins
-                      - mountPath: "/etc/nginx/ssl:Z"
+                      - mountPath: /etc/nginx/ssl:Z
                         name: kanboard_ssl
                       env:
                       - name: DEBUG
