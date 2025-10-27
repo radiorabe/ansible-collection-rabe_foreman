@@ -244,6 +244,15 @@
                 parent: Bond bond0
                 controller: dmz
                 port_type: bridge
+      - name: AlmaLinux 9 server-004 VMs
+        description: AlmaLinux 9 virtual machines to be run on server-004
+        parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
+        organization: RaBe
+        location: Sulgenrain
+        architecture: x86_64
+        operatingsystem: AlmaLinux 9
+        lifecycle_environment: Prod
+        content_view: AlmaLinux 9 x86_64
       - name: AlmaLinux 9 DMZ server-008 VMs
         description: AlmaLinux 9 virtual machines to be run on server-008
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
