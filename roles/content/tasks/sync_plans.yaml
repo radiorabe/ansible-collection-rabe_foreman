@@ -15,6 +15,9 @@
           - Extra Packages for Enterprise Linux 9
           - Foreman Client 3.12 EL7
           - Foreman Client 3.12 EL9
+          - Foreman Client 3.13 EL7
+          - Foreman Client 3.14 EL9
+          - Foreman Client 3.14 EL10
           - RaBe Logstash Addons EL7
           - Zabbix 3.0 (LTS) EL7
           - Zabbix 6.4 EL7
