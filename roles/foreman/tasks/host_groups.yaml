@@ -127,7 +127,7 @@
             value:
               - name: kanboard
                 dns:
-                - kanboard-new.service.int.rabe.ch
+                  - kanboard-new.service.int.rabe.ch
                 ca: ipa
                 principal: HTTP/kanboard-new.service.int.rabe.ch@INT.RABE.CH
                 key_size: 4096
