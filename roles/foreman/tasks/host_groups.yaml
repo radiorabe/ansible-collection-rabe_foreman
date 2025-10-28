@@ -151,9 +151,10 @@
         organization: RaBe
         location: Sulgenrain
         ansible_roles:
-          - redhat.rhel_system_roles.kernel_settings
+          - radiorabe.common.selinux_modules
           - redhat.rhel_system_roles.certificate
           - radiorabe.common.local_user
+          - redhat.rhel_system_roles.kernel_settings
           - redhat.rhel_system_roles.podman
         parameters:
           - name: certificate_requests
@@ -305,6 +306,10 @@
                 setype: http_port_t
               - ports: 443
                 setype: http_port_t
+          - name: selinux_modules_download_file_urls
+            parameter_type: yaml
+            value:
+              - url: https://foreman.service.int.rabe.ch/pulp/content/RaBe/Library/custom/Additional_selinux_policies/Additional_selinux_policies/certmonger-podman.cil
       - name: vm-0043.service.int.rabe.ch
         description: AlmaLinux 9 VM for Letsencrypt certificate renewal on reverse proxies
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
