@@ -83,7 +83,7 @@
                 iburst: true
           - name: time-zone
             parameter_type: string
-            value: "Europe/Zurich"
+            value: Europe/Zurich
           # base options for [selinux](https://github.com/linux-system-roles/selinux) role
       - name: EL7
         description: EL7 configures our EL7 baseline.
@@ -252,7 +252,7 @@
         domain: dmz.int.rabe.ch
         subnet: dmz
         compute_resource: server-008.dmz-admin.int.rabe.ch
-        compute_profile: "1-Small"
+        compute_profile: 1-Small
       - name: vm-2001.dmz.int.rabe.ch
         description: AlmaLinux 9 DMZ virtual machine vm-2001 for running reverse-proxy container
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-008 VMs
@@ -280,17 +280,25 @@
                 state: present
                 permanent: true
               - zone: dmz
+                service:
+                  - 'cockpit'
+                  - 'ssh'
+                  - 'http-alt'
+                  - 'https-alt'
+                  - 'pmcd'
                 state: enabled
                 permanent: true
-                service:
-                  - cockpit
-                  - ssh
-                  - http-alt
-                  - https-alt
-                  - pmcd
           - name: local_user_username
             parameter_type: string
             value: revproxy
+          - name: podman_containers_conf
+            parameter_type: yaml
+            value:
+              containers:
+                log_driver: k8s-file  # log to `podman logs`
+                log_size_max: 1073741824  # 1Gib in bytes
+              network:
+                default_rootless_network_cmd: slirp4netns
           - name: podman_create_host_directories
             parameter_type: boolean
             value: true
@@ -327,22 +335,22 @@
                           - containerPort: 8443
                             hostPort: 8443
                         volumeMounts:
-                          - mountPath: "/etc/httpd/conf.d/local_configs:Z"
+                          - mountPath: /etc/httpd/conf.d/local_configs:Z
                             name: local_httpd_configs
-                          - mountPath: "/etc/httpd/modsecurity.d/local_rules:Z"
+                          - mountPath: /etc/httpd/modsecurity.d/local_rules:Z
                             name: local_modsec_rules
-                          - mountPath: "/etc/pki/tls/private/rabe_certs:Z"
+                          - mountPath: /etc/pki/tls/private/rabe_certs:Z
                             name: local_letsencrypt_certs
                     volumes:
                       - name: local_httpd_configs
                         hostPath:
-                          path: "/home/revproxy/httpd/conf.d/local_configs"
+                          path: /home/revproxy/httpd/conf.d/local_configs
                       - name: local_modsec_rules
                         hostPath:
-                          path: "/home/revproxy/httpd/modsecurity.d/local_rules"
+                          path: /home/revproxy/httpd/modsecurity.d/local_rules
                       - name: local_letsencrypt_certs
                         hostPath:
-                          path: "/home/revproxy/httpd/rabe_certs"
+                          path: /home/revproxy/httpd/rabe_certs
           - name: podman_run_as_group
             parameter_type: string
             value: revproxy
@@ -358,27 +366,19 @@
                 setype: http_port_t
               - ports: 8443
                 setype: http_port_t
-          - name: podman_containers_conf
-            parameter_type: yaml
-            value:
-              containers:
-                log_driver: k8s-file # log to `podman logs`
-                log_size_max: 1073741824 # 1Gib in bytes
-              network:
-                default_rootless_network_cmd: slirp4netns
-          - name: radiorabe_git_local_clone
-            parameter_type: boolean
-            value: true
-          - name: radiorabe_git_clone_remote_dest
-            parameter_type: string
-            value: /home/revproxy
           - name: radiorabe_files
             parameter_type: yaml
             value:
-              - path: "/home/revproxy"
+              - path: /home/revproxy
                 recurse: true
                 owner: revproxy
                 group: revproxy
+          - name: radiorabe_git_clone_remote_dest
+            parameter_type: string
+            value: /home/revproxy
+          - name: radiorabe_git_local_clone
+            parameter_type: boolean
+            value: true
       - name: AlmaLinux 9 DMZ server-009 VMs
         description: AlmaLinux 9 virtual machines to be run on server-009
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
@@ -387,7 +387,7 @@
         domain: dmz.int.rabe.ch
         subnet: dmz
         compute_resource: server-009.dmz-admin.int.rabe.ch
-        compute_profile: "1-Small"
+        compute_profile: 1-Small
       - name: vm-2002.dmz.int.rabe.ch
         description: AlmaLinux 9 DMZ virtual machine vm-2002 for running reverse-proxy container
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-009 VMs
@@ -415,17 +415,25 @@
                 state: present
                 permanent: true
               - zone: dmz
+                service:
+                  - 'cockpit'
+                  - 'ssh'
+                  - 'http-alt'
+                  - 'https-alt'
+                  - 'pmcd'
                 state: enabled
                 permanent: true
-                service:
-                  - cockpit
-                  - ssh
-                  - http-alt
-                  - https-alt
-                  - pmcd
           - name: local_user_username
             parameter_type: string
             value: revproxy
+          - name: podman_containers_conf
+            parameter_type: yaml
+            value:
+              containers:
+                log_driver: k8s-file  # log to `podman logs`
+                log_size_max: 1073741824  # 1Gib in bytes
+              network:
+                default_rootless_network_cmd: slirp4netns
           - name: podman_create_host_directories
             parameter_type: boolean
             value: true
@@ -462,22 +470,22 @@
                           - containerPort: 8443
                             hostPort: 8443
                         volumeMounts:
-                          - mountPath: "/etc/httpd/conf.d/local_configs:Z"
+                          - mountPath: /etc/httpd/conf.d/local_configs:Z
                             name: local_httpd_configs
-                          - mountPath: "/etc/httpd/modsecurity.d/local_rules:Z"
+                          - mountPath: /etc/httpd/modsecurity.d/local_rules:Z
                             name: local_modsec_rules
-                          - mountPath: "/etc/pki/tls/private/rabe_certs:Z"
+                          - mountPath: /etc/pki/tls/private/rabe_certs:Z
                             name: local_letsencrypt_certs
                     volumes:
                       - name: local_httpd_configs
                         hostPath:
-                          path: "/home/revproxy/httpd/conf.d/local_configs"
+                          path: /home/revproxy/httpd/conf.d/local_configs
                       - name: local_modsec_rules
                         hostPath:
-                          path: "/home/revproxy/httpd/modsecurity.d/local_rules"
+                          path: /home/revproxy/httpd/modsecurity.d/local_rules
                       - name: local_letsencrypt_certs
                         hostPath:
-                          path: "/home/revproxy/httpd/rabe_certs"
+                          path: /home/revproxy/httpd/rabe_certs
           - name: podman_run_as_group
             parameter_type: string
             value: revproxy
@@ -493,24 +501,16 @@
                 setype: http_port_t
               - ports: 8443
                 setype: http_port_t
-          - name: podman_containers_conf
-            parameter_type: yaml
-            value:
-              containers:
-                log_driver: k8s-file # log to `podman logs`
-                log_size_max: 1073741824 # 1Gib in bytes
-              network:
-                default_rootless_network_cmd: slirp4netns
-          - name: radiorabe_git_local_clone
-            parameter_type: boolean
-            value: true
-          - name: radiorabe_git_clone_remote_dest
-            parameter_type: string
-            value: /home/revproxy
           - name: radiorabe_files
             parameter_type: yaml
             value:
-              - path: "/home/revproxy"
+              - path: /home/revproxy
                 recurse: true
                 owner: revproxy
                 group: revproxy
+          - name: radiorabe_git_clone_remote_dest
+            parameter_type: string
+            value: /home/revproxy
+          - name: radiorabe_git_local_clone
+            parameter_type: boolean
+            value: true
