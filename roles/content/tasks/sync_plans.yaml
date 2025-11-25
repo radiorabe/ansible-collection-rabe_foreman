@@ -10,9 +10,11 @@
         products:
           - CentOS 7
           - AlmaLinux 9
+          - AlmaLinux 10
           - RaBe Ansible
           - Extra Packages for Enterprise Linux 7
           - Extra Packages for Enterprise Linux 9
+          - Extra Packages for Enterprise Linux 10
           - Foreman Client 3.12 EL7
           - Foreman Client 3.12 EL9
           - Foreman Client 3.13 EL7
@@ -23,6 +25,7 @@
           - Zabbix 6.4 EL7
           - Zabbix 6.4 EL9
           - Zabbix 7.0 EL9
+          - Zabbix 7.0 EL10
           - RaBe Linux EL7
           - RaBe Linux EL9
           - Paravel Systems EL7
