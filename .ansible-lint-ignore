@@ -9,3 +9,4 @@ roles/network/tasks/main.yml syntax-check[specific]
 
 # this might take some work to rename
 roles/network/defaults/main.yml var-naming[no-role-prefix]
+roles/client/defaults/main.yml var-naming[no-role-prefix]

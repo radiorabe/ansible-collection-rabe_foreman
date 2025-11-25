@@ -4,3 +4,4 @@
     path: /etc/yum/pluginconf.d/subscription-manager.conf
     regexp: "^disable_system_repos="
     line: "disable_system_repos=1"
+  when: radiorabe_rabe_foreman_client_yum_disable_system_repos | default(true)
