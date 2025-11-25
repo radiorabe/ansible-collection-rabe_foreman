@@ -242,12 +242,6 @@
             url: https://repo.almalinux.org/almalinux/10/plus/x86_64/os/
             download_policy: on_demand
             auto_enabled: false
-          - name: AlmaLinux 10 ResilientStorage x86_64
-            content_type: yum
-            label: alma10_resilientstorage
-            url: https://repo.almalinux.org/almalinux/10/ResilientStorage/x86_64/os/
-            download_policy: on_demand
-            auto_enabled: false
           - name: AlmaLinux 10 RT x86_64
             content_type: yum
             label: alma10_rt
