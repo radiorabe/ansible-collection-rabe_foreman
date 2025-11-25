@@ -150,7 +150,7 @@
         vlanid: 132
         mtu: 1500
         domains:
-          - storae.int.rabe.ch
+          - storage.int.rabe.ch
         organizations:
           - RaBe
         locations:
