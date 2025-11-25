@@ -138,7 +138,7 @@
           - name: AlmaLinux 10 NFV x86_64
             product: AlmaLinux 10
           - name: AlmaLinux 10 Plus x86_64
-            product: AlmaLinux 9
+            product: AlmaLinux 10
           - name: AlmaLinux 10 RT x86_64
             product: AlmaLinux 10
           - name: Foreman Client 3.14 EL10 x86_64
