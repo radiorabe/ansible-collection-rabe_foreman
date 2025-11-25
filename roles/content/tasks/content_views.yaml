@@ -27,8 +27,8 @@
             product: CentOS 7
           - name: Extra Packages for Enterprise Linux 7 x86_64
             product: Extra Packages for Enterprise Linux 7
-          - name: Foreman Client 3.12 EL7 x86_64
-            product: Foreman Client 3.12 EL7
+          - name: Foreman Client 3.13 EL7 x86_64
+            product: Foreman Client 3.13 EL7
           - name: RaBe Logstash Addons EL7
             product: RaBe Logstash Addons EL7
           - name: Copr repo for rabe-zabbix x86_64
@@ -107,8 +107,8 @@
             product: AlmaLinux 9
           - name: AlmaLinux 9 RT x86_64
             product: AlmaLinux 9
-          - name: Foreman Client 3.12 EL9 x86_64
-            product: Foreman Client 3.12 EL9
+          - name: Foreman Client 3.14 EL9 x86_64
+            product: Foreman Client 3.14 EL9
           - name: Extra Packages for Enterprise Linux 9 x86_64
             product: Extra Packages for Enterprise Linux 9
           - name: Zabbix 7.0 Official Repository - EL9 - x86_64
@@ -119,9 +119,39 @@
             product: Zabbix 6.4 EL9
           - name: Trivy for EL9 (x84_64)
             product: Trivy
+      - name: AlmaLinux 10 x86_64
+        repositories:
+          - name: AlmaLinux 10 BaseOS x86_64
+            product: AlmaLinux 10
+          - name: AlmaLinux 10 BaseOS Kickstart x86_64
+            product: AlmaLinux 10
+          - name: AlmaLinux 10 AppStream x86_64
+            product: AlmaLinux 10
+          - name: AlmaLinux 10 AppStream Kickstart x86_64
+            product: AlmaLinux 10
+          - name: AlmaLinux 10 CRB x86_64
+            product: AlmaLinux 10
+          - name: AlmaLinux 10 Extras x86_64
+            product: AlmaLinux 10
+          - name: AlmaLinux 10 HighAvailability x86_64
+            product: AlmaLinux 10
+          - name: AlmaLinux 10 NFV x86_64
+            product: AlmaLinux 10
+          - name: AlmaLinux 10 Plus x86_64
+            product: AlmaLinux 9
+          - name: AlmaLinux 10 RT x86_64
+            product: AlmaLinux 10
+          - name: Foreman Client 3.14 EL10 x86_64
+            product: Foreman Client 3.14 EL10
+          - name: Extra Packages for Enterprise Linux 10 x86_64
+            product: Extra Packages for Enterprise Linux 10
+          - name: Zabbix 7.0 Official Repository - EL10 - x86_64
+            product: Zabbix 7.0 EL10
       # Next are all non os, but enterprise linux specific content views.
       # These will often be filtered to only contain packages we want in
       # our downstream composite views.
+      # This approach is being phased out with EL10 where we only have
+      # a top-level AlmaLinux 10 content view and no composite views.
       - name: Zabbix 3.0 Agent EL7 x86_64
         repositories:
           - name: Zabbix 3.0 Official Repository - EL7 - x86_64
