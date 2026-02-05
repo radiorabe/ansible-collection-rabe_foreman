@@ -171,6 +171,7 @@
               - songticker.rabe.ch
               - studiomail.rabe.ch
               - wiki.rabe.ch
+              - supersaas-me.rabe.ch
           - name: certbot_remote_hosts
             parameter_type: yaml
             value:
