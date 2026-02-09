@@ -72,3 +72,6 @@
             override: disabled
           - label: RaBe_pgdg16el7_pgdg16el7_pgdg15
             override: disabled
+      - name: AlmaLinux 10
+        lifecycle_environment: Prod
+        content_view: AlmaLinux 10 x86_64
