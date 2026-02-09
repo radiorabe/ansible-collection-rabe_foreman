@@ -1,0 +1,15 @@
+---
+foreman_hostgroup:
+  name: AlmaLinux 10
+  description: AlmaLinux 10
+  parent: RaBe Core/RaBe Base/EL10
+  organization: RaBe
+  locations:
+    - Sulgenrain
+  operatingsystem: AlmaLinux 10
+  lifecycle_environment: Prod
+  content_view: AlmaLinux 10 x86_64
+  parameters:
+    - name: kt_activation_keys
+      parameter_type: string
+      value: AlmaLinux 10
