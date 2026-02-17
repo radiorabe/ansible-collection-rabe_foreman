@@ -32,8 +32,8 @@
                 permanent: true
               - zone: admin
                 service:
-                - ssh
-                - cockpit
+                  - ssh
+                  - cockpit
                 state: enabled
                 permanent: true
               - set_default_zone: admin
@@ -66,8 +66,8 @@
                 permanent: true
               - zone: office
                 service:
-                - ssh
-                - cockpit
+                  - ssh
+                  - cockpit
                 state: enabled
                 permanent: true
               - set_default_zone: office
@@ -101,8 +101,8 @@
                 permanent: true
               - zone: audio
                 service:
-                - ssh
-                - cockpit
+                  - ssh
+                  - cockpit
                 state: enabled
                 permanent: true
               - set_default_zone: audio
@@ -136,8 +136,8 @@
                 permanent: true
               - zone: service
                 service:
-                - ssh
-                - cockpit
+                  - ssh
+                  - cockpit
                 state: enabled
                 permanent: true
               - set_default_zone: service
@@ -170,8 +170,8 @@
                 permanent: true
               - zone: storage
                 service:
-                - ssh
-                - cockpit
+                  - ssh
+                  - cockpit
                 state: enabled
                 permanent: true
               - set_default_zone: storage
@@ -204,8 +204,8 @@
                 permanent: true
               - zone: guest
                 service:
-                - ssh
-                - cockpit
+                  - ssh
+                  - cockpit
                 state: enabled
                 permanent: true
               - set_default_zone: guest
@@ -238,8 +238,8 @@
                 permanent: true
               - zone: vm-admin
                 service:
-                - ssh
-                - cockpit
+                  - ssh
+                  - cockpit
                 state: enabled
                 permanent: true
               - set_default_zone: vm-admin
@@ -272,8 +272,8 @@
                 permanent: true
               - zone: dmz-admin
                 service:
-                - ssh
-                - cockpit
+                  - ssh
+                  - cockpit
                 state: enabled
                 permanent: true
               - set_default_zone: dmz-admin
@@ -306,8 +306,8 @@
                 permanent: true
               - zone: dmz
                 service:
-                - ssh
-                - cockpit
+                  - ssh
+                  - cockpit
                 state: enabled
                 permanent: true
               - set_default_zone: dmz
