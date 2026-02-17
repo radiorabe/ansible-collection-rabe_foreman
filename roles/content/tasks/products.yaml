@@ -519,6 +519,7 @@
           #   url: https://aquasecurity.github.io/trivy-repo/rpm/releases/10/x86_64
           #   download_policy: on_demand
           #   auto_enabled: false
+
       - name: AlmaLinux OS Generic Cloud (Cloud-init) image
         label: AlmaLinux_OS_Generic_Cloud_Cloud-init_image
         description: >
