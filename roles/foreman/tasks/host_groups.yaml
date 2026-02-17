@@ -205,6 +205,180 @@
             parameter_type: array
             value:
               - certbot-renew.timer
+      - name: vm-0045.service.int.rabe.ch
+        description: FreeIPA password expiration notification service
+        parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
+        organization: RaBe
+        location: Sulgenrain
+        ansible_roles:
+          - radiorabe.common.files
+          - redhat.rhel_system_roles.systemd
+        parameters:
+          - name: additional-packages
+            parameter_type: string
+            value: ipa-client-epn
+          - name: radiorabe_copies
+            parameter_type: yaml
+            value:
+              - dest: "/etc/systemd/system/ipa-epn.timer.d/override.conf"
+                mode: '0644'
+                content: |
+                  [Unit]
+                  Description=
+                  Description=Execute IPA Expiring Password Notification (EPN) every day at 3AM
+
+                  [Timer]
+                  OnCalendar=
+                  OnCalendar=*-*-* 03:00:00
+              - dest: "/etc/ipa/epn.conf"
+                mode: '0600'
+                content: |
+                  # This file is a copy from https://github.com/freeipa/freeipa/blob/master/client/share/epn.conf
+                  #
+                  # Global IPA-EPN [0] configuration file.
+                  # For a complete explanation of each parameter, see the epn.conf(5)
+                  # manual page.
+                  # For best results, change no more than a single parameter at a time,
+                  # and test if ipa-epn(1) still works as intended, using --dry-run when
+                  # it makes sense.
+                  #
+                  # [0] https://github.com/freeipa/freeipa/blob/master/doc/designs/expiring-password-notification.md
+
+                  [global]
+
+                  # Specifies the SMTP server to use.
+                  smtp_server = {{ smtp_server }}
+
+                  # Specifies the SMTP port.
+                  smtp_port = {{ smtp_port|default('25') }}
+
+                  # Specifies the id of the user to authenticate with the SMTP server.
+                  # Default None (empty value).
+                  smtp_user = {{ smtp_user }}
+
+                  # Specifies the password for the authorized user.
+                  # Default None (empty value).
+                  smtp_password = {{ smtp_password }}
+
+                  # Specifies the path to a single file in PEM format containing the certificate.
+                  # https://docs.python.org/3/library/ssl.html#ssl.SSLContext.load_cert_chain
+                  # Default None (empty value).
+                  # smtp_client_cert =
+
+                  # Specifies the path to a file containing the private key in. Otherwise the
+                  # private key will be taken from certfile as well.
+                  # https://docs.python.org/3/library/ssl.html#ssl.SSLContext.load_cert_chain
+                  # Default None (empty value).
+                  # smtp_client_key =
+
+                  # Specifies the password for decrypting the private key. It will be ignored if
+                  # the private key is not encrypted and no password is needed.
+                  # https://docs.python.org/3/library/ssl.html#ssl.SSLContext.load_cert_chain
+                  # Default None (empty value).
+                  # smtp_client_key_pass =
+
+                  # Specifies the number of seconds to wait for SMTP to respond.
+                  smtp_timeout = 60
+
+                  # Specifies the type of secure connection to make. Options are: none,
+                  # starttls and ssl.
+                  smtp_security = {{ smtp_security|default('none') }}
+
+                  # Specifies the From e-mail address value in the e-mails sent. Bounces will
+                  # be sent here.
+                  smtp_admin = {{ smtp_admin|default('root@localhost') }}
+
+                  # Time to wait, in milliseconds, between each e-mail sent to try to avoid
+                  # overloading the mail queue.
+                  smtp_delay = 0
+
+                  # Specifies the From: e-mail address value in the e-mails sent.
+                  # The default when unset is noreply@ipadefaultemaildomain.
+                  # This value can be found by running ipa config-show.
+                  mail_from = {{ mail_from|default('noreply@ipadefaultemaildomain') }}
+
+                  # Specifies the From: name value in the e-mails-sent.
+                  # The default when unset is IPA-EPN.
+                  # mail_from_name = {{ mail_from_name|default('IPA-EPN') }}
+
+                  # The list of days before a password expiration when ipa-epn should notify
+                  # a user that their password will soon require a reset.
+                  notify_ttls = {{ notify_ttls|default('28, 14, 7, 3, 1') }}
+
+                  # Set the subject of the message
+                  msg_subject = {{ msg_subject }}
+
+                  # Set the character set of the message.
+                  msg_charset = utf8
+
+                  # Set the message's MIME sub-content type.
+                  msg_subtype = {{ msg_subtype|default('plain') }}
+              - dest: "/etc/ipa/epn/expire_msg.template"
+                mode: '0644'
+                content: |-
+                  <!doctype html>
+                  <html>
+                    <head>
+                      <meta charset="UTF-8">
+                    </head>
+                    <body>
+                      <div>Liebe*r {{ '{{' }} first {{ '}}' }},</div>
+                      <div>&nbsp;</div>
+                      <div>Dein Passwort wird bald {{ '{{' }} expiration {{ '}}' }} ablaufen.</div>
+                      <div>&nbsp;</div>
+                      <div>Du kannst es ganz einfach mit unserem Self-Service unter <a href="https://my.rabe.ch">https://my.rabe.ch</a> erneuern. Siehe auch <a href="https://wiki.rabe.ch/Erste_Schritte">https://wiki.rabe.ch/Erste_Schritte</a> in unserem Wiki. </div>
+                      <div>&nbsp;</div>
+                      <div>Viele Grüsse von der <a href="mailto:it@rabe.ch">RaBe IT-Reaktion</a></div>
+                      <div>&nbsp;</div>
+                      <hr/>
+                      <div>&nbsp;</div>
+                      <div>Dear {{ '{{' }} first {{ '}}' }},</div>
+                      <div>&nbsp;</div>
+                      <div>Your password will expire soon on {{ '{{' }} expiration {{ '}}' }}.</div>
+                      <div>&nbsp;</div>
+                      <div> You can easily renew it using our self-service at <a href="https://my.rabe.ch">https://my.rabe.ch</a>. See <a href="https://wiki.rabe.ch/Erste_Schritte">https://wiki.rabe.ch/Erste_Schritte</a> in our Wiki for more information.</div>
+                      <div>&nbsp;</div>
+                      <div>Best wishes from <a href="mailto:it@rabe.ch">RaBe IT-Reaktion</a></div>
+                    </body>
+                  </html>
+          - name: smtp_server
+            parameter_type: string
+            value: "{{ undef('variable smtp_server needs to be set in host') }}"
+          - name: smtp_user
+            parameter_type: string
+            value: "{{ undef('variable smtp_user needs to be set in host') }}"
+          - name: smtp_password
+            parameter_type: string
+            value: "{{ undef('variable smtp_password needs to be set in host') }}"
+          - name: smtp_admin
+            parameter_type: string
+            value: it@rabe.ch
+          - name: mail_from
+            parameter_type: string
+            value: it@rabe.ch
+          - name: mail_from_name
+            parameter_type: string
+            value: IT-Reaktion
+          - name: msg_subject
+            parameter_type: string
+            value: Dein RaBe Passwort läuft bald ab / Your RaBe password will expire soon
+          - name: msg_subtype
+            parameter_type: string
+            value: html
+          - name: radiorabe_files
+            parameter_type: yaml
+            value:
+              - path: "/etc/systemd/system/ipa-epn.timer.d"
+                state: directory
+                mode: '0755'
+          - name: systemd_enabled_units
+            parameter_type: yaml
+            value:
+              - ipa-epn.timer
+          - name: systemd_started_units
+            parameter_type: yaml
+            value:
+              - ipa-epn.timer
       - name: AlmaLinux 9 DMZ Virtualization Server
         description: AlmaLinux 9 general purpose virtual machines.
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
