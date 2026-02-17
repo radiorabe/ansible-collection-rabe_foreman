@@ -326,7 +326,8 @@
                       <div>&nbsp;</div>
                       <div>Dein Passwort wird bald {{ '{{' }} expiration {{ '}}' }} ablaufen.</div>
                       <div>&nbsp;</div>
-                      <div>Du kannst es ganz einfach mit unserem Self-Service unter <a href="https://my.rabe.ch">https://my.rabe.ch</a> erneuern. Siehe auch <a href="https://wiki.rabe.ch/Erste_Schritte">https://wiki.rabe.ch/Erste_Schritte</a> in unserem Wiki. </div>
+                      <div>Du kannst es ganz einfach mit unserem Self-Service unter <a href="https://my.rabe.ch">https://my.rabe.ch</a> erneuern. Siehe auch
+                       <a href="https://wiki.rabe.ch/Erste_Schritte">https://wiki.rabe.ch/Erste_Schritte</a> in unserem Wiki. </div>
                       <div>&nbsp;</div>
                       <div>Viele Grüsse von der <a href="mailto:it@rabe.ch">RaBe IT-Reaktion</a></div>
                       <div>&nbsp;</div>
@@ -336,7 +337,8 @@
                       <div>&nbsp;</div>
                       <div>Your password will expire soon on {{ '{{' }} expiration {{ '}}' }}.</div>
                       <div>&nbsp;</div>
-                      <div> You can easily renew it using our self-service at <a href="https://my.rabe.ch">https://my.rabe.ch</a>. See <a href="https://wiki.rabe.ch/Erste_Schritte">https://wiki.rabe.ch/Erste_Schritte</a> in our Wiki for more information.</div>
+                      <div> You can easily renew it using our self-service at <a href="https://my.rabe.ch">https://my.rabe.ch</a>. See
+                       <a href="https://wiki.rabe.ch/Erste_Schritte">https://wiki.rabe.ch/Erste_Schritte</a> in our Wiki for more information.</div>
                       <div>&nbsp;</div>
                       <div>Best wishes from <a href="mailto:it@rabe.ch">RaBe IT-Reaktion</a></div>
                     </body>
