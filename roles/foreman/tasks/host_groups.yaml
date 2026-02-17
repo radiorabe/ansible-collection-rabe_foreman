@@ -348,6 +348,7 @@
             parameter_type: string
             value: "{{ undef('variable smtp_user needs to be set in host') }}"
           - name: smtp_password
+            hidden_value: true
             parameter_type: string
             value: "{{ undef('variable smtp_password needs to be set in host') }}"
           - name: smtp_admin
