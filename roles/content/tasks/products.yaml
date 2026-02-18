@@ -65,68 +65,7 @@
       # EL8 product is here to support LEAPPing from EL7
       - name: AlmaLinux 8
         label: alma8
-        repositories:
-          - name: AlmaLinux 8 BaseOS x86_64
-            content_type: yum
-            label: alma8_baseos
-            url: https://repo.almalinux.org/almalinux/8/BaseOS/x86_64/os/
-            download_policy: on_demand
-          - name: AlmaLinux 8 BaseOS Kickstart x86_64
-            content_type: yum
-            label: alma8_baseos_kickstart
-            url: https://repo.almalinux.org/almalinux/8/BaseOS/x86_64/kickstart/
-            download_policy: on_demand
-          - name: AlmaLinux 8 AppStream x86_64
-            content_type: yum
-            label: alma8_appstream
-            url: https://repo.almalinux.org/almalinux/8/AppStream/x86_64/os/
-            download_policy: on_demand
-          - name: AlmaLinux 8 AppStream Kickstart x86_64
-            content_type: yum
-            label: alma8_appstream_kickstart
-            url: https://repo.almalinux.org/almalinux/8/AppStream/x86_64/kickstart/
-            download_policy: on_demand
-          - name: AlmaLinux 8 PowerTools x86_64
-            content_type: yum
-            label: alma8_crb
-            url: https://repo.almalinux.org/almalinux/8/PowerTools/x86_64/os/
-            download_policy: on_demand
-            auto_enabled: false
-          - name: AlmaLinux 8 Extras x86_64
-            content_type: yum
-            label: alma8_extras
-            url: https://repo.almalinux.org/almalinux/8/extras/x86_64/os/
-            download_policy: on_demand
-          - name: AlmaLinux 8 HighAvailability x86_64
-            content_type: yum
-            label: alma8_ha
-            url: https://repo.almalinux.org/almalinux/8/HighAvailability/x86_64/os/
-            download_policy: on_demand
-            auto_enabled: false
-          - name: AlmaLinux 8 NFV x86_64
-            content_type: yum
-            label: alma8_nfv
-            url: https://repo.almalinux.org/almalinux/8/NFV/x86_64/os/
-            download_policy: on_demand
-            auto_enabled: false
-          - name: AlmaLinux 8 Plus x86_64
-            content_type: yum
-            label: alma8_plus
-            url: https://repo.almalinux.org/almalinux/8/plus/x86_64/os/
-            download_policy: on_demand
-            auto_enabled: false
-          - name: AlmaLinux 8 ResilientStorage x86_64
-            content_type: yum
-            label: alma8_resilientstorage
-            url: https://repo.almalinux.org/almalinux/8/ResilientStorage/x86_64/os/
-            download_policy: on_demand
-            auto_enabled: false
-          - name: AlmaLinux 8 RT x86_64
-            content_type: yum
-            label: alma8_rt
-            url: https://repo.almalinux.org/almalinux/8/RT/x86_64/os/
-            download_policy: on_demand
-            auto_enabled: false
+        state: absent
       - name: AlmaLinux 9
         label: alma9
         repositories:
@@ -191,6 +130,63 @@
             url: https://repo.almalinux.org/almalinux/9/RT/x86_64/os/
             download_policy: on_demand
             auto_enabled: false
+      - name: AlmaLinux 10
+        label: alma10
+        repositories:
+          - name: AlmaLinux 10 BaseOS x86_64
+            content_type: yum
+            label: alma10_baseos
+            url: https://repo.almalinux.org/almalinux/10/BaseOS/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 10 BaseOS Kickstart x86_64
+            content_type: yum
+            label: alma10_baseos_kickstart
+            url: https://repo.almalinux.org/almalinux/10/BaseOS/x86_64/kickstart/
+            download_policy: on_demand
+          - name: AlmaLinux 10 AppStream x86_64
+            content_type: yum
+            label: alma10_appstream
+            url: https://repo.almalinux.org/almalinux/10/AppStream/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 10 AppStream Kickstart x86_64
+            content_type: yum
+            label: alma10_appstream_kickstart
+            url: https://repo.almalinux.org/almalinux/10/AppStream/x86_64/kickstart/
+            download_policy: on_demand
+          - name: AlmaLinux 10 CRB x86_64
+            content_type: yum
+            label: alma10_crb
+            url: https://repo.almalinux.org/almalinux/10/CRB/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 10 Extras x86_64
+            content_type: yum
+            label: alma10_extras
+            url: https://repo.almalinux.org/almalinux/10/extras/x86_64/os/
+            download_policy: on_demand
+          - name: AlmaLinux 10 HighAvailability x86_64
+            content_type: yum
+            label: alma10_ha
+            url: https://repo.almalinux.org/almalinux/10/HighAvailability/x86_64/os/
+            download_policy: on_demand
+            auto_enabled: false
+          - name: AlmaLinux 10 NFV x86_64
+            content_type: yum
+            label: alma10_nfv
+            url: https://repo.almalinux.org/almalinux/10/NFV/x86_64/os/
+            download_policy: on_demand
+            auto_enabled: false
+          - name: AlmaLinux 10 Plus x86_64
+            content_type: yum
+            label: alma10_plus
+            url: https://repo.almalinux.org/almalinux/10/plus/x86_64/os/
+            download_policy: on_demand
+            auto_enabled: false
+          - name: AlmaLinux 10 RT x86_64
+            content_type: yum
+            label: alma10_rt
+            url: https://repo.almalinux.org/almalinux/10/RT/x86_64/os/
+            download_policy: on_demand
+            auto_enabled: false
       # The Foreman product is here for safe-keeping but not currently used anywhere (ie. Foreman
       # does not manage it's own content (yet?)).
       # TODO removed because it was way outdated, we'll consider re-adding once we migrate foreman to el9 when it's ready
@@ -225,13 +221,7 @@
             auto_enabled: false
       - name: Extra Packages for Enterprise Linux 8
         label: epel8
-        repositories:
-          - name: Extra Packages for Enterprise Linux 8 x86_64
-            content_type: yum
-            label: epel8
-            url: http://download.fedoraproject.org/pub/epel/8/Everything/x86_64/
-            download_policy: on_demand
-            auto_enabled: false
+        state: absent
       - name: Extra Packages for Enterprise Linux 9
         label: epel9
         repositories:
@@ -241,45 +231,26 @@
             url: http://download.fedoraproject.org/pub/epel/9/Everything/x86_64/
             download_policy: on_demand
             auto_enabled: false
+      - name: Extra Packages for Enterprise Linux 10
+        label: epel10
+        repositories:
+          - name: Extra Packages for Enterprise Linux 10 x86_64
+            content_type: yum
+            label: epel10
+            url: http://download.fedoraproject.org/pub/epel/10/Everything/x86_64/
+            download_policy: on_demand
+            auto_enabled: false
       # All of our distros should have access to foreman client tooling.
-      # Foreman 3.9
-      - name: Foreman Client 3.9 EL7
-        label: foremanclient39el7
-        state: absent
-      - name: Foreman Client 3.9 EL8
-        label: foremanclient39el8
-        state: absent
-      - name: Foreman Client 3.9 EL9
-        label: foremanclient39el9
-        state: absent
       # Foreman 3.10
       - name: Foreman Client 3.10 EL7
         label: foremanclient310el7
-        repositories:
-          - name: Foreman Client 3.10 EL7 x86_64
-            content_type: yum
-            label: foreman310el7_client
-            url: https://yum.theforeman.org/client/3.10/el7/x86_64/
-            download_policy: on_demand
-            auto_enabled: true
+        state: absent
       - name: Foreman Client 3.10 EL8
         label: foremanclient310el8
-        repositories:
-          - name: Foreman Client 3.10 EL8 x86_64
-            content_type: yum
-            label: foreman310el8_client
-            url: https://yum.theforeman.org/client/3.10/el8/x86_64/
-            download_policy: on_demand
-            auto_enabled: true
+        state: absent
       - name: Foreman Client 3.10 EL9
         label: foremanclient310el9
-        repositories:
-          - name: Foreman Client 3.10 EL9 x86_64
-            content_type: yum
-            label: foreman310el9_client
-            url: https://yum.theforeman.org/client/3.10/el9/x86_64/
-            download_policy: on_demand
-            auto_enabled: true
+        state: absent
       # Foreman 3.11
       - name: Foreman Client 3.11 EL7
         label: foremanclient311el7
@@ -292,13 +263,7 @@
             auto_enabled: true
       - name: Foreman Client 3.11 EL8
         label: foremanclient311el8
-        repositories:
-          - name: Foreman Client 3.11 EL8 x86_64
-            content_type: yum
-            label: foreman311el8_client
-            url: https://yum.theforeman.org/client/3.11/el8/x86_64/
-            download_policy: on_demand
-            auto_enabled: true
+        state: absent
       - name: Foreman Client 3.11 EL9
         label: foremanclient311el9
         repositories:
@@ -320,13 +285,7 @@
             auto_enabled: true
       - name: Foreman Client 3.12 EL8
         label: foremanclient312el8
-        repositories:
-          - name: Foreman Client 3.12 EL8 x86_64
-            content_type: yum
-            label: foreman312el8_client
-            url: https://yum.theforeman.org/client/3.12/el8/x86_64/
-            download_policy: on_demand
-            auto_enabled: true
+        state: absent
       - name: Foreman Client 3.12 EL9
         label: foremanclient312el9
         repositories:
@@ -334,6 +293,35 @@
             content_type: yum
             label: foreman312el9_client
             url: https://yum.theforeman.org/client/3.12/el9/x86_64/
+            download_policy: on_demand
+            auto_enabled: true
+      # Foreman 3.13 (EL7 exclusive)
+      - name: Foreman Client 3.13 EL7
+        label: foremanclient313el7
+        repositories:
+          - name: Foreman Client 3.13 EL7 x86_64
+            content_type: yum
+            label: foreman313el7_client
+            url: https://yum.theforeman.org/client/3.13/el7/x86_64/
+            download_policy: on_demand
+            auto_enabled: true
+      # Foreman 3.14
+      - name: Foreman Client 3.14 EL9
+        label: foremanclient314el9
+        repositories:
+          - name: Foreman Client 3.14 EL9 x86_64
+            content_type: yum
+            label: foreman314el9_client
+            url: https://yum.theforeman.org/client/3.14/el9/x86_64/
+            download_policy: on_demand
+            auto_enabled: true
+      - name: Foreman Client 3.14 EL10
+        label: foremanclient314el10
+        repositories:
+          - name: Foreman Client 3.14 EL10 x86_64
+            content_type: yum
+            label: foreman314el10_client_x86_64
+            url: https://yum.theforeman.org/client/3.14/el10/x86_64/
             download_policy: on_demand
             auto_enabled: true
       # old zabbix for exiting el7 machines
@@ -391,6 +379,15 @@
             url: https://repo.zabbix.com/non-supported/rhel/9/x86_64/
             download_policy: on_demand
             auto_enabled: false
+      - name: Zabbix 7.0 EL10
+        label: zabbix70_el10
+        repositories:
+          - name: Zabbix 7.0 Official Repository - EL10 - x86_64
+            content_type: yum
+            label: zabbix70_el10
+            url: https://repo.zabbix.com/zabbix/7.0/rhel/10/x86_64/
+            download_policy: on_demand
+            auto_enabled: false
       # Some things we build and manage as part of a RaBe product. The aim
       # is to minimise these over time but some of them like rabe-zabbix
       # are widely used and not easy to replace.
@@ -405,13 +402,7 @@
             auto_enabled: false
       - name: RaBe Linux EL8
         label: rabeel8
-        repositories:
-          - name: Copr repo for rabe-zabbix x86_64
-            content_type: yum
-            label: rabeel8_rabezabbix
-            url: https://download.copr.fedorainfracloud.org/results/hairmare/rabe-zabbix/rhel-8-x86_64/
-            download_policy: on_demand
-            auto_enabled: false
+        state: absent
       - name: RaBe Linux EL9
         label: rabeel9
         repositories:
@@ -521,6 +512,14 @@
             url: https://aquasecurity.github.io/trivy-repo/rpm/releases/9/x86_64
             download_policy: on_demand
             auto_enabled: false
+          # TBD: https://github.com/aquasecurity/trivy-repo/issues/43
+          # - name: Trivy for EL10 (x84_64)
+          #   label: trivy_el10_x86_64
+          #   content_type: yum
+          #   url: https://aquasecurity.github.io/trivy-repo/rpm/releases/10/x86_64
+          #   download_policy: on_demand
+          #   auto_enabled: false
+
       - name: AlmaLinux OS Generic Cloud (Cloud-init) image
         label: AlmaLinux_OS_Generic_Cloud_Cloud-init_image
         description: >
@@ -545,5 +544,21 @@
 
               virt-customize -a
               Downloads/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2 --install
+              subscription-manager
+            content_type: file
+          - name: AlmaLinux OS 10 Generic Cloud (Cloud-init) image
+            label: alma10_generic_cloud_cloudinit
+            description: >
+              The Generic Cloud image is a general purpose virtual machine
+              image that contains the Cloud-init package.
+              During boot, cloud-init will take configuration options from
+              cloud metadata and initialize a system accordingly. This may
+              include network configuration, user's SSH key pair installation,
+              attaching storage devices, etc.
+
+              To be used with libvirt, the image has to be altered with guestfs-tools and
+
+              virt-customize -a
+              Downloads/AlmaLinux-10-GenericCloud-latest.x86_64.qcow2 --install
               subscription-manager
             content_type: file

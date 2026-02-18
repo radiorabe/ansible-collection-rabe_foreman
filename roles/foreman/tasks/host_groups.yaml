@@ -28,8 +28,8 @@
             value:
               - name: monger-cockpit
                 dns:
-                - "{{'{{ ansible_host }}'}}"
-                principal: "HTTP/{{'{{ ansible_host }}'}}@INT.RABE.CH"
+                  - "{{ '{{ ansible_host }}' }}"
+                principal: "HTTP/{{ '{{ ansible_host }}' }}@INT.RABE.CH"
                 ca: ipa
                 key_size: 4096
           - name: cockpit_packages
@@ -84,7 +84,7 @@
           - name: time-zone
             parameter_type: string
             value: "Europe/Zurich"
-          # base options for [selinux](https://github.com/linux-system-roles/selinux) role
+      # base options for [selinux](https://github.com/linux-system-roles/selinux) role
       - name: EL7
         description: EL7 configures our EL7 baseline.
         parent: RaBe Core/RaBe Base
@@ -363,6 +363,7 @@
               - songticker.rabe.ch
               - studiomail.rabe.ch
               - wiki.rabe.ch
+              - supersaas-me.rabe.ch
           - name: certbot_remote_hosts
             parameter_type: yaml
             value:
@@ -413,10 +414,13 @@
             value: /var/lib/libvirt/images/
           - name: download_file_url
             parameter_type: string
-            value: https://foreman.service.int.rabe.ch/pulp/content/RaBe/Library/custom/AlmaLinux_OS_Generic_Cloud_Cloud-init_image/AlmaLinux_OS_Generic_Cloud_Cloud-init_image/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2
+            value:
+              https://foreman.service.int.rabe.ch/pulp/content/RaBe/Library/custom/AlmaLinux_OS_Generic_Cloud_Cloud-init_image/AlmaLinux_OS_Generic_Cloud_Cloud-init_image/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2
           - name: remote_execution_ssh_keys
             parameter_type: string
-            value: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC4arUJdueCQnOkjVOvrruEEs9M/lKw2ITorTTEIIFgcNAGZNs+SFFxugtMWY2jzrcHoxwSZel3eAMjvS76by6z3ZqZUvMxVHACR0FZvP2WtLk2BjgDjYdmBGDpMArvncHkaiVtjEaruwXVqO+64qsrYXQ3qhUiah+9soFHghWZWS3i+Dnd1JiNFX6TZP+ooqshBaClspAfcywsqFhsFNeU50rlsl11T13vLmZ/G140VF7uhaZ2ukOEj3HSSBcQ1DKIyanoo4fpAG8ealo6Nur0t5rlO67ACgRjLIVBS0LnVG5tvXtnKbz6A0uoUHC5aesDnDUskImWiKnz/6r2QenMkzD08BT6VlaFHhpp4ve2/d2lmjAl4EXvNOCwGsGV9A5BB1O130dwRk85Cxutxm94tuThElWlu37BB8pxOYz8qD+Vph5TVbC4mi1/30hUQffll0x/mcplJsFLY9H7eX0S+Ki2W++udWQ4HfwxbxXlJltMLEw7fhSxEQdGNfIaoM0= foreman@foreman.service.int.rabe.ch
+            value: ssh-rsa
+              AAAAB3NzaC1yc2EAAAADAQABAAABgQC4arUJdueCQnOkjVOvrruEEs9M/lKw2ITorTTEIIFgcNAGZNs+SFFxugtMWY2jzrcHoxwSZel3eAMjvS76by6z3ZqZUvMxVHACR0FZvP2WtLk2BjgDjYdmBGDpMArvncHkaiVtjEaruwXVqO+64qsrYXQ3qhUiah+9soFHghWZWS3i+Dnd1JiNFX6TZP+ooqshBaClspAfcywsqFhsFNeU50rlsl11T13vLmZ/G140VF7uhaZ2ukOEj3HSSBcQ1DKIyanoo4fpAG8ealo6Nur0t5rlO67ACgRjLIVBS0LnVG5tvXtnKbz6A0uoUHC5aesDnDUskImWiKnz/6r2QenMkzD08BT6VlaFHhpp4ve2/d2lmjAl4EXvNOCwGsGV9A5BB1O130dwRk85Cxutxm94tuThElWlu37BB8pxOYz8qD+Vph5TVbC4mi1/30hUQffll0x/mcplJsFLY9H7eX0S+Ki2W++udWQ4HfwxbxXlJltMLEw7fhSxEQdGNfIaoM0=
+              foreman@foreman.service.int.rabe.ch
           - name: network_connections
             parameter_type: yaml
             value:
@@ -510,7 +514,7 @@
                         image: ghcr.io/radiorabe/httpd:0.6.2
                         env:
                           - name: PODMAN_HOST
-                            value: "{{'{{ ansible_host }}'}}"
+                            value: "{{ '{{ ansible_host }}' }}"
                         ports:
                           - containerPort: 8080
                             hostPort: 8080
@@ -645,7 +649,7 @@
                         image: ghcr.io/radiorabe/httpd:0.6.2
                         env:
                           - name: PODMAN_HOST
-                            value: "{{'{{ ansible_host }}'}}"
+                            value: "{{ '{{ ansible_host }}' }}"
                         ports:
                           - containerPort: 8080
                             hostPort: 8080
