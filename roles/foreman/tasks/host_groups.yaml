@@ -234,92 +234,92 @@
                 name: kanboard
               spec:
                 containers:
-                - name: kanboard
-                  restart: always
-                  image: quay.io/kanboard/kanboard:latest
-                  ports:
-                  - containerPort: 80
-                    hostPort: 80
-                  - containerPort: 443
-                    hostPort: 443
-                  volumeMounts:
-                  - mountPath: "/var/www/app/data:Z"
-                    name: kanboard_data
-                  - mountPath: "/var/www/app/plugins:Z"
-                    name: kanboard_plugins
-                  - mountPath: "/etc/nginx/ssl:Z"
-                    name: kanboard_ssl
-                  env:
-                  - name: DEBUG
-                    value: false
-                  - name: LOG_DRIVER
-                    value: system
-                  - name: DB_DRIVER
-                    value: postgres
-                  - name: DB_USERNAME
-                    value: "{{ kanboard_db_user }}"
-                  - name: DB_PASSWORD
-                    value: "{{ kanboard_db_password }}"
-                  - name: DB_HOSTNAME
-                    value: postgresql.service.int.rabe.ch
-                  - name: DB_NAME
-                    value: kanboard
-                  - name: PLUGIN_INSTALLER
-                    value: true
-                  - name: MAIL_FROM
-                    value: kanboard@service.int.rabe.ch
-                  - name: MAIL_TRANSPORT
-                    value: smtp
-                  - name: MAIL_SMTP_HOSTNAME
-                    value: "{{ kanboard_mail_smtp_hostname }}"
-                  - name: MAIL_SMTP_USERNAME
-                    value: "{{ kanboard_mail_smtp_username }}"
-                  - name: MAIL_SMTP_PASSWORD
-                    value: "{{ kanboard_mail_smtp_password }}"
-                  - name: LDAP_SERVER
-                    value: "{{ kanboard_ldap_server }}"
-                  - name: LDAP_BIND_TYPE
-                    value: proxy
-                  - name: LDAP_USERNAME
-                    value: "{{ kanboard_ldap_username }}"
-                  - name: LDAP_PASSWORD
-                    value: "{{ kanboard_ldap_password }}"
-                  - name: LDAP_USER_BASE_DN
-                    value: cn=users,cn=accounts,dc=int,dc=rabe,dc=ch
-                  - name: LDAP_USER_FILTER
-                    value: uid=%s
-                  - name: LDAP_GROUP_ADMIN_DN
-                    value: cn=kanboard-admins,cn=groups,cn=accounts,dc=int,dc=rabe,dc=ch
-                  - name: LDAP_GROUP_MANAGER_DN
-                    value: cn=kanboard-managers,cn=groups,cn=accounts,dc=int,dc=rabe,dc=ch
-                  - name: LDAP_GROUP_PROVIDER
-                    value: true
-                  - name: LDAP_GROUP_BASE_DN
-                    value: cn=groups,cn=accounts,dc=int,dc=rabe,dc=ch
-                  - name: LDAP_GROUP_FILTER
-                    value: "(&(objectClass=groupofnames)(cn=%s*))"
-                  - name: REVERSE_PROXY_AUTH
-                    value: true
-                  - name: REVERSE_PROXY_DEFAULT_ADMIN
-                    value: "{{ kanboard_reverse_proxy_default_admin }}"
-                  - name: REMEMBER_ME_AUTH
-                    value: false
-                  - name: ENABLE_URL_REWRITE
-                    value: true
-                  - name: HIDE_LOGIN_FORM
-                    value: true
-                  - name: DISABLE_LOGOUT
-                    value: true
+                  - name: kanboard
+                    restart: always
+                    image: quay.io/kanboard/kanboard:latest
+                    ports:
+                      - containerPort: 80
+                        hostPort: 80
+                      - containerPort: 443
+                        hostPort: 443
+                    volumeMounts:
+                      - mountPath: "/var/www/app/data:Z"
+                        name: kanboard_data
+                      - mountPath: "/var/www/app/plugins:Z"
+                        name: kanboard_plugins
+                      - mountPath: "/etc/nginx/ssl:Z"
+                        name: kanboard_ssl
+                    env:
+                      - name: DEBUG
+                        value: false
+                      - name: LOG_DRIVER
+                        value: system
+                      - name: DB_DRIVER
+                        value: postgres
+                      - name: DB_USERNAME
+                        value: "{{ kanboard_db_user }}"
+                      - name: DB_PASSWORD
+                        value: "{{ kanboard_db_password }}"
+                      - name: DB_HOSTNAME
+                        value: postgresql.service.int.rabe.ch
+                      - name: DB_NAME
+                        value: kanboard
+                      - name: PLUGIN_INSTALLER
+                        value: true
+                      - name: MAIL_FROM
+                        value: kanboard@service.int.rabe.ch
+                      - name: MAIL_TRANSPORT
+                        value: smtp
+                      - name: MAIL_SMTP_HOSTNAME
+                        value: "{{ kanboard_mail_smtp_hostname }}"
+                      - name: MAIL_SMTP_USERNAME
+                        value: "{{ kanboard_mail_smtp_username }}"
+                      - name: MAIL_SMTP_PASSWORD
+                        value: "{{ kanboard_mail_smtp_password }}"
+                      - name: LDAP_SERVER
+                        value: "{{ kanboard_ldap_server }}"
+                      - name: LDAP_BIND_TYPE
+                        value: proxy
+                      - name: LDAP_USERNAME
+                        value: "{{ kanboard_ldap_username }}"
+                      - name: LDAP_PASSWORD
+                        value: "{{ kanboard_ldap_password }}"
+                      - name: LDAP_USER_BASE_DN
+                        value: cn=users,cn=accounts,dc=int,dc=rabe,dc=ch
+                      - name: LDAP_USER_FILTER
+                        value: uid=%s
+                      - name: LDAP_GROUP_ADMIN_DN
+                        value: cn=kanboard-admins,cn=groups,cn=accounts,dc=int,dc=rabe,dc=ch
+                      - name: LDAP_GROUP_MANAGER_DN
+                        value: cn=kanboard-managers,cn=groups,cn=accounts,dc=int,dc=rabe,dc=ch
+                      - name: LDAP_GROUP_PROVIDER
+                        value: true
+                      - name: LDAP_GROUP_BASE_DN
+                        value: cn=groups,cn=accounts,dc=int,dc=rabe,dc=ch
+                      - name: LDAP_GROUP_FILTER
+                        value: "(&(objectClass=groupofnames)(cn=%s*))"
+                      - name: REVERSE_PROXY_AUTH
+                        value: true
+                      - name: REVERSE_PROXY_DEFAULT_ADMIN
+                        value: "{{ kanboard_reverse_proxy_default_admin }}"
+                      - name: REMEMBER_ME_AUTH
+                        value: false
+                      - name: ENABLE_URL_REWRITE
+                        value: true
+                      - name: HIDE_LOGIN_FORM
+                        value: true
+                      - name: DISABLE_LOGOUT
+                        value: true
                 volumes:
-                - name: kanboard_data
-                  hostPath:
-                    path: "/home/kanboard/data"
-                - name: kanboard_plugins
-                  hostPath:
-                    path: "/home/kanboard/plugins"
-                - name: kanboard_ssl
-                  hostPath:
-                    path: "/home/kanboard/ssl"
+                  - name: kanboard_data
+                    hostPath:
+                      path: "/home/kanboard/data"
+                  - name: kanboard_plugins
+                    hostPath:
+                      path: "/home/kanboard/plugins"
+                  - name: kanboard_ssl
+                    hostPath:
+                      path: "/home/kanboard/ssl"
           - name: podman_run_as_group
             parameter_type: string
             value: kanboard
