@@ -5,7 +5,7 @@
   vars:
     foreman_compute_resources:
       - name: ovirt
-        state: present
+        state: absent
         description: oVirt
         organizations:
           - RaBe
