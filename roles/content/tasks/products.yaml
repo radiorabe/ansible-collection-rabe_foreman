@@ -241,16 +241,6 @@
             download_policy: on_demand
             auto_enabled: false
       # All of our distros should have access to foreman client tooling.
-      # Foreman 3.10
-      - name: Foreman Client 3.10 EL7
-        label: foremanclient310el7
-        state: absent
-      - name: Foreman Client 3.10 EL8
-        label: foremanclient310el8
-        state: absent
-      - name: Foreman Client 3.10 EL9
-        label: foremanclient310el9
-        state: absent
       # Foreman 3.11
       - name: Foreman Client 3.11 EL7
         label: foremanclient311el7
