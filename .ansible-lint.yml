@@ -3,7 +3,12 @@ exclude_paths:
   - .ansible/
   - .github/
   - venv/
-write_list:
-  - all
+skip_list:
+  # we would love to clean these up at some point,
+  # but we also want to include the collection in
+  # the prefix and are waiting for that to be supported.
+  - var-naming[no-role-prefix]
+  # not currently planned, but would be nice
+  - galaxy[no-changelog]
 warn_list:
   - meta-runtime[unsupported-version]
