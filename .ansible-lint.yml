@@ -3,6 +3,8 @@ exclude_paths:
   - .ansible/
   - .github/
   - venv/
+  # ansible-lint fails to lint this file because it uses an rhel role
+  - roles/network/tasks/main.yml
 skip_list:
   # we would love to clean these up at some point,
   # but we also want to include the collection in
@@ -10,5 +12,5 @@ skip_list:
   - var-naming[no-role-prefix]
   # not currently planned, but would be nice
   - galaxy[no-changelog]
-warn_list:
+  # we still need EL8 support, so we allow ansible 2.14
   - meta-runtime[unsupported-version]
