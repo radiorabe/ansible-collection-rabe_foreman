@@ -1,0 +1,209 @@
+---
+# Dump our hostgroups in the format that matches what this repo requires
+#
+# This script has several limitation
+# * it doesn't current dump ansible roles needs upstream investigation)
+# * it's format isn't the best (see below for caveats)
+# * there are a few other quirks in both the tooling as well as our setup
+# * it's as hacky as can be
+#
+# The output template implements a naive approach to generate "nice"
+# output where it makes sense.
+#
+# The resulting file needs to be compared with the actual role and some
+# parts aren't fully automated yet.
+#
+# You can run this play along these lines:
+#
+#   ansible-playbook -e foreman_server_url=<SERVER> -e foreman_username=<USER> -e foreman_password=<TOKEN> hack/plays/dump_host_groups.yaml
+#
+# The output needs some work, some of which can be done as so:
+#
+#   yamlfmt -formatter force_array_style=block,pad_line_comments=2,trim_trailing_whitespace=true,eof_newline=true host_groups.gen.yaml
+#
+# I've found Meld to be helpful in analysing the resulting diff:
+#
+#   meld host_groups.gen.yaml roles/foreman/tasks/host_groups.yaml
+#
+- name: Dump hostgroups from Foreman
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: "Read hostgroups"
+      theforeman.foreman.hostgroup_info:
+        username: "{{ foreman_username }}"
+        password: "{{ foreman_password }}"
+        server_url: "{{ foreman_server_url }}"
+        name: "{{ item.name }}"
+      with_items:
+        - name: "RaBe Core"
+        - name: "RaBe Core/RaBe Base"
+        - name: "RaBe Core/RaBe Base/EL7"
+        - name: "RaBe Core/RaBe Base/EL7/CentOS 7"
+        - name: "RaBe Core/RaBe Base/EL8"
+        - name: "RaBe Core/RaBe Base/EL9"
+        - name: "RaBe Core/RaBe Base/EL9/AlmaLinux 9"
+        - name: "RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs"
+        - name: "RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs/vm-0043.service.int.rabe.ch"
+        - name: "RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ Virtualization Server"
+        - name: "RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 server-004 VMs"
+        - name: "RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-008 VMs"
+        - name: "RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-008 VMs/vm-2001.dmz.int.rabe.ch"
+        - name: "RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-009 VMs"
+        - name: "RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-009 VMs/vm-2002.dmz.int.rabe.ch"
+      register: hostgroup_infos
+    - name: "Template YAML output"
+      ansible.builtin.set_fact:
+        hostgroup_yaml: |
+          - name: "RaBe Foreman Config : Configure Host Groups"
+            ansible.builtin.include_role:
+              name: theforeman.foreman.hostgroups
+            vars:
+              foreman_hostgroups:
+          {% for hostgroup_info in hostgroup_infos.results %}
+                - name: {{ hostgroup_info.hostgroup.name }}
+                  description: {{ hostgroup_info.hostgroup.description }}
+          {% if hostgroup_info.hostgroup.ancestry %}
+                  parent: {{ hostgroup_info.hostgroup.ancestry }}  # TODO
+          {% endif %}
+                  organization: {{ hostgroup_info.hostgroup.organizations[0].name }}
+          {% if hostgroup_info.hostgroup.locations | length > 0 %}
+                  location: {{ hostgroup_info.hostgroup.locations[0].name }}
+          {% endif %}
+          {% if hostgroup_info.hostgroup.domain_name %}
+                  domain: {{ hostgroup_info.hostgroup.domain_name }}
+          {% endif %}
+          {% if hostgroup_info.hostgroup.subnet_name %}
+                  subnet: {{ hostgroup_info.hostgroup.subnet_name }}
+          {% endif %}
+          {% if hostgroup_info.hostgroup.architecture_name %}
+                  architecture: {{ hostgroup_info.hostgroup.architecture_name }}
+          {% endif %}
+          {% if hostgroup_info.hostgroup.operatingsystem_name %}
+                  operatingsystem: {{ hostgroup_info.hostgroup.operatingsystem_name }}
+          {% endif %}
+          {% if hostgroup_info.hostgroup.lifecycle_environment_name %}
+                  lifecycle_environment: {{ hostgroup_info.hostgroup.lifecycle_environment_name }}
+          {% endif %}
+          {% if hostgroup_info.hostgroup.content_view_name %}
+                  content_view: {{ hostgroup_info.hostgroup.content_view_name }}
+          {% endif %}
+          {% if hostgroup_info.hostgroup.compute_resource_name %}
+                  compute_resource: {{ hostgroup_info.hostgroup.compute_resource_name }}
+          {% endif %}
+          {% if hostgroup_info.hostgroup.compute_profile_name %}
+                  compute_profile: {{ hostgroup_info.hostgroup.compute_profile_name }}
+          {% endif %}
+                  ansible_roles: []  # TODO
+          {% if hostgroup_info.hostgroup.parameters | length > 0 %}
+                  parameters:
+          {% for param in hostgroup_info.hostgroup.parameters %}
+                    - name: {{ param.name }}
+                      parameter_type: {{ param.parameter_type }}
+          {% if param.value is string and param.value == "*" %}
+                      value: "{{ param.value }}"
+          {% elif param.value is boolean %}
+                      value: {{ param.value | ternary('true', 'false') }}
+          {% elif param.value is number %}
+                      value: {{ param.value }}
+          {% elif param.value is string %}
+                      value: {{ param.value }}
+          {% elif param.name == "firewall" %}
+                      value:
+          {% for fw in param.value %}
+                        -
+          {% if 'zone' in fw %}
+                          zone: {{ fw.zone }}
+          {% endif %}
+          {% if 'interface' in fw %}
+                          interface: {{ fw.interface }}
+          {% endif %}
+          {% if 'service' in fw %}
+                          service: {{ fw.service }}
+          {% endif %}
+          {% if 'port' in fw %}
+                          port: {{ fw.port }}
+          {% endif %}
+          {% if 'set_default_zone' in fw %}
+                          set_default_zone: {{ fw.set_default_zone }}
+          {% endif %}
+          {% if 'state' in fw %}
+                          state: {{ fw.state }}
+          {% endif %}
+          {% if 'permanent' in fw %}
+                          permanent: {{ fw.permanent | ternary('true', 'false') }}
+          {% endif %}
+          {% if 'immediate' in fw %}
+                          immediate: {{ fw.immediate | ternary('true', 'false') }}
+          {% endif %}
+          {% endfor %}
+          {% elif param.name == "podman_kube_specs" %}
+                      value:
+          {% for k8s in param.value %}
+                        -
+          {% if 'state' in k8s %}
+                          state: {{ k8s.state }}
+          {% endif %}
+          {% if 'kube_file_content' in k8s %}
+                          kube_file_content:
+                            {{ k8s.kube_file_content | to_nice_yaml | indent(width=18) }}
+          {% endif %}
+          {% endfor %}
+          {% elif param.name == "radiorabe_files" %}
+                      value:
+          {% for rfile in param.value %}
+                        - path: {{ rfile.path }}
+          {% if 'recurse' in rfile %}
+                          recurse: {{ rfile.recurse | ternary('true', 'false') }}
+          {% endif %}
+          {% if 'owner' in rfile %}
+                          owner: {{ rfile.owner }}
+          {% endif %}
+          {% if 'group' in rfile %}
+                          group: {{ rfile.group }}
+          {% endif %}
+          {% endfor %}
+          {% elif param.name == "network_connections" %}
+                      value:
+          {% for conn in param.value %}
+                        - name: {{ conn.name }}
+          {% if 'state' in conn %}
+                          state: {{ conn.state }}
+          {% endif %}
+          {% if 'interface_name' in conn %}
+                          interface_name: {{ conn.interface_name }}
+          {% endif %}
+          {% if 'type' in conn %}
+                          type: {{ conn.type }}
+          {% endif %}
+          {% if 'ip' in conn %}
+                          ip:
+                            dhcp4: {{ conn.ip.dhcp4 | ternary('true', 'false') }}
+                            auto6: {{ conn.ip.auto6 | ternary('true', 'false') }}
+          {% endif %}
+          {% if 'vlan' in conn %}
+                          vlan:
+                            {{ conn.vlan | to_nice_yaml | indent(width=20) }}
+          {% endif %}
+          {% if 'parent' in conn %}
+                          parent: {{ conn.parent }}
+          {% endif %}
+          {% if 'controller' in conn %}
+                          controller: {{ conn.controller }}
+          {% endif %}
+          {% if 'port_type' in conn %}
+                          port_type: {{ conn.port_type }}
+          {% endif %}
+          {% endfor %}
+          {% else %}
+                      value:
+                        {{ param.value | to_nice_yaml | indent(width=14) }}
+          {% endif -%}
+          {% endfor %}
+          {% endif %}
+          {% endfor %}
+    - name: "Dump YAML to file"
+      ansible.builtin.copy:
+        content: "{{ hostgroup_yaml }}"
+        dest: ../../host_groups.gen.yaml
+        mode: preserve
