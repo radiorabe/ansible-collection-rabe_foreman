@@ -155,6 +155,7 @@
           - redhat.rhel_system_roles.certificate
           - radiorabe.common.local_user
           - redhat.rhel_system_roles.kernel_settings
+          - radiorabe.common.files
           - redhat.rhel_system_roles.podman
         parameters:
           - name: certificate_requests
@@ -236,7 +237,7 @@
                     containers:
                       - name: kanboard
                         restart: always
-                        image: quay.io/kanboard/kanboard:latest
+                        image: quay.io/kanboard/kanboard:v1.2.51
                         ports:
                           - containerPort: 80
                             hostPort: 80
@@ -251,6 +252,8 @@
                             name: kanboard_ssl
                           - mountPath: "/etc/ssl/certs/ca-certificates.crt:ro"
                             name: ca_certs
+                          - mountPath: "/etc/php84/conf.d/z.ini:ro,Z"
+                            name: php_fpm_ini
                         env:
                           - name: DEBUG
                             value: false
@@ -317,19 +320,23 @@
                     volumes:
                       - name: kanboard_data
                         hostPath:
-                          path: "/home/kanboard/data"
+                          path: "/home/{{ podman_run_as_user }}/data"
                           type: Directory
                       - name: kanboard_plugins
                         hostPath:
-                          path: "/home/kanboard/plugins"
+                          path: "/home/{{ podman_run_as_user }}/plugins"
                           type: Directory
                       - name: kanboard_ssl
                         hostPath:
-                          path: "/home/kanboard/ssl"
+                          path: "/home/{{ podman_run_as_user }}/ssl"
                           type: Directory
                       - name: ca_certs
                         hostPath:
                           path: "/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt"
+                          type: File
+                      - name: php_fpm_ini
+                        hostPath:
+                          path: "/home/{{ podman_run_as_user }}/phpfpm_conf.d/z.ini"
                           type: File
           - name: podman_run_as_group
             parameter_type: string
@@ -344,6 +351,22 @@
                 setype: http_port_t
               - ports: 443
                 setype: http_port_t
+          - name: radiorabe_copies
+            parameter_type: yaml
+            value:
+              - dest: "/home/{{ podman_run_as_user }}/phpfpm_conf.d/z.ini"
+                mode: '0644'
+                content: display_errors = Off
+                owner: "{{ podman_run_as_user }}"
+                group: "{{ podman_run_as_group }}"
+          - name: radiorabe_files
+            parameter_type: yaml
+            value:
+              - path: "/home/{{ podman_run_as_user }}/phpfpm_conf.d/"
+                state: directory
+                mode: '0755'
+                owner: "{{ podman_run_as_user }}"
+                group: "{{ podman_run_as_group }}"
           - name: selinux_booleans
             parameter_type: yaml
             value:
