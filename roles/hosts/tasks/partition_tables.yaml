@@ -1,0 +1,40 @@
+- name: "RaBe Foreman Hosts Templates: Create Partition Tables"
+  ansible.builtin.include_role:
+    name: theforeman.foreman.partition_tables
+  vars:
+    foreman_partition_tables:
+      - name: RaBe Standard VM Disk Layout
+        description: RaBe standard disk layout for all virtual machines.
+        os_family: RedHat
+        state: present
+        locked: true
+        layout: |
+          <%#
+            name: RaBe Standard VM Disk Layout
+          %>
+          # Clear all partitions and create a new GPT disklabel on /dev/sda and /dev/sdb
+          clearpart --all --initlabel --drives=sda,sdb --disklabel=gpt
+
+          # Clear partition table
+          zerombr
+
+          # Partition /dev/sda
+          # EFI System Partition (boot/efi) - 600 MiB, FAT32
+          part /boot/efi --fstype=fat32 --size=600 --ondisk=sda
+
+          # /boot partition - 1.00 GiB, XFS
+          part /boot --fstype=xfs --size=1000 --ondisk=sda
+
+          # Swap partition - 4.00 GiB
+          part swap --size=4000 --ondisk=sda
+
+          # Root partition (/) - 14.41 GiB (or remaining space), XFS
+          part / --fstype=xfs --size=14400 --grow --ondisk=sda
+
+          # Partition /dev/sdb
+          # /var partition - 20.00 GiB, XFS
+          part /var --fstype=xfs --size=20000 --grow --ondisk=sdb
+        locations:
+          - Sulgenrain
+        organizations:
+          - RaBe
