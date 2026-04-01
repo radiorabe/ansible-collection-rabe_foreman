@@ -14,3 +14,5 @@ skip_list:
   - galaxy[no-changelog]
   # we still need EL8 support, so we allow ansible 2.14
   - meta-runtime[unsupported-version]
+  # ignore line length
+  - yaml[line-length]
