@@ -145,6 +145,245 @@
         organization: RaBe
         location: Sulgenrain
         compute_resource: ovirt
+      - name: vm-0041.service.int.rabe.ch
+        description: AlmaLinux 9 VM for Letsencrypt certificate renewal on reverse proxies
+        parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
+        organization: RaBe
+        location: Sulgenrain
+        ansible_roles:
+          - radiorabe.common.selinux_modules
+          - redhat.rhel_system_roles.certificate
+          - radiorabe.common.local_user
+          - redhat.rhel_system_roles.kernel_settings
+          - radiorabe.common.files
+          - redhat.rhel_system_roles.podman
+        parameters:
+          - name: certificate_requests
+            parameter_type: yaml
+            value:
+              - name: kanboard
+                dns:
+                  - kanboard-new.service.int.rabe.ch
+                ca: ipa
+                principal: HTTP/kanboard-new.service.int.rabe.ch@INT.RABE.CH
+                key_size: 4096
+                run_after: "/usr/bin/cp /etc/pki/tls/*/kanboard.* /home/kanboard/ssl/ \n/usr/bin/chown
+                  kanboard: /home/kanboard/ssl/*\ncd /home/kanboard\n/usr/bin/sudo -u kanboard /usr/bin/podman
+                  pod restart kanboard\n"
+          - name: kanboard_db_password
+            parameter_type: string
+            hidden_value: true
+            value: "{{ undef('variable kanboard_db_password needs to be set in host') }}"
+          - name: kanboard_db_user
+            parameter_type: string
+            value: "{{ undef('variable kanboard_db_user needs to be set in host') }}"
+          - name: kanboard_ldap_password
+            parameter_type: string
+            hidden_value: true
+            value: "{{ undef('variable kanboard_ldap_password needs to be set in host') }}"
+          - name: kanboard_ldap_server
+            parameter_type: string
+            value: "{{ undef('variable kanboard_ldap_server needs to be set in host') }}"
+          - name: kanboard_ldap_username
+            parameter_type: string
+            value: "{{ undef('variable kanboard_ldap_username needs to be set in host') }}"
+          - name: kanboard_smtp_hostname
+            parameter_type: string
+            value: "{{ undef('variable kanboard_smtp_hostname needs to be set in host') }}"
+          - name: kanboard_smtp_password
+            parameter_type: string
+            hidden_value: true
+            value: "{{ undef('variable kanboard_smtp_password needs to be set in host') }}"
+          - name: kanboard_smtp_username
+            parameter_type: string
+            value: "{{ undef('variable kanboard_smtp_username needs to be set in host') }}"
+          - name: kanboard_reverse_proxy_default_admin
+            parameter_type: string
+            value: "{{ undef('variable kanboard_reverse_proxy_default_admin needs to be set in host') }}"
+          - name: kernel_settings_sysctl
+            parameter_type: yaml
+            value:
+              - name: net.ipv4.ip_unprivileged_port_start
+                value: 80
+          - name: local_user_username
+            parameter_type: string
+            value: kanboard
+          - name: podman_containers_conf
+            parameter_type: yaml
+            value:
+              containers:
+                log_driver: k8s-file
+                log_size_max: 1073741824
+          - name: podman_create_host_directories
+            parameter_type: boolean
+            value: true
+          - name: podman_firewall
+            parameter_type: yaml
+            value:
+              - service:
+                  - http
+                  - https
+                state: enabled
+          - name: podman_kube_specs
+            parameter_type: yaml
+            value:
+              - state: started
+                kube_file_content:
+                  apiVersion: v1
+                  kind: Pod
+                  metadata:
+                    name: kanboard
+                  spec:
+                    containers:
+                      - name: kanboard
+                        restart: always
+                        image: quay.io/kanboard/kanboard:v1.2.51
+                        ports:
+                          - containerPort: 80
+                            hostPort: 80
+                          - containerPort: 443
+                            hostPort: 443
+                        volumeMounts:
+                          - mountPath: "/var/www/app/data:Z"
+                            name: kanboard_data
+                          - mountPath: "/var/www/app/plugins:Z"
+                            name: kanboard_plugins
+                          - mountPath: "/etc/nginx/ssl:ro,Z"
+                            name: kanboard_ssl
+                          - mountPath: "/etc/ssl/certs/ca-certificates.crt:ro"
+                            name: ca_certs
+                          - mountPath: "/etc/php84/conf.d/z.ini:ro,Z"
+                            name: php_fpm_ini
+                        env:
+                          - name: DEBUG
+                            value: false
+                          - name: LOG_DRIVER
+                            value: system
+                          - name: DB_DRIVER
+                            value: postgres
+                          - name: DB_USERNAME
+                            value: "{{ kanboard_db_user }}"
+                          - name: DB_PASSWORD
+                            value: "{{ kanboard_db_password }}"
+                          - name: DB_HOSTNAME
+                            value: postgresql.service.int.rabe.ch
+                          - name: DB_NAME
+                            value: kanboard
+                          - name: PLUGIN_INSTALLER
+                            value: true
+                          - name: MAIL_FROM
+                            value: kanboard@service.int.rabe.ch
+                          - name: MAIL_TRANSPORT
+                            value: smtp
+                          - name: MAIL_SMTP_HOSTNAME
+                            value: "{{ kanboard_mail_smtp_hostname }}"
+                          - name: MAIL_SMTP_USERNAME
+                            value: "{{ kanboard_mail_smtp_username }}"
+                          - name: MAIL_SMTP_PASSWORD
+                            value: "{{ kanboard_mail_smtp_password }}"
+                          - name: LDAP_SERVER
+                            value: "{{ kanboard_ldap_server }}"
+                          - name: LDAP_BIND_TYPE
+                            value: proxy
+                          - name: LDAP_USERNAME
+                            value: "{{ kanboard_ldap_username }}"
+                          - name: LDAP_PASSWORD
+                            value: "{{ kanboard_ldap_password }}"
+                          - name: LDAP_USER_BASE_DN
+                            value: cn=users,cn=accounts,dc=int,dc=rabe,dc=ch
+                          - name: LDAP_USER_FILTER
+                            value: uid=%s
+                          - name: LDAP_GROUP_ADMIN_DN
+                            value: cn=kanboard-admins,cn=groups,cn=accounts,dc=int,dc=rabe,dc=ch
+                          - name: LDAP_GROUP_MANAGER_DN
+                            value: cn=kanboard-managers,cn=groups,cn=accounts,dc=int,dc=rabe,dc=ch
+                          - name: LDAP_GROUP_PROVIDER
+                            value: true
+                          - name: LDAP_GROUP_BASE_DN
+                            value: cn=groups,cn=accounts,dc=int,dc=rabe,dc=ch
+                          - name: LDAP_GROUP_FILTER
+                            value: "(&(objectClass=groupofnames)(cn=%s*))"
+                          - name: TRUSTED_PROXY_NETWORKS
+                            value: 127.0.0.1/32,::1/128
+                          - name: REVERSE_PROXY_AUTH
+                            value: true
+                          - name: REVERSE_PROXY_DEFAULT_ADMIN
+                            value: "{{ kanboard_reverse_proxy_default_admin }}"
+                          - name: REMEMBER_ME_AUTH
+                            value: false
+                          - name: ENABLE_URL_REWRITE
+                            value: true
+                          - name: HIDE_LOGIN_FORM
+                            value: true
+                          - name: DISABLE_LOGOUT
+                            value: true
+                    volumes:
+                      - name: kanboard_data
+                        hostPath:
+                          path: "/home/{{ podman_run_as_user }}/data"
+                          type: Directory
+                      - name: kanboard_plugins
+                        hostPath:
+                          path: "/home/{{ podman_run_as_user }}/plugins"
+                          type: Directory
+                      - name: kanboard_ssl
+                        hostPath:
+                          path: "/home/{{ podman_run_as_user }}/ssl"
+                          type: Directory
+                      - name: ca_certs
+                        hostPath:
+                          path: "/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt"
+                          type: File
+                      - name: php_fpm_ini
+                        hostPath:
+                          path: "/home/{{ podman_run_as_user }}/phpfpm_conf.d/z.ini"
+                          type: File
+          - name: podman_run_as_group
+            parameter_type: string
+            value: kanboard
+          - name: podman_run_as_user
+            parameter_type: string
+            value: kanboard
+          - name: podman_selinux_ports
+            parameter_type: yaml
+            value:
+              - ports: 80
+                setype: http_port_t
+              - ports: 443
+                setype: http_port_t
+          - name: radiorabe_copies
+            parameter_type: yaml
+            value:
+              - dest: "/home/{{ podman_run_as_user }}/phpfpm_conf.d/z.ini"
+                mode: '0644'
+                content: display_errors = Off
+                owner: "{{ podman_run_as_user }}"
+                group: "{{ podman_run_as_group }}"
+          - name: radiorabe_files
+            parameter_type: yaml
+            value:
+              - path: "/home/{{ podman_run_as_user }}/phpfpm_conf.d/"
+                state: directory
+                mode: '0755'
+                owner: "{{ podman_run_as_user }}"
+                group: "{{ podman_run_as_group }}"
+          - name: selinux_booleans
+            parameter_type: yaml
+            value:
+              - name: container_read_certs
+                state: true
+                persistent: true
+          - name: selinux_fcontexts
+            parameter_type: yaml
+            value:
+              - target: /etc/certmonger/post-scripts(/.*)?
+                setype: certmonger_unconfined_exec_t
+                ftype: f
+                state: present
+          - name: selinux_restore_dirs
+            parameter_type: yaml
+            value:
+              - /etc/certmonger/post-scripts/
       - name: vm-0043.service.int.rabe.ch
         description: AlmaLinux 9 VM for Letsencrypt certificate renewal on reverse proxies
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
@@ -205,6 +444,252 @@
             parameter_type: array
             value:
               - certbot-renew.timer
+      - name: vm-0045.service.int.rabe.ch
+        description: FreeIPA password expiration notification service
+        parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
+        organization: RaBe
+        location: Sulgenrain
+        ansible_roles:
+          - radiorabe.common.files
+          - redhat.rhel_system_roles.systemd
+        parameters:
+          - name: additional-packages
+            parameter_type: string
+            value: ipa-client-epn
+          - name: radiorabe_copies
+            parameter_type: yaml
+            value:
+              - dest: "/etc/systemd/system/ipa-epn.timer.d/override.conf"
+                mode: '0644'
+                content: |
+                  [Unit]
+                  Description=
+                  Description=Execute IPA Expiring Password Notification (EPN) every day at 3AM
+
+                  [Timer]
+                  OnCalendar=
+                  OnCalendar=*-*-* 03:00:00
+              - dest: "/etc/ipa/epn.conf"
+                mode: '0600'
+                content: |
+                  # This file is a copy from https://github.com/freeipa/freeipa/blob/master/client/share/epn.conf
+                  #
+                  # Global IPA-EPN [0] configuration file.
+                  # For a complete explanation of each parameter, see the epn.conf(5)
+                  # manual page.
+                  # For best results, change no more than a single parameter at a time,
+                  # and test if ipa-epn(1) still works as intended, using --dry-run when
+                  # it makes sense.
+                  #
+                  # [0] https://github.com/freeipa/freeipa/blob/master/doc/designs/expiring-password-notification.md
+
+                  [global]
+
+                  # Specifies the SMTP server to use.
+                  smtp_server = {{ smtp_server }}
+
+                  # Specifies the SMTP port.
+                  smtp_port = {{ smtp_port|default('25') }}
+
+                  # Specifies the id of the user to authenticate with the SMTP server.
+                  # Default None (empty value).
+                  smtp_user = {{ smtp_user }}
+
+                  # Specifies the password for the authorized user.
+                  # Default None (empty value).
+                  smtp_password = {{ smtp_password }}
+
+                  # Specifies the path to a single file in PEM format containing the certificate.
+                  # https://docs.python.org/3/library/ssl.html#ssl.SSLContext.load_cert_chain
+                  # Default None (empty value).
+                  # smtp_client_cert =
+
+                  # Specifies the path to a file containing the private key in. Otherwise the
+                  # private key will be taken from certfile as well.
+                  # https://docs.python.org/3/library/ssl.html#ssl.SSLContext.load_cert_chain
+                  # Default None (empty value).
+                  # smtp_client_key =
+
+                  # Specifies the password for decrypting the private key. It will be ignored if
+                  # the private key is not encrypted and no password is needed.
+                  # https://docs.python.org/3/library/ssl.html#ssl.SSLContext.load_cert_chain
+                  # Default None (empty value).
+                  # smtp_client_key_pass =
+
+                  # Specifies the number of seconds to wait for SMTP to respond.
+                  smtp_timeout = 60
+
+                  # Specifies the type of secure connection to make. Options are: none,
+                  # starttls and ssl.
+                  smtp_security = {{ smtp_security|default('none') }}
+
+                  # Specifies the From e-mail address value in the e-mails sent. Bounces will
+                  # be sent here.
+                  smtp_admin = {{ smtp_admin|default('root@localhost') }}
+
+                  # Time to wait, in milliseconds, between each e-mail sent to try to avoid
+                  # overloading the mail queue.
+                  smtp_delay = 0
+
+                  # Specifies the From: e-mail address value in the e-mails sent.
+                  # The default when unset is noreply@ipadefaultemaildomain.
+                  # This value can be found by running ipa config-show.
+                  mail_from = {{ mail_from|default('noreply@ipadefaultemaildomain') }}
+
+                  # Specifies the From: name value in the e-mails-sent.
+                  # The default when unset is IPA-EPN.
+                  # mail_from_name = {{ mail_from_name|default('IPA-EPN') }}
+
+                  # The list of days before a password expiration when ipa-epn should notify
+                  # a user that their password will soon require a reset.
+                  notify_ttls = {{ notify_ttls|default('28, 14, 7, 3, 1') }}
+
+                  # Set the subject of the message
+                  msg_subject = {{ msg_subject }}
+
+                  # Set the character set of the message.
+                  msg_charset = utf8
+
+                  # Set the message's MIME sub-content type.
+                  msg_subtype = {{ msg_subtype|default('plain') }}
+              - dest: "/etc/ipa/epn/expire_msg.template"
+                mode: '0644'
+                content: |-
+                  <!DOCTYPE html>
+                  <html>
+                  <head>
+                      <meta charset="utf-8" />
+                      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                      <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+                  </head>
+                  <body >
+                      <table style="background-color: #eee; font-family: 'Helvetica', 'Arial', sans-serif; padding: 20px; width: 100%; font-size: 14px;">
+                          <tr>
+                              <td>
+                                  <center style="width: 100%; margin: auto; max-width: 560px;">
+                                      <table class="row" cellpadding="0" cellspacing="0" border="0" style="width:100%;">
+                                          <tr>
+                                              <td style="font-family: 'Helvetica', 'Arial', sans-serif;">
+                                                  <table class="row" cellpadding="0" cellspacing="0" border="0" style="width:100%;">
+                                                      <tr>
+                                                          <td style="padding-bottom:12px; vertical-align: middle; width: 1%;">
+                                                              <img style="max-width: 100px; padding-left: 1px;" src="https://mein.fairgate.ch/uploads/1127/admin/clublogo_100/logo.jpg" />
+                                                          </td>
+                                                          <td style="width: 28px;"></td>
+                                                          <td style="font-family: 'Helvetica', 'Arial', sans-serif; vertical-align: middle;">
+                                                              <h1 style="margin: 0; font-size: 30px; font-weight: 500; margin-top: -4px;">RaBe Login</h1>
+                                                          </td>
+                                                      </tr>
+                                                  </table>
+                                              </td>
+                                          </tr>
+                                      </table>
+
+                                      <table style="background-color:#fff; border:1px solid #e1e1e1; width:100%;" cellpadding="0" cellspacing="0">
+                                          <tr>
+                                              <td style="padding-bottom: 20px; padding-left: 20px; padding-top: 20px; padding-right: 20px; font-family: 'Helvetica', 'Arial', sans-serif;">
+                                                  <div style="overflow: hidden;">
+                                                      <p>
+                                                          Liebe*r {{ '{{' }} first {{ '}}' }},
+                                                      </p>
+
+                                                      <p>
+                                                          Dein Passwort wird am  {{ '{{' }} expiration | datetimeformat('long', 'Europe/Berlin', 'de_DE') {{ '}}' }} ablaufen.
+                                                      </p>
+
+                                                      <p>
+                                                          Du kannst es ganz einfach mit unserem Self-Service unter <a href="https://my.rabe.ch" style="text-decoration: none; color:#2da6cb;">my.rabe.ch</a> erneuern.
+                                                          Siehe auch <a href="https://wiki.rabe.ch/Erste_Schritte" style="text-decoration: none; color:#2da6cb;">wiki.rabe.ch/Erste_Schritte</a> in unserem Wiki.
+                                                      </p>
+
+                                                      <p>Liebe Grüsse</p>
+
+                                                      <p><a href="mailto:it@rabe.ch" style="text-decoration: none; color:#2da6cb;">RaBe IT-Reaktion</a></p>
+                                                  </div>
+                                              </td>
+                                          </tr>
+                                          <tr>
+                                              <td>
+                                                  <hr style="border: 0; border-top: 1px solid #e1e1e1; margin: 0;" />
+                                              </td>
+                                          </tr>
+                                          <tr>
+                                              <td style="padding-bottom: 20px; padding-left: 20px; padding-top: 20px; padding-right: 20px; font-family: 'Helvetica', 'Arial', sans-serif;">
+                                                  <div style="overflow: hidden;">
+                                                      <p>
+                                                          Dear {{ '{{' }} first {{ '}}' }},
+                                                      </p>
+
+                                                      <p>
+                                                          Your password will expire soon on {{ '{{' }} expiration | datetimeformat('long', 'Europe/Berlin') {{ '}}' }}.</p>
+                                                      </p>
+
+                                                      <p>
+                                                          You can easily renew it using our self-service at <a href="https://my.rabe.ch" style="text-decoration: none; color:#2da6cb;">my.rabe.ch</a>.
+                                                          See also <a href="https://wiki.rabe.ch/Erste_Schritte" style="text-decoration: none; color:#2da6cb;">wiki.rabe.ch/Erste_Schritte</a> in our wiki.
+                                                      </p>
+
+                                                      <p>Best wishes</p>
+
+                                                      <p><a href="mailto:it@rabe.ch" style="text-decoration: none; color:#2da6cb;">RaBe IT-Reaktion</a></p>
+                                                  </div>
+                                              </td>
+                                          </tr>
+
+                                      </table>
+
+                                      <table cellpadding="0" cellspacing="0" border="0" style="width:100%">
+                                          <tr>
+                                              <td style="float:right; padding-top:10px; font-size:12px; display:inline-block; padding-left: 1px; text-align: right; font-family: 'Helvetica', 'Arial', sans-serif;">
+                                                  <p>Mailing powered by <a href="https://www.rabe.ch" style="text-decoration: none;">RaBe</a></p>
+                                              </td>
+                                          </tr>
+                                      </table>
+                                  </center>
+                              </td>
+                          </tr>
+                      </table>
+                  </body>
+                  </html>
+          - name: smtp_server
+            parameter_type: string
+            value: "{{ undef('variable smtp_server needs to be set in host') }}"
+          - name: smtp_user
+            parameter_type: string
+            value: "{{ undef('variable smtp_user needs to be set in host') }}"
+          - name: smtp_password
+            hidden_value: true
+            parameter_type: string
+            value: "{{ undef('variable smtp_password needs to be set in host') }}"
+          - name: smtp_admin
+            parameter_type: string
+            value: it@rabe.ch
+          - name: mail_from
+            parameter_type: string
+            value: it@rabe.ch
+          - name: mail_from_name
+            parameter_type: string
+            value: IT-Reaktion
+          - name: msg_subject
+            parameter_type: string
+            value: Dein RaBe Passwort läuft bald ab / Your RaBe password will expire soon
+          - name: msg_subtype
+            parameter_type: string
+            value: html
+          - name: radiorabe_files
+            parameter_type: yaml
+            value:
+              - path: "/etc/systemd/system/ipa-epn.timer.d"
+                state: directory
+                mode: '0755'
+          - name: systemd_enabled_units
+            parameter_type: yaml
+            value:
+              - ipa-epn.timer
+          - name: systemd_started_units
+            parameter_type: yaml
+            value:
+              - ipa-epn.timer
       - name: AlmaLinux 9 DMZ Virtualization Server
         description: AlmaLinux 9 general purpose virtual machines.
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
