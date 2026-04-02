@@ -42,4 +42,3 @@ parameters:
         parent: Bond bond0
         controller: dmz
         port_type: bridge
-name: AlmaLinux 9 DMZ server-008 VMs
