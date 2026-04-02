@@ -1,0 +1,7 @@
+---
+foreman_hostgroup:
+  name: EL8
+  description: EL8 configures our EL8 baseline.
+  parent: RaBe Core/RaBe Base
+  organization: RaBe
+  location: Sulgenrain

@@ -1,7 +1,0 @@
----
-name: CentOS 7
-description: CentOS 7 configures the RaBe CentOS 7 baseline and serves as a catch-all for imported CentOS 7 infrastructure.
-parent: RaBe Core/RaBe Base/EL7
-organization: RaBe
-location: Sulgenrain
-operatingsystem: CentOS 7

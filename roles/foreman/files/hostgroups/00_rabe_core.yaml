@@ -1,7 +1,0 @@
----
-name: RaBe Core
-description: RaBe Core contains roles that set facts and sets settings that don't rely on anything and are not OS specific.
-organization: RaBe
-location: Sulgenrain
-ansible_roles:
-  - radiorabe.common.core
