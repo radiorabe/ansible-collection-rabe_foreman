@@ -1,0 +1,14 @@
+---
+foreman_hostgroup:
+  name: AlmaLinux 9
+  description: AlmaLinux 9.
+  parent: RaBe Core/RaBe Base/EL9
+  organization: RaBe
+  location: Sulgenrain
+  operatingsystem: AlmaLinux 9
+  lifecycle_environment: Prod
+  content_view: AlmaLinux 9 x86_64
+  parameters:
+    - name: kt_activation_keys
+      parameter_type: string
+      value: AlmaLinux 9
