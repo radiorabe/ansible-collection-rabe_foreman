@@ -249,52 +249,52 @@ foreman_hostgroup:
         - repo: https://codeberg.org/abu/Calendar.git
           dest: "/home/{{ podman_run_as_user }}/plugins/Calendar"
           force: true
-          single_branch: yes
+          single_branch: true
           version: refs/tags/v1.5.0
         - repo: https://github.com/creecros/Customizer.git
           dest: "/home/{{ podman_run_as_user }}/plugins/Customizer"
           force: true
-          single_branch: yes
+          single_branch: true
           version: refs/tags/1.14.2
         - repo: https://github.com/atcomputing/kanboard-ExtendedMail.git
           dest: "/home/{{ podman_run_as_user }}/plugins/ExtendedMail"
           force: true
-          single_branch: yes
+          single_branch: true
           version: refs/tags/v0.8
         - repo: https://github.com/kanboard/plugin-gantt.git
           dest: "/home/{{ podman_run_as_user }}/plugins/Gantt"
           force: true
-          single_branch: yes
+          single_branch: true
           version: refs/tags/v1.0.6
         - repo: https://github.com/kenlog/HighlightCodeSyntax.git
           dest: "/home/{{ podman_run_as_user }}/plugins/HighlightCodeSyntax"
           force: true
-          single_branch: yes
+          single_branch: true
           version: refs/tags/v1.0.3
         - repo: https://github.com/kanboard/plugin-oauth2.git
           dest: "/home/{{ podman_run_as_user }}/plugins/OAuth2"
           force: true
-          single_branch: yes
+          single_branch: true
           version: refs/tags/v1.0.2
         - repo: https://github.com/radiorabe/kanboard-theme-rabe.git
           dest: "/home/{{ podman_run_as_user }}/plugins/RaBe"
           force: true
-          single_branch: yes
+          single_branch: true
           version: main
         - repo: https://github.com/creecros/SendEmailCreator.git
           dest: "/home/{{ podman_run_as_user }}/plugins/SendEmailCreator"
           force: true
-          single_branch: yes
+          single_branch: true
           version: refs/tags/1.2.6
         - repo: https://github.com/creecros/Task2pdf.git
           dest: "/home/{{ podman_run_as_user }}/plugins/Task2pdf"
           force: true
-          single_branch: yes
+          single_branch: true
           version: refs/tags/1.8.0
         - repo: https://github.com/imfx77/kanboard-plugin-Wysiwyg-MD-Editor.git
           dest: "/home/{{ podman_run_as_user }}/plugins/WysiwygMDEditor"
           force: true
-          single_branch: yes
+          single_branch: true
           version: refs/tags/v0.9.8
     - name: selinux_booleans
       parameter_type: yaml
