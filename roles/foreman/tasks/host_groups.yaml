@@ -739,16 +739,16 @@
             value:
               - kernel: ALL
                 options:
-                  - name: console
-                    value: tty0
-                    state: present
-                  - name: console
-                    value: ttyS1,115200
-                    state: present
-                  - name: splash
-                    state: absent
-                  - name: quiet
-                    state: absent
+                - name: console
+                  value: tty0
+                  state: present
+                - name: console
+                  value: ttyS1,115200
+                  state: present
+                - name: splash
+                  state: absent
+                - name: quiet
+                  state: absent
       - name: AlmaLinux 9 DMZ server-008 VMs
         description: AlmaLinux 9 virtual machines to be run on server-008
         parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
