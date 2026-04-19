@@ -1,0 +1,63 @@
+---
+foreman_hostgroup:
+  name: vm-0043.service.int.rabe.ch
+  description: AlmaLinux 9 VM for Letsencrypt certificate renewal on reverse proxies
+  parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
+  organization: RaBe
+  locations:
+    - Sulgenrain
+  ansible_roles:
+    - radiorabe.certbot.certbot
+    - redhat.rhel_system_roles.systemd
+  parameters:
+    - name: certbot_acme_account_mail
+      parameter_type: string
+      value: it@rabe.ch
+    - name: certbot_certificates
+      parameter_type: yaml
+      value:
+        - archiv.rabe.ch
+        - default.rabe.ch,sso.rabe.ch
+        - dmz-rev-proxy.ewb.rabe.ch
+        - dmz-rev-proxy.upc.rabe.ch
+        - intranet.rabe.ch
+        - my.rabe.ch
+        - onlyoffice.rabe.ch
+        - share.rabe.ch
+        - songticker.rabe.ch
+        - studiomail.rabe.ch
+        - wiki.rabe.ch
+        - supersaas-me.rabe.ch
+    - name: certbot_remote_hosts
+      parameter_type: yaml
+      value:
+        - vm-2001.dmz.int.rabe.ch
+        - vm-2002.dmz.int.rabe.ch
+    - name: firewall
+      parameter_type: yaml
+      value:
+        - zone: service
+          state: present
+          permanent: true
+          immediate: true
+        - zone: service
+          interface: enp1s0
+          state: present
+          permanent: true
+          immediate: true
+        - zone: service
+          service:
+            - cockpit
+            - ssh
+            - http
+            - pmcd
+          state: enabled
+          permanent: true
+          immediate: true
+        - set_default_zone: drop
+          permanent: true
+          immediate: true
+    - name: systemd_enabled_units
+      parameter_type: array
+      value:
+        - certbot-renew.timer

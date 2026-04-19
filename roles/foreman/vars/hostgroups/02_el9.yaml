@@ -1,0 +1,29 @@
+---
+foreman_hostgroup:
+  name: EL9
+  description: EL9 configures our EL9 baseline
+  parent: RaBe Core/RaBe Base
+  organization: RaBe
+  locations:
+    - Sulgenrain
+  ansible_roles:
+    - radiorabe.rabe_foreman.client
+    - redhat.rhel_system_roles.journald
+    - redhat.rhel_system_roles.timesync
+    - redhat.rhel_system_roles.kdump
+    - redhat.rhel_system_roles.logging
+    - redhat.rhel_system_roles.metrics
+    - redhat.rhel_system_roles.crypto_policies
+  parameters:
+    - name: journald_persistent
+      parameter_type: boolean
+      value: true
+    - name: metrics_manage_firewall
+      parameter_type: boolean
+      value: true
+    - name: metrics_manage_selinux
+      parameter_type: boolean
+      value: true
+    - name: metrics_retention_days
+      parameter_type: integer
+      value: 30
