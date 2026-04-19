@@ -6,11 +6,15 @@
     - role::rabe_foreman.infrastructure:domains
 - name: "RaBe Foreman Infrastructure : Compute Profiles"
   ansible.builtin.import_tasks: compute_profiles.yaml
+  # TODO: fix tasks or remove fully
+  when: false
   tags:
     - role::rabe_foreman.infrastructure
     - role::rabe_foreman.infrastructure:compute_profiles
 - name: "RaBe Foreman Infrastructure : Compute Resources"
   ansible.builtin.import_tasks: compute_resources.yaml
+  # TODO: fix tasks or remove fully
+  when: false
   tags:
     - role::rabe_foreman.infrastructure
     - role::rabe_foreman.infrastructure:compute_resources
