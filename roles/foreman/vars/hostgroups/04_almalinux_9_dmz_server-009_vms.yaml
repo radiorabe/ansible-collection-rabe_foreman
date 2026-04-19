@@ -4,7 +4,7 @@ foreman_hostgroup:
   description: AlmaLinux 9 virtual machines to be run on server-009
   parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
   organization: RaBe
-  location: Sulgenrain
+  locations: Sulgenrain
   domain: dmz.int.rabe.ch
   subnet: dmz
   compute_resource: server-009.dmz-admin.int.rabe.ch

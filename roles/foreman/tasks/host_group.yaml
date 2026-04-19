@@ -13,7 +13,7 @@
     description: "{{ foreman_hostgroup.description | default(omit) }}"
     parent: "{{ foreman_hostgroup.parent | default(omit) }}"
     organization: "{{ foreman_hostgroup.organization | default(omit) }}"
-    location: "{{ foreman_hostgroup.location | default(omit) }}"
+    locations: "{{ foreman_hostgroup.locations | default(omit) }}"
     operatingsystem: "{{ foreman_hostgroup.operatingsystem | default(omit) }}"
     architecture: "{{ foreman_hostgroup.architecture | default(omit) }}"
     medium: "{{ foreman_hostgroup.medium | default(omit) }}"

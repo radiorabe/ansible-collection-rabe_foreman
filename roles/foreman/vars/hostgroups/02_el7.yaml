@@ -4,4 +4,4 @@ foreman_hostgroup:
   description: EL7 configures our EL7 baseline.
   parent: RaBe Core/RaBe Base
   organization: RaBe
-  location: Sulgenrain
+  locations: Sulgenrain

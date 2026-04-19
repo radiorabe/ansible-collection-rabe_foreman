@@ -4,7 +4,7 @@ foreman_hostgroup:
   description: FreeIPA password expiration notification service
   parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
   organization: RaBe
-  location: Sulgenrain
+  locations: Sulgenrain
   ansible_roles:
     - radiorabe.common.files
     - redhat.rhel_system_roles.systemd
