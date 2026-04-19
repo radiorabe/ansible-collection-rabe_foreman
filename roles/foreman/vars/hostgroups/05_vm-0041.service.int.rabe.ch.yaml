@@ -1,7 +1,7 @@
 ---
 foreman_hostgroup:
   name: vm-0041.service.int.rabe.ch
-  description: AlmaLinux 9 VM for Letsencrypt certificate renewal on reverse proxies
+  description: AlmaLinux 9 VM for Kanboard project management tool
   parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
   organization: RaBe
   locations:
@@ -11,9 +11,13 @@ foreman_hostgroup:
     - redhat.rhel_system_roles.certificate
     - radiorabe.common.local_user
     - redhat.rhel_system_roles.kernel_settings
+    - radiorabe.common.git_clone
     - radiorabe.common.files
     - redhat.rhel_system_roles.podman
   parameters:
+    - name: additional-packages
+      parameter_type: string
+      value: git
     - name: certificate_requests
       parameter_type: yaml
       value:
@@ -23,9 +27,11 @@ foreman_hostgroup:
           ca: ipa
           principal: HTTP/kanboard-new.service.int.rabe.ch@INT.RABE.CH
           key_size: 4096
-          run_after: "/usr/bin/cp /etc/pki/tls/*/kanboard.* /home/kanboard/ssl/ \n/usr/bin/chown
-            kanboard: /home/kanboard/ssl/*\ncd /home/kanboard\n/usr/bin/sudo -u kanboard /usr/bin/podman
-            pod restart kanboard\n"
+          run_after: >
+            /usr/bin/cp /etc/pki/tls/*/kanboard.* /home/kanboard/ssl/\n
+            /usr/bin/chown kanboard: /home/kanboard/ssl/*\n
+            cd /home/kanboard\n
+            /usr/bin/sudo -u kanboard /usr/bin/podman pod restart kanboard
     - name: kanboard_db_password
       parameter_type: string
       hidden_value: true
@@ -55,7 +61,8 @@ foreman_hostgroup:
       value: "{{ undef('variable kanboard_smtp_username needs to be set in host') }}"
     - name: kanboard_reverse_proxy_default_admin
       parameter_type: string
-      value: "{{ undef('variable kanboard_reverse_proxy_default_admin needs to be set in host') }}"
+      value: "{{ undef('variable kanboard_reverse_proxy_default_admin needs to be set
+        in host') }}"
     - name: kernel_settings_sysctl
       parameter_type: yaml
       value:
@@ -211,18 +218,84 @@ foreman_hostgroup:
       parameter_type: yaml
       value:
         - dest: "/home/{{ podman_run_as_user }}/phpfpm_conf.d/z.ini"
-          mode: '0644'
+          mode: "0644"
           content: display_errors = Off
           owner: "{{ podman_run_as_user }}"
           group: "{{ podman_run_as_group }}"
+        # The creation of .gitconfig only works the very first time the Ansible
+        # roles are executed
+        - dest: "$HOME/.gitconfig"
+          mode: "0644"
+          content: |-
+            [safe]
+              directory = /home/kanboard/plugins/*
     - name: radiorabe_files
       parameter_type: yaml
       value:
         - path: "/home/{{ podman_run_as_user }}/phpfpm_conf.d/"
           state: directory
-          mode: '0755'
+          mode: "0755"
           owner: "{{ podman_run_as_user }}"
           group: "{{ podman_run_as_group }}"
+        - path: "/home/{{ podman_run_as_user }}/plugins/"
+          state: directory
+          mode: "0755"
+          owner: "{{ podman_run_as_user }}"
+          group: "{{ podman_run_as_group }}"
+          recurse: true
+    - name: radiorabe_git_clone
+      parameter_type: yaml
+      value:
+        - repo: https://codeberg.org/abu/Calendar.git
+          dest: "/home/{{ podman_run_as_user }}/plugins/Calendar"
+          force: true
+          single_branch: true
+          version: refs/tags/v1.5.0
+        - repo: https://github.com/creecros/Customizer.git
+          dest: "/home/{{ podman_run_as_user }}/plugins/Customizer"
+          force: true
+          single_branch: true
+          version: refs/tags/1.14.2
+        - repo: https://github.com/atcomputing/kanboard-ExtendedMail.git
+          dest: "/home/{{ podman_run_as_user }}/plugins/ExtendedMail"
+          force: true
+          single_branch: true
+          version: refs/tags/v0.8
+        - repo: https://github.com/kanboard/plugin-gantt.git
+          dest: "/home/{{ podman_run_as_user }}/plugins/Gantt"
+          force: true
+          single_branch: true
+          version: refs/tags/v1.0.6
+        - repo: https://github.com/kenlog/HighlightCodeSyntax.git
+          dest: "/home/{{ podman_run_as_user }}/plugins/HighlightCodeSyntax"
+          force: true
+          single_branch: true
+          version: refs/tags/v1.0.3
+        - repo: https://github.com/kanboard/plugin-oauth2.git
+          dest: "/home/{{ podman_run_as_user }}/plugins/OAuth2"
+          force: true
+          single_branch: true
+          version: refs/tags/v1.0.2
+        - repo: https://github.com/radiorabe/kanboard-theme-rabe.git
+          dest: "/home/{{ podman_run_as_user }}/plugins/RaBe"
+          force: true
+          single_branch: true
+          version: main
+        - repo: https://github.com/creecros/SendEmailCreator.git
+          dest: "/home/{{ podman_run_as_user }}/plugins/SendEmailCreator"
+          force: true
+          single_branch: true
+          version: refs/tags/1.2.6
+        - repo: https://github.com/creecros/Task2pdf.git
+          dest: "/home/{{ podman_run_as_user }}/plugins/Task2pdf"
+          force: true
+          single_branch: true
+          version: refs/tags/1.8.0
+        - repo: https://github.com/imfx77/kanboard-plugin-Wysiwyg-MD-Editor.git
+          dest: "/home/{{ podman_run_as_user }}/plugins/WysiwygMDEditor"
+          force: true
+          single_branch: true
+          version: refs/tags/v0.9.8
     - name: selinux_booleans
       parameter_type: yaml
       value:
