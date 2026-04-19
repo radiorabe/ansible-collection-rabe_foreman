@@ -4,7 +4,8 @@ foreman_hostgroup:
   description: AlmaLinux 9 general purpose virtual machines.
   parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
   organization: RaBe
-  locations: Sulgenrain
+  locations:
+    - Sulgenrain
   domain: dmz-admin.int.rabe.ch
   subnet: dmz-admin
   ansible_roles:

@@ -4,7 +4,8 @@ foreman_hostgroup:
   description: AlmaLinux 9 DMZ virtual machine vm-2001 for running reverse-proxy container
   parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-008 VMs
   organization: RaBe
-  locations: Sulgenrain
+  locations:
+    - Sulgenrain
   ansible_roles:
     - radiorabe.common.local_user
     - radiorabe.common.git_clone

@@ -4,7 +4,8 @@ foreman_hostgroup:
   description: AlmaLinux 9 VM for Letsencrypt certificate renewal on reverse proxies
   parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
   organization: RaBe
-  locations: Sulgenrain
+  locations:
+    - Sulgenrain
   ansible_roles:
     - radiorabe.certbot.certbot
     - redhat.rhel_system_roles.systemd

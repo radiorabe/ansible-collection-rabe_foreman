@@ -4,7 +4,8 @@ foreman_hostgroup:
   description: RaBe Core configures the bare minimum of non OS specific things.
   parent: RaBe Core
   organization: RaBe
-  locations: Sulgenrain
+  locations:
+    - Sulgenrain
   architecture: x86_64
   ansible_roles:
     - radiorabe.common.base
