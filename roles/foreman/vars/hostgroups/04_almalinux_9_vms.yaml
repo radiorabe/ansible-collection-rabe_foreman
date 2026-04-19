@@ -1,0 +1,9 @@
+---
+foreman_hostgroup:
+  name: AlmaLinux 9 VMs
+  description: AlmaLinux 9 general purpose virtual machines.
+  parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9
+  organization: RaBe
+  locations:
+    - Sulgenrain
+  compute_resource: ovirt
