@@ -61,8 +61,7 @@ foreman_hostgroup:
       value: "{{ undef('variable kanboard_smtp_username needs to be set in host') }}"
     - name: kanboard_reverse_proxy_default_admin
       parameter_type: string
-      value: "{{ undef('variable kanboard_reverse_proxy_default_admin needs to be set
-        in host') }}"
+      value: "{{ undef('variable kanboard_reverse_proxy_default_admin needs to be set in host') }}"
     - name: kernel_settings_sysctl
       parameter_type: yaml
       value:
