@@ -114,9 +114,20 @@ foreman_hostgroup:
           log_size_max: 1073741824 # 1Gib in bytes
         network:
           default_rootless_network_cmd: slirp4netns
+    - name: radiorabe_git_clone
+      parameter_type: yaml
+      value:
+        - repo: "https://{{ radiorabe_git_clone_pat }}@github.com/radiorabe/reverse-proxy-configuration.git"
+          dest: "/tmp/reverse-proxy-configuration"
+          separate_git_dir: "/tmp/reverse-proxy-configuration-git"
+          single_branch: true
+          version: "main"
     - name: radiorabe_git_local_clone
       parameter_type: boolean
       value: true
+    - name: radiorabe_git_clone_pat
+      parameter_type: string
+      value: "{{ undef('variable radiorabe_git_clone_pat needs to be set in host') }}"
     - name: radiorabe_git_clone_remote_dest
       parameter_type: string
       value: /home/revproxy
