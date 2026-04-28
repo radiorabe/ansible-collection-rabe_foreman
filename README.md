@@ -21,6 +21,53 @@ GitOps our Foreman. This is where most of our Foreman configuration lives.
 
 ## Development
 
+### Hostgroups Dumper
+
+The repository includes a hostgroup dumper that reads hostgroup data from Foreman
+and writes YAML files into `roles/foreman/vars/hostgroups/`.
+
+1. Create and activate a Python virtual environment:
+
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   pip install --upgrade pip
+   pip install ansible ansible-lint ruamel.yaml
+   ansible-galaxy collection install theforeman.foreman
+   ```
+
+2. In the Foreman UI, create a Personal Access Token for your user:
+
+   `User menu` -> `My Account` -> `Personal Access Tokens` -> `Create token`
+
+   Save the token in a secure location, you won't be able to recover it once you close the Foreman UI.
+
+3. Run the dumper with your Foreman username and API token:
+
+   ```bash
+   export FOREMAN_SERVER_URL="https://foreman.service.int.rabe.ch"
+   export FOREMAN_USERNAME="your-user"
+   export FOREMAN_API_TOKEN="your-personal-access-token"
+
+   source .venv/bin/activate
+   ansible-playbook \
+     -e foreman_server_url="$FOREMAN_SERVER_URL" \
+     -e foreman_username="$FOREMAN_USERNAME" \
+     -e foreman_password="$FOREMAN_API_TOKEN" \
+     -e foreman_validate_certs=false \
+     hack/playbooks/dump_foreman_hostgroups.yaml
+   ```
+
+4. Review changes
+
+   The resulting output might need some cleanup in edge cases.
+
+   Verify the output using git:
+
+   ```bash
+   git diff roles/foreman/vars/hostgroups/
+   ```
+
 ### Adding a Product and Repositories
 
 * add the product and repo in `roles/content/tasks/products.yaml`

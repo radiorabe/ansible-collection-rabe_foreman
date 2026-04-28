@@ -1,8 +1,8 @@
 ---
 foreman_hostgroup:
-  name: vm-2002.dmz.int.rabe.ch
-  description: AlmaLinux 9 DMZ virtual machine vm-2002 for running reverse-proxy container
-  parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-009 VMs
+  name: vm-2001.dmz.int.rabe.ch
+  description: AlmaLinux 9 DMZ virtual machine vm-2001 for running reverse-proxy container
+  parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 DMZ server-008 VMs
   organization: RaBe
   locations:
     - Sulgenrain
@@ -114,9 +114,20 @@ foreman_hostgroup:
           log_size_max: 1073741824 # 1Gib in bytes
         network:
           default_rootless_network_cmd: slirp4netns
+    - name: radiorabe_git_clone
+      parameter_type: yaml
+      value:
+        - repo: "https://{{ radiorabe_git_clone_pat }}@github.com/radiorabe/reverse-proxy-configuration.git"
+          dest: "/tmp/reverse-proxy-configuration"
+          separate_git_dir: "/tmp/reverse-proxy-configuration-git"
+          single_branch: true
+          version: "main"
     - name: radiorabe_git_local_clone
       parameter_type: boolean
       value: true
+    - name: radiorabe_git_clone_pat
+      parameter_type: string
+      value: "{{ undef('variable radiorabe_git_clone_pat needs to be set in host') }}"
     - name: radiorabe_git_clone_remote_dest
       parameter_type: string
       value: /home/revproxy
