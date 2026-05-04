@@ -1,26 +1,26 @@
 ---
 - name: "RaBe Foreman Content : Products"
-  ansible.builtin.import_tasks: products.yaml
+  ansible.builtin.import_tasks: products.yml
   tags:
     - role::rabe_foreman.content
     - role::rabe_foreman.content:products
 - name: "RaBe Foreman Content : Sync Plans"
-  ansible.builtin.import_tasks: sync_plans.yaml
+  ansible.builtin.import_tasks: sync_plans.yml
   tags:
     - role::rabe_foreman.content
     - role::rabe_foreman.content:sync_plans
 - name: "RaBe Foreman Content : Lifecycle Environments"
-  ansible.builtin.import_tasks: lifecycle_environments.yaml
+  ansible.builtin.import_tasks: lifecycle_environments.yml
   tags:
     - role::rabe_foreman.content
     - role::rabe_foreman.content:lifecycle_environments
 - name: "RaBe Foreman Content : Content Views"
-  ansible.builtin.import_tasks: content_views.yaml
+  ansible.builtin.import_tasks: content_views.yml
   tags:
     - role::rabe_foreman.content
     - role::rabe_foreman.content:content_views
 - name: "RaBe Foreman Content : Activation Keys"
-  ansible.builtin.import_tasks: activation_keys.yaml
+  ansible.builtin.import_tasks: activation_keys.yml
   tags:
     - role::rabe_foreman.content
     - role::rabe_foreman.content:activation_keys

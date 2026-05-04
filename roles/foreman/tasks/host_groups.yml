@@ -1,7 +1,7 @@
 ---
 - name: "RaBe Foreman Config : Configure Host Groups"
-  ansible.builtin.include_tasks: host_group.yaml
-  loop: "{{ query('fileglob', role_path ~ '/vars/hostgroups/*.yaml') | sort }}"
+  ansible.builtin.include_tasks: host_group.yml
+  loop: "{{ query('fileglob', role_path ~ '/vars/hostgroups/*.yml') | sort }}"
   loop_control:
     loop_var: _hostgroup_file
     label: "{{ _hostgroup_file | basename }}"
