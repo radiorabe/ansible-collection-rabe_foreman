@@ -1,7 +1,7 @@
 ---
 # Dump Host Groups from Foreman
 #
-# Helps manage the hostgroups in `roles/foreman/vars/hostgroups/*.yaml`.
+# Helps manage the hostgroups in `roles/foreman/vars/hostgroups/*.yml`.
 #
 # It updates existing files based on the data in the hostgroup and
 # creates new files when hostgroups are added.
@@ -23,7 +23,7 @@
 #
 # You can run this playbook like so:
 #
-#   ansible-playbook -e foreman_server_url=<SERVER> -e foreman_username=<USER> -e foreman_password=<TOKEN> hack/playbooks/dump_foreman_hostgroups.yaml
+#   ansible-playbook -e foreman_server_url=<SERVER> -e foreman_username=<USER> -e foreman_password=<TOKEN> hack/playbooks/dump_foreman_hostgroups.yml
 #
 # Use git to analyse the resulting diff:
 #
@@ -42,7 +42,7 @@
   tasks:
     - name: "List hostgroup variable files"
       ansible.builtin.set_fact:
-        hostgroup_var_files: "{{ query('fileglob', hostgroups_vars_dir ~ '/*.yaml') | sort }}"
+        hostgroup_var_files: "{{ query('fileglob', hostgroups_vars_dir ~ '/*.yml') | sort }}"
 
     - name: "Build existing hostgroup dump plan"
       ansible.builtin.set_fact:
@@ -83,10 +83,10 @@
         _all_parent_titles: "{{ all_hostgroups_info.hostgroups | default([]) | map(attribute='parent_name') | select('defined') | reject('equalto', None) | list }}"
         _depth_key: "{{ (item.title.split('/') | length | int) | string }}"
         _depth_prefix: "{{ depth_prefix_map[_depth_key] if (_depth_key in (depth_prefix_map | default({}))) else ('%02d' | format(((item.title.split('/') | length | int) - 1))) }}"
-        _generated_name: "{{ (item.name | default('') | lower) | regex_replace('[^a-z0-9._-]+', '_') | regex_replace('^_+|_+$', '') | regex_replace('[.]yaml$', '') }}"
+        _generated_name: "{{ (item.name | default('') | lower) | regex_replace('[^a-z0-9._-]+', '_') | regex_replace('^_+|_+$', '') | regex_replace('[.]yml$', '') }}"
         _is_fqdn_name: "{{ ((item.name | default('') | lower) is match('^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:[.][a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+$')) }}"
         _is_leaf_hostgroup: "{{ _is_fqdn_name and (((_all_parent_titles | default([])) | select('equalto', (item.title | default(''))) | list | length) == 0) }}"
-        _dest_path: "{{ _existing_dest if _existing_dest else (hostgroups_vars_dir ~ '/' ~ (_generated_name ~ '.yaml' if _is_leaf_hostgroup else (_depth_prefix ~ '_' ~ _generated_name) ~ '.yaml' )) }}"
+        _dest_path: "{{ _existing_dest if _existing_dest else (hostgroups_vars_dir ~ '/' ~ (_generated_name ~ '.yml' if _is_leaf_hostgroup else (_depth_prefix ~ '_' ~ _generated_name) ~ '.yml' )) }}"
       loop: "{{ all_hostgroups_info.hostgroups | default([]) | sort(attribute='title') }}"
       loop_control:
         label: "{{ item.title }}"

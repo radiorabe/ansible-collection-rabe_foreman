@@ -1,31 +1,31 @@
 ---
 - name: "RaBe Foreman Infrastructure : Domains"
-  ansible.builtin.import_tasks: domains.yaml
+  ansible.builtin.import_tasks: domains.yml
   tags:
     - role::rabe_foreman.infrastructure
     - role::rabe_foreman.infrastructure:domains
 - name: "RaBe Foreman Infrastructure : Compute Profiles"
-  ansible.builtin.import_tasks: compute_profiles.yaml
+  ansible.builtin.import_tasks: compute_profiles.yml
   tags:
     - role::rabe_foreman.infrastructure
     - role::rabe_foreman.infrastructure:compute_profiles
 - name: "RaBe Foreman Infrastructure : Compute Resources"
-  ansible.builtin.import_tasks: compute_resources.yaml
+  ansible.builtin.import_tasks: compute_resources.yml
   tags:
     - role::rabe_foreman.infrastructure
     - role::rabe_foreman.infrastructure:compute_resources
 - name: "RaBe Foreman Infrastructure : Realms"
-  ansible.builtin.import_tasks: realms.yaml
+  ansible.builtin.import_tasks: realms.yml
   tags:
     - role::rabe_foreman.infrastructure
     - role::rabe_foreman.infrastructure:realms
 - name: "RaBe Foreman Infrastructure : Subnets"
-  ansible.builtin.import_tasks: subnets.yaml
+  ansible.builtin.import_tasks: subnets.yml
   tags:
     - role::rabe_foreman.infrastructure
     - role::rabe_foreman.infrastructure:subnets
 - name: "RaBe Foreman Infrastructure : Bootdisk"
-  ansible.builtin.import_tasks: bootdisk.yaml
+  ansible.builtin.import_tasks: bootdisk.yml
   tags:
     - role::rabe_foreman.infrastructure
     - role::rabe_foreman.infrastructure:bootdisk

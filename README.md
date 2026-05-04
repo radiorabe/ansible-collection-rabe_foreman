@@ -55,7 +55,7 @@ and writes YAML files into `roles/foreman/vars/hostgroups/`.
      -e foreman_username="$FOREMAN_USERNAME" \
      -e foreman_password="$FOREMAN_API_TOKEN" \
      -e foreman_validate_certs=false \
-     hack/playbooks/dump_foreman_hostgroups.yaml
+     hack/playbooks/dump_foreman_hostgroups.yml
    ```
 
 4. Review changes
@@ -70,22 +70,22 @@ and writes YAML files into `roles/foreman/vars/hostgroups/`.
 
 ### Adding a Product and Repositories
 
-* add the product and repo in `roles/content/tasks/products.yaml`
-* if creating a new product, add it in `roles/content/tasks/sync_plans.yaml`
-* add the new repo to the corresponding "Base" repo or create a new view in `roles/content/tasks/content_views.yaml`
+* add the product and repo in `roles/content/tasks/products.yml`
+* if creating a new product, add it in `roles/content/tasks/sync_plans.yml`
+* add the new repo to the corresponding "Base" repo or create a new view in `roles/content/tasks/content_views.yml`
 * if you created a new view add it to `playbooks/content_view_publish.yml` and `playbooks/content_view_promote.yml`
-* disable the new repo in all relevant activation keys or create a new key in `roles/content/tasks/activation_keys.yaml`
+* disable the new repo in all relevant activation keys or create a new key in `roles/content/tasks/activation_keys.yml`
   * your content views need to be published to Prod for this step! this isn't currently automated
 
 ### Removing old Products
 
 Products are removed once they are not in active use by any content view. Hence deprovisioning a component needs to be done in stages:
 
-* remove the product from `roles/content/tasks/content_views.yaml` and from the publish and promote playbooks in `playbooks/`
+* remove the product from `roles/content/tasks/content_views.yml` and from the publish and promote playbooks in `playbooks/`
 * at this stage, there are probably still active users of the old content view so we wait until a new version of the content view is released and they are life cycled
-* once there are no more active users, we can stop syncing the product since we don't need updated errata anymore, we remove it from `roles/content/tasks/sync_plans.yaml`
+* once there are no more active users, we can stop syncing the product since we don't need updated errata anymore, we remove it from `roles/content/tasks/sync_plans.yml`
 * at this point, there are still old versions of content views that may contain the product. it will take a while until `playbooks/content_view_version_cleanup.yml` removes them
-* after checking that there are no more dependencies on the product, they get changed to `state: absent` in `roles/content/tasks/products.yaml` removing them from our foreman, at this point the list of repositories is also removed from the file
+* after checking that there are no more dependencies on the product, they get changed to `state: absent` in `roles/content/tasks/products.yml` removing them from our foreman, at this point the list of repositories is also removed from the file
 * Once they are gone from Foreman they can be removed from this repo with the next major release (or any 0.x release)
 
 ## License

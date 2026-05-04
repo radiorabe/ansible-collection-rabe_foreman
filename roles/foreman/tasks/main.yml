@@ -1,41 +1,41 @@
 ---
 - name: "RaBe Foreman Config : Patches"
-  ansible.builtin.import_tasks: patches.yaml
+  ansible.builtin.import_tasks: patches.yml
   tags:
     - role::rabe_foreman.foreman
     - role::rabe_foreman.foreman:patches
 - name: "RaBe Foreman Config : Organizations"
-  ansible.builtin.import_tasks: organizations.yaml
+  ansible.builtin.import_tasks: organizations.yml
   tags:
     - role::rabe_foreman.foreman
     - role::rabe_foreman.foreman:organizations
 - name: "RaBe Foreman Config : Locations"
-  ansible.builtin.import_tasks: locations.yaml
+  ansible.builtin.import_tasks: locations.yml
   tags:
     - role::rabe_foreman.foreman
     - role::rabe_foreman.foreman:locations
 - name: "RaBe Foreman Config : Settings"
-  ansible.builtin.import_tasks: settings.yaml
+  ansible.builtin.import_tasks: settings.yml
   tags:
     - role::rabe_foreman.foreman
     - role::rabe_foreman.foreman:settings
 - name: "RaBe Foreman Config : Roles"
-  ansible.builtin.import_tasks: roles.yaml
+  ansible.builtin.import_tasks: roles.yml
   tags:
     - role::rabe_foreman.foreman
     - role::rabe_foreman.foreman:roles
 - name: "RaBe Foreman Config : Global Parameters"
-  ansible.builtin.import_tasks: global_parameters.yaml
+  ansible.builtin.import_tasks: global_parameters.yml
   tags:
     - role::rabe_foreman.foreman
     - role::rabe_foreman.foreman:global_parameters
 - name: "RaBe Foreman Config : Host Groups"
-  ansible.builtin.import_tasks: host_groups.yaml
+  ansible.builtin.import_tasks: host_groups.yml
   tags:
     - role::rabe_foreman.foreman
     - role::rabe_foreman.foreman:host_groups
 - name: "RaBe Foreman Config : Job Templates"
-  ansible.builtin.import_tasks: job_templates.yaml
+  ansible.builtin.import_tasks: job_templates.yml
   tags:
     - role::rabe_foreman.foreman
     - role::rabe_foreman.foreman:job_templates
