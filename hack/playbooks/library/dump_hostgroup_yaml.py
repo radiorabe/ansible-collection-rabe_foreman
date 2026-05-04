@@ -17,6 +17,21 @@ from ruamel.yaml.scalarstring import (
 )
 
 
+# Hacker-only toggle: flip to True for alpha-sorted parameter output.
+# Default stays False to preserve existing behavior and file ordering.
+HACK_SORT_PARAMS_ALPHA = False
+
+
+DEFAULT_HOSTGROUP_FIELD_VALUES = {
+    "architecture": "x86_64",
+    "operatingsystem": "AlmaLinux 9",
+    "lifecycle_environment": "Prod",
+    "content_view": "AlmaLinux 9 x86_64",
+    "compute_resource": "ovirt",
+    "compute_profile": "1-Small",
+}
+
+
 def _yaml_loader():
     yaml = YAML(typ="rt")
     yaml.preserve_quotes = True
@@ -164,6 +179,10 @@ def _normalize_params(existing_params, source_params):
             item["hidden_value"] = True
         normalized.append(item)
 
+    if HACK_SORT_PARAMS_ALPHA:
+        # Deterministic alpha order by parameter name for hacking/debug output.
+        normalized.sort(key=lambda p: p.get("name", ""))
+
     return normalized
 
 
@@ -206,6 +225,18 @@ def _merge_parameter_seq(existing_seq, new_params):
             merged_seq.append(_to_yaml_node(param))
 
     return merged_seq
+
+
+def _normalize_defaulted_field(existing_hostgroup, field_name, source_value):
+    # If a field is already explicitly declared in YAML, always track Foreman.
+    if field_name in existing_hostgroup:
+        return source_value
+
+    default_value = DEFAULT_HOSTGROUP_FIELD_VALUES.get(field_name)
+    if source_value == default_value:
+        return None
+
+    return source_value
 
 
 def run_module():
@@ -253,9 +284,35 @@ def run_module():
     ]
     roles_value = fetched_roles if fetched_roles else None
 
-    merged_architecture = hostgroup.get("architecture_name")
-    dumped_architecture = (
-        None if merged_architecture == "x86_64" else merged_architecture
+    dumped_architecture = _normalize_defaulted_field(
+        existing_hostgroup,
+        "architecture",
+        hostgroup.get("architecture_name"),
+    )
+    dumped_operatingsystem = _normalize_defaulted_field(
+        existing_hostgroup,
+        "operatingsystem",
+        hostgroup.get("operatingsystem_name"),
+    )
+    dumped_lifecycle_environment = _normalize_defaulted_field(
+        existing_hostgroup,
+        "lifecycle_environment",
+        hostgroup.get("lifecycle_environment_name"),
+    )
+    dumped_content_view = _normalize_defaulted_field(
+        existing_hostgroup,
+        "content_view",
+        hostgroup.get("content_view_name"),
+    )
+    dumped_compute_resource = _normalize_defaulted_field(
+        existing_hostgroup,
+        "compute_resource",
+        hostgroup.get("compute_resource_name"),
+    )
+    dumped_compute_profile = _normalize_defaulted_field(
+        existing_hostgroup,
+        "compute_profile",
+        hostgroup.get("compute_profile_name"),
     )
 
     orgs = hostgroup.get("organizations") or []
@@ -280,20 +337,31 @@ def run_module():
         "domain": hostgroup.get("domain_name"),
         "subnet": hostgroup.get("subnet_name"),
         "architecture": dumped_architecture,
-        "operatingsystem": hostgroup.get("operatingsystem_name"),
-        "lifecycle_environment": hostgroup.get("lifecycle_environment_name"),
-        "content_view": hostgroup.get("content_view_name"),
-        "compute_resource": hostgroup.get("compute_resource_name"),
-        "compute_profile": hostgroup.get("compute_profile_name"),
+        "operatingsystem": dumped_operatingsystem,
+        "lifecycle_environment": dumped_lifecycle_environment,
+        "content_view": dumped_content_view,
+        "compute_resource": dumped_compute_resource,
+        "compute_profile": dumped_compute_profile,
         "ansible_roles": roles_value,
         "parameters": merged_params if merged_params else None,
     }
 
     merged_hostgroup = updates
 
-    ordered_keys = list(existing_hostgroup.keys())
+    tail_keys = ["ansible_roles", "parameters"]
+    ordered_keys = [k for k in existing_hostgroup.keys() if k not in tail_keys]
+
+    # Preserve the established ordering for non-tail keys while allowing
+    # newly introduced fields to appear before ansible_roles/parameters.
     for key in updates.keys():
+        if key in tail_keys:
+            continue
         if key not in ordered_keys:
+            ordered_keys.append(key)
+
+    # Keep these two fields at the very end, in this exact order.
+    for key in tail_keys:
+        if key in updates and key not in ordered_keys:
             ordered_keys.append(key)
 
     merged_ordered = CommentedMap()
