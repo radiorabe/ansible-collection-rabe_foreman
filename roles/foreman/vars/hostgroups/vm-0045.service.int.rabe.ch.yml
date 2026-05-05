@@ -16,16 +16,17 @@ foreman_hostgroup:
     - name: radiorabe_copies
       parameter_type: yaml
       value:
-        - dest: "/etc/systemd/system/ipa-epn.timer.d/override.conf"
+        - dest: /etc/systemd/system/ipa-epn.timer.d/override.conf
           mode: '0644'
           content: |
             [Unit]
             Description=
             Description=Execute IPA Expiring Password Notification (EPN) every day at 3AM
+
             [Timer]
             OnCalendar=
             OnCalendar=*-*-* 03:00:00
-        - dest: "/etc/ipa/epn.conf"
+        - dest: /etc/ipa/epn.conf
           mode: '0600'
           content: |
             # This file is a copy from https://github.com/freeipa/freeipa/blob/master/client/share/epn.conf
@@ -38,59 +39,77 @@ foreman_hostgroup:
             # it makes sense.
             #
             # [0] https://github.com/freeipa/freeipa/blob/master/doc/designs/expiring-password-notification.md
+
             [global]
-            # Specifies the SMTP server to use.
+
+            # Specifies the SMTP server to use. 
             smtp_server = {{ smtp_server }}
+
             # Specifies the SMTP port.
-            smtp_port = {{ smtp_port | default('25') }}
+            smtp_port = {{ smtp_port|default('25') }}
+
             # Specifies the id of the user to authenticate with the SMTP server.
             # Default None (empty value).
             smtp_user = {{ smtp_user }}
+
             # Specifies the password for the authorized user.
             # Default None (empty value).
             smtp_password = {{ smtp_password }}
+
             # Specifies the path to a single file in PEM format containing the certificate.
             # https://docs.python.org/3/library/ssl.html#ssl.SSLContext.load_cert_chain
             # Default None (empty value).
             # smtp_client_cert =
+
             # Specifies the path to a file containing the private key in. Otherwise the
             # private key will be taken from certfile as well.
             # https://docs.python.org/3/library/ssl.html#ssl.SSLContext.load_cert_chain
             # Default None (empty value).
             # smtp_client_key =
+
             # Specifies the password for decrypting the private key. It will be ignored if
             # the private key is not encrypted and no password is needed.
             # https://docs.python.org/3/library/ssl.html#ssl.SSLContext.load_cert_chain
             # Default None (empty value).
             # smtp_client_key_pass =
+
             # Specifies the number of seconds to wait for SMTP to respond.
             smtp_timeout = 60
+
             # Specifies the type of secure connection to make. Options are: none,
             # starttls and ssl.
-            smtp_security = {{ smtp_security | default('none') }}
+            smtp_security = {{ smtp_security|default('none') }}
+
             # Specifies the From e-mail address value in the e-mails sent. Bounces will
             # be sent here.
             smtp_admin = {{ smtp_admin | default('root@localhost') }}
+
             # Time to wait, in milliseconds, between each e-mail sent to try to avoid
             # overloading the mail queue.
             smtp_delay = 0
+
             # Specifies the From: e-mail address value in the e-mails sent.
             # The default when unset is noreply@ipadefaultemaildomain.
             # This value can be found by running ipa config-show.
-            mail_from = {{ mail_from | default('noreply@ipadefaultemaildomain') }}
+            mail_from = {{ mail_from|default('noreply@ipadefaultemaildomain') }}
+
             # Specifies the From: name value in the e-mails-sent.
             # The default when unset is IPA-EPN.
-            # mail_from_name = {{ mail_from_name | default('IPA-EPN') }}
+            # mail_from_name = {{ mail_from_name|default('IPA-EPN') }}
+
             # The list of days before a password expiration when ipa-epn should notify
             # a user that their password will soon require a reset.
-            notify_ttls = {{ notify_ttls | default('28, 14, 7, 3, 1') }}
+            notify_ttls = {{ notify_ttls|default('28, 14, 7, 3, 1') }}
+
             # Set the subject of the message
             msg_subject = {{ msg_subject }}
+
             # Set the character set of the message.
             msg_charset = utf8
+
             # Set the message's MIME sub-content type.
-            msg_subtype = {{ msg_subtype | default('plain') }}
-        - dest: "/etc/ipa/epn/expire_msg.template"
+            msg_subtype = {{ msg_subtype|default('plain') }}
+        - dest: /etc/ipa/epn/expire_msg.template
           mode: '0644'
           content: |-
             <!DOCTYPE html>
@@ -122,6 +141,7 @@ foreman_hostgroup:
                                         </td>
                                     </tr>
                                 </table>
+
                                 <table style="background-color:#fff; border:1px solid #e1e1e1; width:100%;" cellpadding="0" cellspacing="0">
                                     <tr>
                                         <td style="padding-bottom: 20px; padding-left: 20px; padding-top: 20px; padding-right: 20px; font-family: 'Helvetica', 'Arial', sans-serif;">
@@ -129,14 +149,18 @@ foreman_hostgroup:
                                                 <p>
                                                     Liebe*r {{ '{{' }} first {{ '}}' }},
                                                 </p>
+
                                                 <p>
                                                     Dein Passwort wird am  {{ '{{' }} expiration | datetimeformat('long', 'Europe/Berlin', 'de_DE') {{ '}}' }} ablaufen.
                                                 </p>
+
                                                 <p>
                                                     Du kannst es ganz einfach mit unserem Self-Service unter <a href="https://my.rabe.ch" style="text-decoration: none; color:#2da6cb;">my.rabe.ch</a> erneuern.
                                                     Siehe auch <a href="https://wiki.rabe.ch/Erste_Schritte" style="text-decoration: none; color:#2da6cb;">wiki.rabe.ch/Erste_Schritte</a> in unserem Wiki.
                                                 </p>
+
                                                 <p>Liebe Grüsse</p>
+
                                                 <p><a href="mailto:it@rabe.ch" style="text-decoration: none; color:#2da6cb;">RaBe IT-Reaktion</a></p>
                                             </div>
                                         </td>
@@ -152,19 +176,25 @@ foreman_hostgroup:
                                                 <p>
                                                     Dear {{ '{{' }} first {{ '}}' }},
                                                 </p>
+
                                                 <p>
                                                     Your password will expire soon on {{ '{{' }} expiration | datetimeformat('long', 'Europe/Berlin') {{ '}}' }}.</p>
                                                 </p>
+
                                                 <p>
                                                     You can easily renew it using our self-service at <a href="https://my.rabe.ch" style="text-decoration: none; color:#2da6cb;">my.rabe.ch</a>.
                                                     See also <a href="https://wiki.rabe.ch/Erste_Schritte" style="text-decoration: none; color:#2da6cb;">wiki.rabe.ch/Erste_Schritte</a> in our wiki.
                                                 </p>
+
                                                 <p>Best wishes</p>
+
                                                 <p><a href="mailto:it@rabe.ch" style="text-decoration: none; color:#2da6cb;">RaBe IT-Reaktion</a></p>
                                             </div>
                                         </td>
                                     </tr>
+
                                 </table>
+
                                 <table cellpadding="0" cellspacing="0" border="0" style="width:100%">
                                     <tr>
                                         <td style="float:right; padding-top:10px; font-size:12px; display:inline-block; padding-left: 1px; text-align: right; font-family: 'Helvetica', 'Arial', sans-serif;">
@@ -185,9 +215,9 @@ foreman_hostgroup:
       parameter_type: string
       value: "{{ undef('variable smtp_user needs to be set in host') }}"
     - name: smtp_password
-      hidden_value: true
       parameter_type: string
-      value: "{{ undef('variable smtp_password needs to be set in host') }}"
+      value: "*****"
+      hidden_value: true
     - name: smtp_admin
       parameter_type: string
       value: it@rabe.ch
@@ -209,11 +239,11 @@ foreman_hostgroup:
         - path: "/etc/systemd/system/ipa-epn.timer.d"
           state: directory
           mode: '0755'
-    - name: systemd_enabled_units
+    - name: systemd_disabled_units
       parameter_type: yaml
       value:
         - ipa-epn.timer
-    - name: systemd_started_units
+    - name: systemd_stopped_units
       parameter_type: yaml
       value:
         - ipa-epn.timer

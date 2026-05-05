@@ -10,3 +10,14 @@ foreman_hostgroup:
   subnet: dmz
   compute_resource: server-008.dmz-admin.int.rabe.ch
   compute_profile: "1-Small"
+  lifecycle_environment: Dev
+  parameters:
+    - name: cockpit_certificates
+      parameter_type: yaml
+      value: []
+    - name: cockpit_packages
+      parameter_type: yaml
+      value: []
+    - name: remote_execution_ssh_keys
+      parameter_type: string
+      value: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDXayGRGotju+1QhlGZ0GZQVo9EEgOUWGoJaZiZ42LCsM8b/nLOWNUKRmmCoj6pDR0aOOYDUfGcK8EQlTvSLGgDAadnCQL36LF4s6T0Q0kIr151x8KM+rIO9DHCudmkVsE+WwsUevDTmvZkskMdg8hKKL8gusjmuSA50oHH+OChDa1zAsCbageM0unL2Xh7utFj8msGZOlz1bXhPwA42i7gCZZZexO9c4zZDfn277S1eld0uHaddIRmx6+KwW4Ko/kgQo/kVbCC1Av0FRG0GmyFAZvM0+pKdiomFKYaYhwRiQilAhHLBg5lipqtlCsidgkqPLB2aajaPHcAIZ/grIYg2JwZNc8j/7zDybSp93slPPDVAynA7ZB179iNz2mZMNPMj4D4iWduLjFkvRaCEkheMgmf7VjeKTc/SId9qGV/ereTK/Z2m54wnl89NJWySOyIG89s4rLGaxsYum1jSZAQ3J9HKWv0s1oPXqJHft7psD06XZORopHqPUdjqvTwxErvh2Me4mF0rfaHSFM1qbjCfwG9hzB4B0nrPNqgB60tssRbDbAHIiER76TM8eKACsxSZvhEGc5PKPazfX+7y24Y10mn5dHwQKfg9vL+lzRd8zNqqWVDVXYjyeDkAWc4RU20D0swFeLWt+gYVWkT7WRFCGe+FCF1myIYMxlyGNRuPw== backup@vm-1001.service.int.rabe.ch

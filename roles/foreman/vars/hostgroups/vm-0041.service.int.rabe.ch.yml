@@ -1,11 +1,12 @@
 ---
 foreman_hostgroup:
   name: vm-0041.service.int.rabe.ch
-  description: AlmaLinux 9 VM for Kanboard project management tool
+  description: New Kanboard Host
   parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
   organization: RaBe
   locations:
     - Sulgenrain
+  subnet: service-temp
   ansible_roles:
     - radiorabe.common.selinux_modules
     - redhat.rhel_system_roles.certificate
@@ -15,9 +16,6 @@ foreman_hostgroup:
     - radiorabe.common.files
     - redhat.rhel_system_roles.podman
   parameters:
-    - name: additional-packages
-      parameter_type: string
-      value: git
     - name: certificate_requests
       parameter_type: yaml
       value:
@@ -28,20 +26,18 @@ foreman_hostgroup:
           principal: HTTP/kanboard-new.service.int.rabe.ch@INT.RABE.CH
           key_size: 4096
           run_after: |
-            /usr/bin/cp /etc/pki/tls/*/kanboard.* /home/kanboard/ssl/\n
-            /usr/bin/chown kanboard: /home/kanboard/ssl/*\n
-            cd /home/kanboard\n
+            /usr/bin/cp /etc/pki/tls/*/kanboard.* /home/kanboard/ssl/
+            /usr/bin/chown kanboard: /home/kanboard/ssl/*
+            cd /home/kanboard
             /usr/bin/sudo -u kanboard /usr/bin/podman pod restart kanboard
     - name: kanboard_db_password
       parameter_type: string
-      hidden_value: true
       value: "{{ undef('variable kanboard_db_password needs to be set in host') }}"
     - name: kanboard_db_user
       parameter_type: string
       value: "{{ undef('variable kanboard_db_user needs to be set in host') }}"
     - name: kanboard_ldap_password
       parameter_type: string
-      hidden_value: true
       value: "{{ undef('variable kanboard_ldap_password needs to be set in host') }}"
     - name: kanboard_ldap_server
       parameter_type: string
@@ -49,15 +45,6 @@ foreman_hostgroup:
     - name: kanboard_ldap_username
       parameter_type: string
       value: "{{ undef('variable kanboard_ldap_username needs to be set in host') }}"
-    - name: kanboard_smtp_hostname
-      parameter_type: string
-      value: "{{ undef('variable kanboard_smtp_hostname needs to be set in host') }}"
-    - name: kanboard_smtp_password
-      parameter_type: string
-      value: "{{ undef('variable kanboard_smtp_password needs to be set in host') }}"
-    - name: kanboard_smtp_username
-      parameter_type: string
-      value: "{{ undef('variable kanboard_smtp_username needs to be set in host') }}"
     - name: kanboard_reverse_proxy_default_admin
       parameter_type: string
       value: "{{ undef('variable kanboard_reverse_proxy_default_admin needs to be set in host') }}"
@@ -105,19 +92,21 @@ foreman_hostgroup:
                     - containerPort: 443
                       hostPort: 443
                   volumeMounts:
-                    - mountPath: "/var/www/app/data:Z"
+                    - mountPath: /var/www/app/data:Z
                       name: kanboard_data
-                    - mountPath: "/var/www/app/plugins:Z"
+                    - mountPath: /var/www/app/plugins:Z
                       name: kanboard_plugins
-                    - mountPath: "/etc/nginx/ssl:ro,Z"
+                    - mountPath: /etc/nginx/ssl:ro,Z
                       name: kanboard_ssl
-                    - mountPath: "/etc/ssl/certs/ca-certificates.crt:ro"
+                    - mountPath: /etc/ssl/certs/ca-certificates.crt:ro
                       name: ca_certs
-                    - mountPath: "/etc/php84/conf.d/z.ini:ro,Z"
+                    - mountPath: /etc/php84/conf.d/z.ini:ro,Z
                       name: php_fpm_ini
                   env:
+                    - name: TRUSTED_PROXY_NETWORKS
+                      value: 127.0.0.1/32,::1/128
                     - name: DEBUG
-                      value: false
+                      value: true
                     - name: LOG_DRIVER
                       value: system
                     - name: DB_DRIVER
@@ -129,7 +118,7 @@ foreman_hostgroup:
                     - name: DB_HOSTNAME
                       value: postgresql.service.int.rabe.ch
                     - name: DB_NAME
-                      value: kanboard
+                      value: kanboard-new
                     - name: PLUGIN_INSTALLER
                       value: true
                     - name: MAIL_FROM
@@ -142,6 +131,8 @@ foreman_hostgroup:
                       value: "{{ kanboard_mail_smtp_username }}"
                     - name: MAIL_SMTP_PASSWORD
                       value: "{{ kanboard_mail_smtp_password }}"
+                    - name: LDAP_AUTH
+                      value: true
                     - name: LDAP_SERVER
                       value: "{{ kanboard_ldap_server }}"
                     - name: LDAP_BIND_TYPE
@@ -150,26 +141,24 @@ foreman_hostgroup:
                       value: "{{ kanboard_ldap_username }}"
                     - name: LDAP_PASSWORD
                       value: "{{ kanboard_ldap_password }}"
-                    - name: LDAP_USER_BASE_DN
-                      value: cn=users,cn=accounts,dc=int,dc=rabe,dc=ch
-                    - name: LDAP_USER_FILTER
-                      value: uid=%s
                     - name: LDAP_GROUP_ADMIN_DN
-                      value: cn=kanboard-admins,cn=groups,cn=accounts,dc=int,dc=rabe,dc=ch
+                      value: cn=kanboard-admins,cn=groups,cn=compat,dc=int,dc=rabe,dc=ch
                     - name: LDAP_GROUP_MANAGER_DN
-                      value: cn=kanboard-managers,cn=groups,cn=accounts,dc=int,dc=rabe,dc=ch
+                      value: cn=kanboard-managers,cn=groups,cn=compat,dc=int,dc=rabe,dc=ch
                     - name: LDAP_GROUP_PROVIDER
                       value: true
                     - name: LDAP_GROUP_BASE_DN
-                      value: cn=groups,cn=accounts,dc=int,dc=rabe,dc=ch
+                      value: cn=groups,cn=compat,dc=int,dc=rabe,dc=ch
                     - name: LDAP_GROUP_FILTER
-                      value: "(&(objectClass=groupofnames)(cn=%s*))"
-                    - name: TRUSTED_PROXY_NETWORKS
-                      value: 127.0.0.1/32,::1/128
-                    - name: REVERSE_PROXY_AUTH
-                      value: true
-                    - name: REVERSE_PROXY_DEFAULT_ADMIN
-                      value: "{{ kanboard_reverse_proxy_default_admin }}"
+                      value: (&(objectClass=posixGroup)(cn=*%s*))
+                    - name: LDAP_GROUP_USER_ATTRIBUTE
+                      value: memberUid
+                    - name: LDAP_GROUP_USER_FILTER
+                      value: (&(objectClass=posixGroup)(memberUid=%s))
+                    - name: LDAP_USER_BASE_DN
+                      value: cn=users,cn=compat,dc=int,dc=rabe,dc=ch
+                    - name: LDAP_USER_FILTER
+                      value: uid=%s
                     - name: REMEMBER_ME_AUTH
                       value: false
                     - name: ENABLE_URL_REWRITE
@@ -178,6 +167,8 @@ foreman_hostgroup:
                       value: true
                     - name: DISABLE_LOGOUT
                       value: true
+                    - name: TRUSTED_PROXY_NETWORKS
+                      value: 10.88.0.0/16
               volumes:
                 - name: kanboard_data
                   hostPath:
@@ -193,7 +184,7 @@ foreman_hostgroup:
                     type: Directory
                 - name: ca_certs
                   hostPath:
-                    path: "/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt"
+                    path: /etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
                     type: File
                 - name: php_fpm_ini
                   hostPath:
@@ -299,7 +290,6 @@ foreman_hostgroup:
       value:
         - name: container_read_certs
           state: true
-          persistent: true
     - name: selinux_fcontexts
       parameter_type: yaml
       value:
@@ -311,3 +301,16 @@ foreman_hostgroup:
       parameter_type: yaml
       value:
         - /etc/certmonger/post-scripts/
+    - name: kanboard_mail_smtp_hostname
+      parameter_type: string
+      value: "{{ undef('variable kanboard_smtp_hostname needs to be set in host') }}"
+    - name: kanboard_mail_smtp_password
+      parameter_type: string
+      value: "{{ undef('variable kanboard_smtp_password needs to be set in host') }}"
+    - name: kanboard_mail_smtp_username
+      parameter_type: string
+      value: "{{ undef('variable kanboard_smtp_username needs to be set in host') }}"
+    - name: rabe_backup_include_paths
+      parameter_type: yaml
+      value:
+        - /home/kanboard

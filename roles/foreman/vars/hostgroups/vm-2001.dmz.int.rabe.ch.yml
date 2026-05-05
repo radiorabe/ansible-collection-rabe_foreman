@@ -6,6 +6,10 @@ foreman_hostgroup:
   organization: RaBe
   locations:
     - Sulgenrain
+  domain: dmz.int.rabe.ch
+  subnet: dmz
+  lifecycle_environment: Dev
+  compute_resource: server-008.dmz-admin.int.rabe.ch
   ansible_roles:
     - radiorabe.common.local_user
     - radiorabe.common.git_clone
@@ -54,19 +58,18 @@ foreman_hostgroup:
     - name: podman_kube_specs
       parameter_type: yaml
       value:
-        - state: started
-          kube_file_content:
+        - kube_file_content:
             apiVersion: v1
             kind: Pod
             metadata:
               name: revproxy
             spec:
               containers:
-                - name: revproxy
-                  image: ghcr.io/radiorabe/httpd:0.6.2
-                  env:
+                - env:
                     - name: PODMAN_HOST
-                      value: "{{ '{{ ansible_host }}' }}"
+                      value: "{{ ansible_host }}"
+                  image: ghcr.io/radiorabe/httpd:0.6.2
+                  name: revproxy
                   ports:
                     - containerPort: 8080
                       hostPort: 8080
@@ -75,22 +78,23 @@ foreman_hostgroup:
                     - containerPort: 8443
                       hostPort: 8443
                   volumeMounts:
-                    - mountPath: "/etc/httpd/conf.d/local_configs:Z"
+                    - mountPath: /etc/httpd/conf.d/local_configs:Z
                       name: local_httpd_configs
-                    - mountPath: "/etc/httpd/modsecurity.d/local_rules:Z"
+                    - mountPath: /etc/httpd/modsecurity.d/local_rules:Z
                       name: local_modsec_rules
-                    - mountPath: "/etc/pki/tls/private/rabe_certs:Z"
+                    - mountPath: /etc/pki/tls/private/rabe_certs:Z
                       name: local_letsencrypt_certs
               volumes:
-                - name: local_httpd_configs
-                  hostPath:
-                    path: "/home/revproxy/httpd/conf.d/local_configs"
-                - name: local_modsec_rules
-                  hostPath:
-                    path: "/home/revproxy/httpd/modsecurity.d/local_rules"
-                - name: local_letsencrypt_certs
-                  hostPath:
-                    path: "/home/revproxy/httpd/rabe_certs"
+                - hostPath:
+                    path: /home/revproxy/httpd/conf.d/local_configs
+                  name: local_httpd_configs
+                - hostPath:
+                    path: /home/revproxy/httpd/modsecurity.d/local_rules
+                  name: local_modsec_rules
+                - hostPath:
+                    path: /home/revproxy/httpd/rabe_certs
+                  name: local_letsencrypt_certs
+          state: started
     - name: podman_run_as_group
       parameter_type: string
       value: revproxy
@@ -114,20 +118,9 @@ foreman_hostgroup:
           log_size_max: 1073741824 # 1Gib in bytes
         network:
           default_rootless_network_cmd: slirp4netns
-    - name: radiorabe_git_clone
-      parameter_type: yaml
-      value:
-        - repo: "https://{{ radiorabe_git_clone_pat }}@github.com/radiorabe/reverse-proxy-configuration.git"
-          dest: "/tmp/reverse-proxy-configuration"
-          separate_git_dir: "/tmp/reverse-proxy-configuration-git"
-          single_branch: true
-          version: "main"
     - name: radiorabe_git_local_clone
       parameter_type: boolean
       value: true
-    - name: radiorabe_git_clone_pat
-      parameter_type: string
-      value: "{{ undef('variable radiorabe_git_clone_pat needs to be set in host') }}"
     - name: radiorabe_git_clone_remote_dest
       parameter_type: string
       value: /home/revproxy
