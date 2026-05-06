@@ -1,7 +1,7 @@
 ---
 foreman_hostgroup:
   name: vm-0041.service.int.rabe.ch
-  description: New Kanboard Host
+  description: AlmaLinux 9 VM for Kanboard project management tool
   parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
   organization: RaBe
   locations:
@@ -290,6 +290,7 @@ foreman_hostgroup:
       value:
         - name: container_read_certs
           state: true
+          persistent: true
     - name: selinux_fcontexts
       parameter_type: yaml
       value:
