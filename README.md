@@ -68,6 +68,66 @@ and writes YAML files into `roles/foreman/vars/hostgroups/`.
    git diff roles/foreman/vars/hostgroups/
    ```
 
+### Jinja2 in hostgroup vars
+
+Hostgroup files in `roles/foreman/vars/hostgroups/` are regular Ansible vars first and
+Foreman data second. Jinja2 in those files is therefore rendered by this collection
+unless it is escaped on purpose.
+
+If a value must reach Foreman as a literal template for later evaluation on the host,
+escape the outer expression:
+
+```yaml
+parameters:
+  - name: cockpit_certificates
+    parameter_type: yaml
+    value:
+      - dns:
+          - "{{ '{{ ansible_host }}' }}"
+        principal: "HTTP/{{ '{{ ansible_host }}' }}@INT.RABE.CH"
+```
+
+Use plain Jinja2 when resolving the value while applying the hostgroup is acceptable
+or desired:
+
+```yaml
+parameters:
+  - name: example_secret
+    parameter_type: string
+    value: "{{ undef('variable example_secret needs to be set in host') }}"
+  - name: example_yaml_config
+    parameter_type: yaml
+    value:
+      secret: "{{ example_secret }}"
+  - name: example_b64_config
+    parameter_type: yaml
+    value:
+      secret: "{{ example_secret | ansible.builtin.b64encode }}"
+```
+
+If the nested value must also stay as a template inside Foreman, escape the whole
+expression instead:
+
+```yaml
+parameters:
+  - name: example_runtime_yaml_config
+    parameter_type: yaml
+    value:
+      secret: "{{ '{{ example_secret }}' }}"
+  - name: example_runtime_b64_config
+    parameter_type: yaml
+    value:
+      secret: "{{ '{{ example_secret | ansible.builtin.b64encode }}' }}"
+```
+
+Templates in comments or generated text can use whichever form is more useful for the
+resulting data. For example, rendering `# {{ ansible_managed }}` while applying the
+hostgroup is acceptable when Foreman does not need to keep it as a live template.
+
+The hostgroup dumper cannot reliably infer which templates should stay literal in
+Foreman, so always review dumped files and re-escape values as needed before
+committing them.
+
 ### Adding a Product and Repositories
 
 * add the product and repo in `roles/content/tasks/products.yml`

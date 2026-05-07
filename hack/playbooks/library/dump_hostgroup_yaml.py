@@ -68,6 +68,66 @@ def _to_yaml_node(value):
     return value
 
 
+def _is_jinja_string(value):
+    return isinstance(value, str) and (
+        ("{{" in value and "}}" in value) or ("{%" in value and "%}" in value)
+    )
+
+
+def _unwrap_escaped_jinja_string(value):
+    if not isinstance(value, str):
+        return None
+
+    match = re.fullmatch(
+        r"""\s*\{\{\s*(?P<quote>['"])(?P<body>.*?)(?P=quote)\s*\}\}\s*""",
+        value,
+        re.DOTALL,
+    )
+    if not match:
+        return None
+
+    body = match.group("body")
+    if _is_jinja_string(body):
+        return body
+
+    return None
+
+
+def _merge_value_preserving_existing_jinja(existing_value, new_value):
+    escaped_existing_jinja = _unwrap_escaped_jinja_string(existing_value)
+    if (
+        escaped_existing_jinja is not None
+        and isinstance(new_value, str)
+        and new_value == escaped_existing_jinja
+    ):
+        return existing_value
+
+    if isinstance(existing_value, CommentedMap) and isinstance(new_value, dict):
+        merged = CommentedMap()
+        for key, value in new_value.items():
+            if key in existing_value:
+                merged[key] = _merge_value_preserving_existing_jinja(
+                    existing_value[key], value
+                )
+            else:
+                merged[key] = _to_yaml_node(value)
+        return merged
+
+    if isinstance(existing_value, CommentedSeq) and isinstance(new_value, list):
+        if len(existing_value) != len(new_value):
+            # A length change means we cannot safely align old and new items,
+            # so we prefer the freshly fetched Foreman value over preserving
+            # possibly unrelated escaped templates by position.
+            return _to_yaml_node(new_value)
+
+        merged = CommentedSeq()
+        for current_item, value in zip(existing_value, new_value):
+            merged.append(_merge_value_preserving_existing_jinja(current_item, value))
+        return merged
+
+    return _to_yaml_node(new_value)
+
+
 def _json_equal(a, b):
     return json.dumps(_to_plain(a), sort_keys=True) == json.dumps(
         _to_plain(b), sort_keys=True
@@ -213,7 +273,9 @@ def _merge_parameter_seq(existing_seq, new_params):
             for key, value in param.items():
                 if key in existing_item and _plain_equal(existing_item[key], value):
                     continue
-                existing_item[key] = _to_yaml_node(value)
+                existing_item[key] = _merge_value_preserving_existing_jinja(
+                    existing_item.get(key), value
+                )
 
             # Keep predictable key order inside each parameter item.
             for key in param.keys():
