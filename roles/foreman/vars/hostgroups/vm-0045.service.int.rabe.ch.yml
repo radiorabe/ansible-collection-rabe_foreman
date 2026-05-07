@@ -216,8 +216,7 @@ foreman_hostgroup:
       value: "{{ undef('variable smtp_user needs to be set in host') }}"
     - name: smtp_password
       parameter_type: string
-      value: "*****"
-      hidden_value: true
+      value: "{{ undef('variable smtp_password needs to be set in host') }}"
     - name: smtp_admin
       parameter_type: string
       value: it@rabe.ch
