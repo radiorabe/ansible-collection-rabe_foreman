@@ -69,8 +69,8 @@ def _to_yaml_node(value):
 
 
 def _is_jinja_string(value):
-    return isinstance(value, str) and bool(
-        re.search(r"({{.*?}}|{%.*?%})", value, re.DOTALL)
+    return isinstance(value, str) and (
+        ("{{" in value and "}}" in value) or ("{%" in value and "%}" in value)
     )
 
 
@@ -79,7 +79,7 @@ def _unwrap_escaped_jinja_string(value):
         return None
 
     match = re.fullmatch(
-        r"""\s*\{\{\s*(?P<quote>['"])(?P<body>.*)(?P=quote)\s*\}\}\s*""",
+        r"""\s*\{\{\s*(?P<quote>['"])(?P<body>.*?)(?P=quote)\s*\}\}\s*""",
         value,
         re.DOTALL,
     )

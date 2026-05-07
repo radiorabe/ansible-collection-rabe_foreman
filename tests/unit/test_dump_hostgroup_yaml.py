@@ -19,7 +19,7 @@ assert SPEC.loader is not None
 SPEC.loader.exec_module(MODULE)
 
 
-class MergeParameterSeqTest(unittest.TestCase):
+class ParameterMergingTest(unittest.TestCase):
     def test_preserves_existing_escaped_jinja_in_nested_parameter_value(self):
         yaml = MODULE._yaml_loader()
         existing = yaml.load(
