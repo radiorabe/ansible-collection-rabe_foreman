@@ -108,7 +108,7 @@ foreman_hostgroup:
             msg_charset = utf8
 
             # Set the message's MIME sub-content type.
-            msg_subtype = {{ msg_subtype|default('plain') }}
+            msg_subtype = {{ msg_subtype | default('plain') }}
         - dest: /etc/ipa/epn/expire_msg.template
           mode: '0644'
           content: |-
