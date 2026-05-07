@@ -7,7 +7,3 @@ foreman_hostgroup:
   locations:
     - Sulgenrain
   compute_resource: ovirt
-  parameters:
-    - name: kdump_reboot_ok
-      parameter_type: boolean
-      value: true
