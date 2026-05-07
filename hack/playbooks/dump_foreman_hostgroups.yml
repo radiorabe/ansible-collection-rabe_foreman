@@ -10,6 +10,8 @@
 #
 # It has some limitations:
 # - Multi-line strings and jinja2 templates are not always dumped properly
+# - The dumper cannot reliably decide which templates should stay literal
+#   for Foreman, so escaped templates may need manual cleanup
 # - It doesn't preserve file-first ordering for deeply nested YAML
 # - It seems to be too eager in dumping some inherited values:
 #   - operatingsystem
