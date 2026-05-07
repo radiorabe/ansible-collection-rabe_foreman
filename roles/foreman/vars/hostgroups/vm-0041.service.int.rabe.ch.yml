@@ -176,8 +176,6 @@ foreman_hostgroup:
                       value: true
                     - name: DISABLE_LOGOUT
                       value: true
-                    - name: TRUSTED_PROXY_NETWORKS
-                      value: 10.88.0.0/16
               volumes:
                 - name: kanboard_data
                   hostPath:
