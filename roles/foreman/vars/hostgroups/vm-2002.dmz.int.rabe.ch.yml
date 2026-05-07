@@ -75,22 +75,22 @@ foreman_hostgroup:
                     - containerPort: 8443
                       hostPort: 8443
                   volumeMounts:
-                    - mountPath: "/etc/httpd/conf.d/local_configs:Z"
+                    - mountPath: /etc/httpd/conf.d/local_configs:Z
                       name: local_httpd_configs
-                    - mountPath: "/etc/httpd/modsecurity.d/local_rules:Z"
+                    - mountPath: /etc/httpd/modsecurity.d/local_rules:Z
                       name: local_modsec_rules
-                    - mountPath: "/etc/pki/tls/private/rabe_certs:Z"
+                    - mountPath: /etc/pki/tls/private/rabe_certs:Z
                       name: local_letsencrypt_certs
               volumes:
                 - name: local_httpd_configs
                   hostPath:
-                    path: "/home/revproxy/httpd/conf.d/local_configs"
+                    path: /home/revproxy/httpd/conf.d/local_configs
                 - name: local_modsec_rules
                   hostPath:
-                    path: "/home/revproxy/httpd/modsecurity.d/local_rules"
+                    path: /home/revproxy/httpd/modsecurity.d/local_rules
                 - name: local_letsencrypt_certs
                   hostPath:
-                    path: "/home/revproxy/httpd/rabe_certs"
+                    path: /home/revproxy/httpd/rabe_certs
     - name: podman_run_as_group
       parameter_type: string
       value: revproxy

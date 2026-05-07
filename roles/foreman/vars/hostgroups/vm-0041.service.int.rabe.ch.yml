@@ -103,15 +103,15 @@ foreman_hostgroup:
                     - containerPort: 443
                       hostPort: 443
                   volumeMounts:
-                    - mountPath: "/var/www/app/data:Z"
+                    - mountPath: /var/www/app/data:Z
                       name: kanboard_data
-                    - mountPath: "/var/www/app/plugins:Z"
+                    - mountPath: /var/www/app/plugins:Z
                       name: kanboard_plugins
-                    - mountPath: "/etc/nginx/ssl:ro,Z"
+                    - mountPath: /etc/nginx/ssl:ro,Z
                       name: kanboard_ssl
-                    - mountPath: "/etc/ssl/certs/ca-certificates.crt:ro"
+                    - mountPath: /etc/ssl/certs/ca-certificates.crt:ro
                       name: ca_certs
-                    - mountPath: "/etc/php84/conf.d/z.ini:ro,Z"
+                    - mountPath: /etc/php84/conf.d/z.ini:ro,Z
                       name: php_fpm_ini
                   env:
                     - name: DEBUG
@@ -191,7 +191,7 @@ foreman_hostgroup:
                     type: Directory
                 - name: ca_certs
                   hostPath:
-                    path: "/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt"
+                    path: /etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
                     type: File
                 - name: php_fpm_ini
                   hostPath:

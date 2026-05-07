@@ -16,16 +16,17 @@ foreman_hostgroup:
     - name: radiorabe_copies
       parameter_type: yaml
       value:
-        - dest: "/etc/systemd/system/ipa-epn.timer.d/override.conf"
+        - dest: /etc/systemd/system/ipa-epn.timer.d/override.conf
           mode: '0644'
           content: |
             [Unit]
             Description=
             Description=Execute IPA Expiring Password Notification (EPN) every day at 3AM
+
             [Timer]
             OnCalendar=
             OnCalendar=*-*-* 03:00:00
-        - dest: "/etc/ipa/epn.conf"
+        - dest: /etc/ipa/epn.conf
           mode: '0600'
           content: |
             # This file is a copy from https://github.com/freeipa/freeipa/blob/master/client/share/epn.conf
@@ -90,7 +91,7 @@ foreman_hostgroup:
             msg_charset = utf8
             # Set the message's MIME sub-content type.
             msg_subtype = {{ msg_subtype | default('plain') }}
-        - dest: "/etc/ipa/epn/expire_msg.template"
+        - dest: /etc/ipa/epn/expire_msg.template
           mode: '0644'
           content: |-
             <!DOCTYPE html>
