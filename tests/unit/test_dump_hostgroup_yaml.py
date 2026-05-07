@@ -73,6 +73,33 @@ class MergeParameterSeqTest(unittest.TestCase):
 
         self.assertEqual(MODULE._to_plain(merged)[0]["value"], "new-value")
 
+    def test_updates_when_literal_template_changes(self):
+        yaml = MODULE._yaml_loader()
+        existing = yaml.load(
+            """
+            parameters:
+              - name: example_secret
+                parameter_type: string
+                value: "{{ '{{ example_secret }}' }}"
+            """
+        )["parameters"]
+
+        merged = MODULE._merge_parameter_seq(
+            existing,
+            [
+                {
+                    "name": "example_secret",
+                    "parameter_type": "string",
+                    "value": "{{ different_secret }}",
+                }
+            ],
+        )
+
+        self.assertEqual(
+            MODULE._to_plain(merged)[0]["value"],
+            "{{ different_secret }}",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

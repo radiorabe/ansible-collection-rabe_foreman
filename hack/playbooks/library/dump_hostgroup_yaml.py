@@ -69,11 +69,37 @@ def _to_yaml_node(value):
 
 
 def _is_jinja_string(value):
-    return isinstance(value, str) and ("{{" in value or "{%" in value)
+    return isinstance(value, str) and bool(
+        re.search(r"({{.*?}}|{%.*?%})", value, re.DOTALL)
+    )
+
+
+def _unwrap_escaped_jinja_string(value):
+    if not isinstance(value, str):
+        return None
+
+    match = re.fullmatch(
+        r"""\s*\{\{\s*(?P<quote>['"])(?P<body>.*)(?P=quote)\s*\}\}\s*""",
+        value,
+        re.DOTALL,
+    )
+    if not match:
+        return None
+
+    body = match.group("body")
+    if _is_jinja_string(body):
+        return body
+
+    return None
 
 
 def _merge_value_preserving_existing_jinja(existing_value, new_value):
-    if _is_jinja_string(existing_value):
+    escaped_existing_jinja = _unwrap_escaped_jinja_string(existing_value)
+    if (
+        escaped_existing_jinja is not None
+        and isinstance(new_value, str)
+        and new_value == escaped_existing_jinja
+    ):
         return existing_value
 
     if isinstance(existing_value, CommentedMap) and isinstance(new_value, dict):
@@ -89,6 +115,9 @@ def _merge_value_preserving_existing_jinja(existing_value, new_value):
 
     if isinstance(existing_value, CommentedSeq) and isinstance(new_value, list):
         if len(existing_value) != len(new_value):
+            # A length change means we cannot safely align old and new items,
+            # so we prefer the freshly fetched Foreman value over preserving
+            # possibly unrelated escaped templates by position.
             return _to_yaml_node(new_value)
 
         merged = CommentedSeq()
