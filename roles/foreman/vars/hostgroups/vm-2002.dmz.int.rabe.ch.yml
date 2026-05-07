@@ -85,15 +85,16 @@ foreman_hostgroup:
                     - mountPath: /etc/pki/tls/private/rabe_certs:Z
                       name: local_letsencrypt_certs
               volumes:
-                - name: local_httpd_configs
-                  hostPath:
+                - hostPath:
                     path: /home/revproxy/httpd/conf.d/local_configs
-                - name: local_modsec_rules
-                  hostPath:
+                  name: local_httpd_configs
+                - hostPath:
                     path: /home/revproxy/httpd/modsecurity.d/local_rules
-                - name: local_letsencrypt_certs
-                  hostPath:
+                  name: local_modsec_rules
+                - hostPath:
                     path: /home/revproxy/httpd/rabe_certs
+                  name: local_letsencrypt_certs
+          state: started
     - name: podman_run_as_group
       parameter_type: string
       value: revproxy
