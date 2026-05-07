@@ -47,13 +47,13 @@ foreman_hostgroup:
       value: "{{ undef('variable kanboard_ldap_username needs to be set in host') }}"
     - name: kanboard_mail_smtp_hostname
       parameter_type: string
-      value: "{{ undef('variable kanboard_mail_smtp_hostname needs to be set in host') }}"
+      value: "{{ undef('variable kanboard_smtp_hostname needs to be set in host') }}"
     - name: kanboard_mail_smtp_password
       parameter_type: string
-      value: "{{ undef('variable kanboard_mail_smtp_password needs to be set in host') }}"
+      value: "{{ undef('variable kanboard_smtp_password needs to be set in host') }}"
     - name: kanboard_mail_smtp_username
       parameter_type: string
-      value: "{{ undef('variable kanboard_mail_smtp_username needs to be set in host') }}"
+      value: "{{ undef('variable kanboard_smtp_username needs to be set in host') }}"
     - name: kanboard_reverse_proxy_default_admin
       parameter_type: string
       value: "{{ undef('variable kanboard_reverse_proxy_default_admin needs to be set in host') }}"
@@ -315,16 +315,3 @@ foreman_hostgroup:
       parameter_type: yaml
       value:
         - /etc/certmonger/post-scripts/
-    - name: kanboard_mail_smtp_hostname
-      parameter_type: string
-      value: "{{ undef('variable kanboard_smtp_hostname needs to be set in host') }}"
-    - name: kanboard_mail_smtp_password
-      parameter_type: string
-      value: "{{ undef('variable kanboard_smtp_password needs to be set in host') }}"
-    - name: kanboard_mail_smtp_username
-      parameter_type: string
-      value: "{{ undef('variable kanboard_smtp_username needs to be set in host') }}"
-    - name: rabe_backup_include_paths
-      parameter_type: yaml
-      value:
-        - /home/kanboard
