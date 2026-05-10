@@ -148,18 +148,14 @@ foreman_hostgroup:
                                                 <p>
                                                     Liebe*r {{ '{{' }} first {{ '}}' }},
                                                 </p>
-
                                                 <p>
                                                     Dein Passwort wird am  {{ '{{' }} expiration | datetimeformat('long', 'Europe/Berlin', 'de_DE') {{ '}}' }} ablaufen.
                                                 </p>
-
                                                 <p>
                                                     Du kannst es ganz einfach mit unserem Self-Service unter <a href="https://my.rabe.ch" style="text-decoration: none; color:#2da6cb;">my.rabe.ch</a> erneuern.
                                                     Siehe auch <a href="https://wiki.rabe.ch/Erste_Schritte" style="text-decoration: none; color:#2da6cb;">wiki.rabe.ch/Erste_Schritte</a> in unserem Wiki.
                                                 </p>
-
                                                 <p>Liebe Grüsse</p>
-
                                                 <p><a href="mailto:it@rabe.ch" style="text-decoration: none; color:#2da6cb;">RaBe IT-Reaktion</a></p>
                                             </div>
                                         </td>
@@ -175,25 +171,19 @@ foreman_hostgroup:
                                                 <p>
                                                     Dear {{ '{{' }} first {{ '}}' }},
                                                 </p>
-
                                                 <p>
                                                     Your password will expire soon on {{ '{{' }} expiration | datetimeformat('long', 'Europe/Berlin') {{ '}}' }}.</p>
                                                 </p>
-
                                                 <p>
                                                     You can easily renew it using our self-service at <a href="https://my.rabe.ch" style="text-decoration: none; color:#2da6cb;">my.rabe.ch</a>.
                                                     See also <a href="https://wiki.rabe.ch/Erste_Schritte" style="text-decoration: none; color:#2da6cb;">wiki.rabe.ch/Erste_Schritte</a> in our wiki.
                                                 </p>
-
                                                 <p>Best wishes</p>
-
                                                 <p><a href="mailto:it@rabe.ch" style="text-decoration: none; color:#2da6cb;">RaBe IT-Reaktion</a></p>
                                             </div>
                                         </td>
                                     </tr>
-
                                 </table>
-
                                 <table cellpadding="0" cellspacing="0" border="0" style="width:100%">
                                     <tr>
                                         <td style="float:right; padding-top:10px; font-size:12px; display:inline-block; padding-left: 1px; text-align: right; font-family: 'Helvetica', 'Arial', sans-serif;">
