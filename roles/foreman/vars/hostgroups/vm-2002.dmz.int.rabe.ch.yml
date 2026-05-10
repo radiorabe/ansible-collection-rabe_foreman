@@ -58,18 +58,19 @@ foreman_hostgroup:
     - name: podman_kube_specs
       parameter_type: yaml
       value:
-        - kube_file_content:
+        - state: started]
+          kube_file_content:
             apiVersion: v1
             kind: Pod
             metadata:
               name: revproxy
             spec:
               containers:
-                - env:
+                - name: revproxy
+                  image: ghcr.io/radiorabe/httpd:0.6.2
+                  env:
                     - name: PODMAN_HOST
                       value: "{{ '{{ ansible_host }}' }}"
-                  image: ghcr.io/radiorabe/httpd:0.6.2
-                  name: revproxy
                   ports:
                     - containerPort: 8080
                       hostPort: 8080
@@ -85,16 +86,15 @@ foreman_hostgroup:
                     - mountPath: /etc/pki/tls/private/rabe_certs:Z
                       name: local_letsencrypt_certs
               volumes:
-                - hostPath:
+                - name: local_httpd_configs
+                  hostPath:
                     path: /home/revproxy/httpd/conf.d/local_configs
-                  name: local_httpd_configs
-                - hostPath:
+                - name: local_modsec_rules
+                  hostPath:
                     path: /home/revproxy/httpd/modsecurity.d/local_rules
-                  name: local_modsec_rules
-                - hostPath:
+                - name: local_letsencrypt_certs
+                  hostPath:
                     path: /home/revproxy/httpd/rabe_certs
-                  name: local_letsencrypt_certs
-          state: started
     - name: podman_run_as_group
       parameter_type: string
       value: revproxy
