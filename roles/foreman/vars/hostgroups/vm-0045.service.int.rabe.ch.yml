@@ -28,6 +28,9 @@ foreman_hostgroup:
             OnCalendar=*-*-* 03:00:00
         - dest: /etc/ipa/epn.conf
           mode: '0600'
+          # The file was copied verbatim from the mentioned URL and only jinja expressions were added.
+          # Do not clean up whitespace or remove the comments, they stay here to help us diff the file
+          # when we align it with future upstream changes.
           content: |
             # This file is a copy from https://github.com/freeipa/freeipa/blob/master/client/share/epn.conf
             #
