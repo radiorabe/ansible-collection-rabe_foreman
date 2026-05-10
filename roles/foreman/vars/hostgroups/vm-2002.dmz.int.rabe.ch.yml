@@ -67,7 +67,7 @@ foreman_hostgroup:
               containers:
                 - env:
                     - name: PODMAN_HOST
-                      value: "{{ ansible_host }}"
+                      value: "{{ '{{ ansible_host }}' }}"
                   image: ghcr.io/radiorabe/httpd:0.6.2
                   name: revproxy
                   ports:
