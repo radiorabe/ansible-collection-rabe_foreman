@@ -15,9 +15,6 @@ foreman_hostgroup:
     - radiorabe.common.files
     - redhat.rhel_system_roles.podman
   parameters:
-    - name: additional-packages
-      parameter_type: string
-      value: git
     - name: certificate_requests
       parameter_type: yaml
       value:
