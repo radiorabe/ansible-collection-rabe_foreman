@@ -6,12 +6,3 @@ foreman_hostgroup:
   organization: RaBe
   locations:
     - Sulgenrain
-  ansible_roles:
-    - theforeman.foreman_scap_client
-  parameters:
-    - name: zabbix_agent_version
-      parameter_type: string
-      value: '6'
-    - name: zabbix_agent_version_minor
-      parameter_type: string
-      value: '*'
