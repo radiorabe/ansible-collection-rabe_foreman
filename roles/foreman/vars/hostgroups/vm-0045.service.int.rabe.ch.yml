@@ -42,11 +42,11 @@ foreman_hostgroup:
 
             [global]
 
-            # Specifies the SMTP server to use. 
+            # Specifies the SMTP server to use.
             smtp_server = {{ smtp_server }}
 
             # Specifies the SMTP port.
-            smtp_port = {{ smtp_port|default('25') }}
+            smtp_port = {{ smtp_port | default('25') }}
 
             # Specifies the id of the user to authenticate with the SMTP server.
             # Default None (empty value).
@@ -78,7 +78,7 @@ foreman_hostgroup:
 
             # Specifies the type of secure connection to make. Options are: none,
             # starttls and ssl.
-            smtp_security = {{ smtp_security|default('none') }}
+            smtp_security = {{ smtp_security | default('none') }}
 
             # Specifies the From e-mail address value in the e-mails sent. Bounces will
             # be sent here.
@@ -91,15 +91,15 @@ foreman_hostgroup:
             # Specifies the From: e-mail address value in the e-mails sent.
             # The default when unset is noreply@ipadefaultemaildomain.
             # This value can be found by running ipa config-show.
-            mail_from = {{ mail_from|default('noreply@ipadefaultemaildomain') }}
+            mail_from = {{ mail_from | default('noreply@ipadefaultemaildomain') }}
 
             # Specifies the From: name value in the e-mails-sent.
             # The default when unset is IPA-EPN.
-            # mail_from_name = {{ mail_from_name|default('IPA-EPN') }}
+            # mail_from_name = {{ mail_from_name | default('IPA-EPN') }}
 
             # The list of days before a password expiration when ipa-epn should notify
             # a user that their password will soon require a reset.
-            notify_ttls = {{ notify_ttls|default('28, 14, 7, 3, 1') }}
+            notify_ttls = {{ notify_ttls | default('28, 14, 7, 3, 1') }}
 
             # Set the subject of the message
             msg_subject = {{ msg_subject }}
@@ -108,7 +108,7 @@ foreman_hostgroup:
             msg_charset = utf8
 
             # Set the message's MIME sub-content type.
-            msg_subtype = {{ msg_subtype|default('plain') }}
+            msg_subtype = {{ msg_subtype | default('plain') }}
         - dest: /etc/ipa/epn/expire_msg.template
           mode: '0644'
           content: |-
@@ -141,7 +141,6 @@ foreman_hostgroup:
                                         </td>
                                     </tr>
                                 </table>
-
                                 <table style="background-color:#fff; border:1px solid #e1e1e1; width:100%;" cellpadding="0" cellspacing="0">
                                     <tr>
                                         <td style="padding-bottom: 20px; padding-left: 20px; padding-top: 20px; padding-right: 20px; font-family: 'Helvetica', 'Arial', sans-serif;">
