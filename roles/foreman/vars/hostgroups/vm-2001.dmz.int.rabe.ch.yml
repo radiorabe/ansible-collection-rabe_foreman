@@ -118,10 +118,10 @@ foreman_hostgroup:
       parameter_type: yaml
       value:
         - repo: "https://{{ radiorabe_git_clone_pat }}@github.com/radiorabe/reverse-proxy-configuration.git"
-          dest: "/tmp/reverse-proxy-configuration"
-          separate_git_dir: "/tmp/reverse-proxy-configuration-git"
+          dest: /tmp/reverse-proxy-configuration
+          separate_git_dir: /tmp/reverse-proxy-configuration-git
           single_branch: true
-          version: "main"
+          version: main
     - name: radiorabe_git_local_clone
       parameter_type: boolean
       value: true
