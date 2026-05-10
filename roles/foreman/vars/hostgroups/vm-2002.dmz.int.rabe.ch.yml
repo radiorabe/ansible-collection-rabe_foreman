@@ -58,7 +58,7 @@ foreman_hostgroup:
     - name: podman_kube_specs
       parameter_type: yaml
       value:
-        - state: started]
+        - state: started
           kube_file_content:
             apiVersion: v1
             kind: Pod
