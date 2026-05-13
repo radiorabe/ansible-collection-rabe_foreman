@@ -98,7 +98,7 @@ foreman_hostgroup:
 
             # Specifies the From: name value in the e-mails-sent.
             # The default when unset is IPA-EPN.
-            # mail_from_name = {{ mail_from_name | default('IPA-EPN') }}
+            mail_from_name = {{ mail_from_name | default('IPA-EPN') }}
 
             # The list of days before a password expiration when ipa-epn should notify
             # a user that their password will soon require a reset.
