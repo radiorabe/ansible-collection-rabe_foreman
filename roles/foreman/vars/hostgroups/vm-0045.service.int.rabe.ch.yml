@@ -26,7 +26,15 @@ foreman_hostgroup:
             [Timer]
             OnCalendar=
             OnCalendar=*-*-* 03:00:00
-        - dest: /etc/ipa/epn.conf
+        - dest: "/etc/systemd/system/ipa-epn.service.d/override.conf"
+          mode: '0644'
+          content: |
+            [Service]
+            Environment=
+            Environment=LANG=de_CH.UTF8
+            # The LANG environment variable is set to a German locale to ensure
+            # that the date formatting in the email matches the expected format.
+        - dest: "/etc/ipa/epn.conf"
           mode: '0600'
           # The file was copied verbatim from the mentioned URL and only jinja expressions were added.
           # Do not clean up whitespace or remove the comments, they stay here to help us diff the file
@@ -98,7 +106,7 @@ foreman_hostgroup:
 
             # Specifies the From: name value in the e-mails-sent.
             # The default when unset is IPA-EPN.
-            # mail_from_name = {{ mail_from_name | default('IPA-EPN') }}
+            mail_from_name = {{ mail_from_name | default('IPA-EPN') }}
 
             # The list of days before a password expiration when ipa-epn should notify
             # a user that their password will soon require a reset.
@@ -152,7 +160,7 @@ foreman_hostgroup:
                                                     Liebe*r {{ '{{' }} first {{ '}}' }},
                                                 </p>
                                                 <p>
-                                                    Dein Passwort wird am  {{ '{{' }} expiration | datetimeformat('long', 'Europe/Berlin', 'de_DE') {{ '}}' }} ablaufen.
+                                                    Dein Passwort wird am  {{ '{{' }} expiration | datetimeformat('%e. %B %Y %X', 'Europe/Berlin') {{ '}}' }} ablaufen.
                                                 </p>
                                                 <p>
                                                     Du kannst es ganz einfach mit unserem Self-Service unter <a href="https://my.rabe.ch" style="text-decoration: none; color:#2da6cb;">my.rabe.ch</a> erneuern.
@@ -160,6 +168,30 @@ foreman_hostgroup:
                                                 </p>
                                                 <p>Liebe Grüsse</p>
                                                 <p><a href="mailto:it@rabe.ch" style="text-decoration: none; color:#2da6cb;">RaBe IT-Reaktion</a></p>
+                                                <p>
+                                                    <table style="border: 2px solid #005C63; border-radius: 6px; color:#00454D; background-color:#98EAE1"; width:100%;" cellpadding="0" cellspacing="0">
+                                                        <tr>
+                                                            <td style="padding-left: 10px; padding-right: 10px; padding-top: 10px;">
+                                                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                                                </svg>
+                                                            </td>
+                                                            <td style="padding-right: 10px; padding-top: 10px;">
+                                                                <div style="color:#00454D; font-weight:bold">Passwort vergessen?</div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td></td>
+                                                            <td style="padding-bottom: 10px; padding-right: 10px;">
+                                                                <div>
+                                                                    Kein Problem! Klicke bei <a href="https://my.rabe.ch" target="_blank">my.rabe.ch</a> auf <strong>"Forgot your password?"</strong> und gib im darauffolgenden Fenster deinen Benutzernamen ein. Nach dem Klick auf <strong>"Reset"</strong> wird dir automatisch eine E-Mail zugestellt. Diese enthält einen Link, über den du dein Passwort neu setzen kannst.
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </p>
                                             </div>
                                         </td>
                                     </tr>
@@ -175,7 +207,7 @@ foreman_hostgroup:
                                                     Dear {{ '{{' }} first {{ '}}' }},
                                                 </p>
                                                 <p>
-                                                    Your password will expire soon on {{ '{{' }} expiration | datetimeformat('long', 'Europe/Berlin') {{ '}}' }}.</p>
+                                                    Your password will expire soon on {{ '{{' }} expiration | datetimeformat('%e. %B %Y %X', 'Europe/Berlin') {{ '}}' }}.</p>
                                                 </p>
                                                 <p>
                                                     You can easily renew it using our self-service at <a href="https://my.rabe.ch" style="text-decoration: none; color:#2da6cb;">my.rabe.ch</a>.
@@ -183,6 +215,30 @@ foreman_hostgroup:
                                                 </p>
                                                 <p>Best wishes</p>
                                                 <p><a href="mailto:it@rabe.ch" style="text-decoration: none; color:#2da6cb;">RaBe IT-Reaktion</a></p>
+                                                <p>
+                                                    <table style="border: 2px solid #005C63; border-radius: 6px; color:#00454D; color:#00454D; background-color:#98EAE1"; width:100%;" cellpadding="0" cellspacing="0">
+                                                        <tr>
+                                                            <td style="padding-left: 10px; padding-right: 10px; padding-top: 10px;">
+                                                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                                                </svg>
+                                                            </td>
+                                                            <td style="padding-right: 10px; padding-top: 10px;">
+                                                                <div style="color:#00454D; font-weight:bold">Forgot your password?</div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td></td>
+                                                            <td style="padding-bottom: 10px; padding-right: 10px;">
+                                                                <div>
+                                                                    No problem! Visit <a href="https://my.rabe.ch" target="_blank">my.rabe.ch</a>, click on <strong>"Forgot your password?"</strong> and enter your username in the window that appears. After clicking <strong>"Reset"</strong> an email will be automatically sent to your address. This email contains a link that allows you to set a new password.
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </p>
                                             </div>
                                         </td>
                                     </tr>
