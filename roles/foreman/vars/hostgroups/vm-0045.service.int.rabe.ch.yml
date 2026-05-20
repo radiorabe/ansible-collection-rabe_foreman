@@ -32,15 +32,7 @@ foreman_hostgroup:
             [Timer]
             OnCalendar=
             OnCalendar=*-*-* 03:00:00
-        - dest: "/etc/systemd/system/ipa-epn.service.d/override.conf"
-          mode: '0644'
-          content: |
-            [Service]
-            Environment=
-            Environment=LANG=de_CH.UTF8
-            # The LANG environment variable is set to a German locale to ensure
-            # that the date formatting in the email matches the expected format.
-        - dest: "/etc/ipa/epn.conf"
+        - dest: /etc/ipa/epn.conf
           mode: '0600'
           # The file was copied verbatim from the mentioned URL and only jinja expressions were added.
           # Do not clean up whitespace or remove the comments, they stay here to help us diff the file
