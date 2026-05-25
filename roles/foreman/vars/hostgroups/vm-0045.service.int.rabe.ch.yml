@@ -160,7 +160,7 @@ foreman_hostgroup:
                                                     Liebe*r {{ '{{' }} first {{ '}}' }},
                                                 </p>
                                                 <p>
-                                                    Das Passwort für dein RaBe-Login {{ uid }} für das Wiki, den Share, das Archiv usw. wird am {{ '{{' }} expiration | datetimeformat('%e. %B %Y %X', 'Europe/Berlin') {{ '}}' }} ablaufen.
+                                                    Das Passwort für dein RaBe-Login {{ '{{' }} uid {{ '}}' }} für das Wiki, den Share, das Archiv usw. wird am {{ '{{' }} expiration | datetimeformat('%e. %B %Y %X', 'Europe/Berlin') {{ '}}' }} ablaufen.
                                                 </p>
                                                 <p>
                                                     Du kannst es ganz einfach mit unserem Self-Service unter <a href="https://my.rabe.ch" style="text-decoration: none; color:#2da6cb;">my.rabe.ch</a> erneuern.
