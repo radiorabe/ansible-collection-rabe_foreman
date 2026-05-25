@@ -35,15 +35,6 @@ foreman_hostgroup:
     - name: kanboard_db_user
       parameter_type: string
       value: "{{ undef('variable kanboard_db_user needs to be set in host') }}"
-    - name: kanboard_ldap_password
-      parameter_type: string
-      value: "{{ undef('variable kanboard_ldap_password needs to be set in host') }}"
-    - name: kanboard_ldap_server
-      parameter_type: string
-      value: "{{ undef('variable kanboard_ldap_server needs to be set in host') }}"
-    - name: kanboard_ldap_username
-      parameter_type: string
-      value: "{{ undef('variable kanboard_ldap_username needs to be set in host') }}"
     - name: kanboard_mail_smtp_hostname
       parameter_type: string
       value: "{{ undef('variable kanboard_mail_smtp_hostname needs to be set in host') }}"
@@ -137,28 +128,6 @@ foreman_hostgroup:
                       value: "{{ kanboard_mail_smtp_username }}"
                     - name: MAIL_SMTP_PASSWORD
                       value: "{{ kanboard_mail_smtp_password }}"
-                    - name: LDAP_SERVER
-                      value: "{{ kanboard_ldap_server }}"
-                    - name: LDAP_BIND_TYPE
-                      value: proxy
-                    - name: LDAP_USERNAME
-                      value: "{{ kanboard_ldap_username }}"
-                    - name: LDAP_PASSWORD
-                      value: "{{ kanboard_ldap_password }}"
-                    - name: LDAP_USER_BASE_DN
-                      value: cn=users,cn=accounts,dc=int,dc=rabe,dc=ch
-                    - name: LDAP_USER_FILTER
-                      value: uid=%s
-                    - name: LDAP_GROUP_ADMIN_DN
-                      value: cn=kanboard-admins,cn=groups,cn=accounts,dc=int,dc=rabe,dc=ch
-                    - name: LDAP_GROUP_MANAGER_DN
-                      value: cn=kanboard-managers,cn=groups,cn=accounts,dc=int,dc=rabe,dc=ch
-                    - name: LDAP_GROUP_PROVIDER
-                      value: true
-                    - name: LDAP_GROUP_BASE_DN
-                      value: cn=groups,cn=accounts,dc=int,dc=rabe,dc=ch
-                    - name: LDAP_GROUP_FILTER
-                      value: "(&(objectClass=groupofnames)(cn=%s*))"
                     - name: TRUSTED_PROXY_NETWORKS
                       value: 10.88.0.0/16
                     - name: REVERSE_PROXY_AUTH
