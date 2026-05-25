@@ -207,7 +207,7 @@ foreman_hostgroup:
                                                     Dear {{ '{{' }} first {{ '}}' }},
                                                 </p>
                                                 <p>
-                                                    The password for your RaBe login {{ uid }} for accessing the wiki, the share, the archive etc will expire soon on {{ '{{' }} expiration | datetimeformat('%e. %B %Y %X', 'Europe/Berlin') {{ '}}' }}.</p>
+                                                    The password for your RaBe login {{ '{{' }} uid {{ '}}' }} for accessing the wiki, the share, the archive etc will expire soon on {{ '{{' }} expiration | datetimeformat('%e. %B %Y %X', 'Europe/Berlin') {{ '}}' }}.</p>
                                                 </p>
                                                 <p>
                                                     You can easily renew it using our self-service at <a href="https://my.rabe.ch" style="text-decoration: none; color:#2da6cb;">my.rabe.ch</a>.
