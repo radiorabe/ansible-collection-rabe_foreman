@@ -176,15 +176,15 @@ foreman_hostgroup:
               volumes:
                 - name: kanboard_data
                   hostPath:
-                    path: "/home/{{ podman_run_as_user }}/data"
+                    path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/data"
                     type: Directory
                 - name: kanboard_plugins
                   hostPath:
-                    path: "/home/{{ podman_run_as_user }}/plugins"
+                    path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins"
                     type: Directory
                 - name: kanboard_ssl
                   hostPath:
-                    path: "/home/{{ podman_run_as_user }}/ssl"
+                    path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/ssl"
                     type: Directory
                 - name: ca_certs
                   hostPath:
@@ -192,7 +192,7 @@ foreman_hostgroup:
                     type: File
                 - name: php_fpm_ini
                   hostPath:
-                    path: "/home/{{ podman_run_as_user }}/phpfpm_conf.d/z.ini"
+                    path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/phpfpm_conf.d/z.ini"
                     type: File
     - name: podman_run_as_group
       parameter_type: string
@@ -214,7 +214,7 @@ foreman_hostgroup:
     - name: radiorabe_copies
       parameter_type: yaml
       value:
-        - dest: "/home/{{ podman_run_as_user }}/phpfpm_conf.d/z.ini"
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/phpfpm_conf.d/z.ini"
           mode: "0644"
           content: display_errors = Off
           owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}
@@ -229,12 +229,12 @@ foreman_hostgroup:
     - name: radiorabe_files
       parameter_type: yaml
       value:
-        - path: "/home/{{ podman_run_as_user }}/phpfpm_conf.d/"
+        - path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/phpfpm_conf.d/"
           state: directory
           mode: "0755"
           owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}
           group: "{{ '{{' }} podman_run_as_group {{ '}}' }}
-        - path: "/home/{{ podman_run_as_user }}/plugins/"
+        - path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/"
           state: directory
           mode: "0755"
           owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}
@@ -244,52 +244,52 @@ foreman_hostgroup:
       parameter_type: yaml
       value:
         - repo: https://codeberg.org/abu/Calendar.git
-          dest: "/home/{{ podman_run_as_user }}/plugins/Calendar"
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/Calendar"
           force: true
           single_branch: true
           version: refs/tags/v1.5.0
         - repo: https://github.com/creecros/Customizer.git
-          dest: "/home/{{ podman_run_as_user }}/plugins/Customizer"
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/Customizer"
           force: true
           single_branch: true
           version: refs/tags/1.14.2
         - repo: https://github.com/atcomputing/kanboard-ExtendedMail.git
-          dest: "/home/{{ podman_run_as_user }}/plugins/ExtendedMail"
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/ExtendedMail"
           force: true
           single_branch: true
           version: refs/tags/v0.8
         - repo: https://github.com/kanboard/plugin-gantt.git
-          dest: "/home/{{ podman_run_as_user }}/plugins/Gantt"
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/Gantt"
           force: true
           single_branch: true
           version: refs/tags/v1.0.6
         - repo: https://github.com/kenlog/HighlightCodeSyntax.git
-          dest: "/home/{{ podman_run_as_user }}/plugins/HighlightCodeSyntax"
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/HighlightCodeSyntax"
           force: true
           single_branch: true
           version: refs/tags/v1.0.3
         - repo: https://github.com/kanboard/plugin-oauth2.git
-          dest: "/home/{{ podman_run_as_user }}/plugins/OAuth2"
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/OAuth2"
           force: true
           single_branch: true
           version: refs/tags/v1.0.2
         - repo: https://github.com/radiorabe/kanboard-theme-rabe.git
-          dest: "/home/{{ podman_run_as_user }}/plugins/RaBe"
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/RaBe"
           force: true
           single_branch: true
           version: main
         - repo: https://github.com/creecros/SendEmailCreator.git
-          dest: "/home/{{ podman_run_as_user }}/plugins/SendEmailCreator"
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/SendEmailCreator"
           force: true
           single_branch: true
           version: refs/tags/1.2.6
         - repo: https://github.com/creecros/Task2pdf.git
-          dest: "/home/{{ podman_run_as_user }}/plugins/Task2pdf"
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/Task2pdf"
           force: true
           single_branch: true
           version: refs/tags/1.8.0
         - repo: https://github.com/imfx77/kanboard-plugin-Wysiwyg-MD-Editor.git
-          dest: "/home/{{ podman_run_as_user }}/plugins/WysiwygMDEditor"
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/WysiwygMDEditor"
           force: true
           single_branch: true
           version: refs/tags/v0.9.8
