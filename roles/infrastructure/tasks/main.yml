@@ -4,16 +4,6 @@
   tags:
     - role::rabe_foreman.infrastructure
     - role::rabe_foreman.infrastructure:domains
-- name: "RaBe Foreman Infrastructure : Compute Profiles"
-  ansible.builtin.import_tasks: compute_profiles.yml
-  tags:
-    - role::rabe_foreman.infrastructure
-    - role::rabe_foreman.infrastructure:compute_profiles
-- name: "RaBe Foreman Infrastructure : Compute Resources"
-  ansible.builtin.import_tasks: compute_resources.yml
-  tags:
-    - role::rabe_foreman.infrastructure
-    - role::rabe_foreman.infrastructure:compute_resources
 - name: "RaBe Foreman Infrastructure : Realms"
   ansible.builtin.import_tasks: realms.yml
   tags:
