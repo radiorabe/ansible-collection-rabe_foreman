@@ -22,6 +22,8 @@ foreman_hostgroup:
             [Service]
             Environment=
             Environment=LANG=de_CH.UTF8
+            # The LANG environment variable is set to a German locale to ensure
+            # that the date formatting in the email matches the expected format.
         - dest: /etc/systemd/system/ipa-epn.timer.d/override.conf
           mode: '0644'
           content: |
@@ -158,7 +160,7 @@ foreman_hostgroup:
                                                     Liebe*r {{ '{{' }} first {{ '}}' }},
                                                 </p>
                                                 <p>
-                                                    Dein Passwort wird am  {{ '{{' }} expiration | datetimeformat('%e. %B %Y %X', 'Europe/Berlin') {{ '}}' }} ablaufen.
+                                                    Das Passwort für dein RaBe-Login {{ '{{' }} uid {{ '}}' }}, um auf das Wiki, den Share, das Archiv usw. zuzugreifen, wird am {{ '{{' }} expiration | datetimeformat('%e. %B %Y %X', 'Europe/Berlin') {{ '}}' }} ablaufen.
                                                 </p>
                                                 <p>
                                                     Du kannst es ganz einfach mit unserem Self-Service unter <a href="https://my.rabe.ch" style="text-decoration: none; color:#2da6cb;">my.rabe.ch</a> erneuern.
@@ -205,7 +207,7 @@ foreman_hostgroup:
                                                     Dear {{ '{{' }} first {{ '}}' }},
                                                 </p>
                                                 <p>
-                                                    Your password will expire soon on {{ '{{' }} expiration | datetimeformat('%e. %B %Y %X', 'Europe/Berlin') {{ '}}' }}.</p>
+                                                    The password for your RaBe login {{ '{{' }} uid {{ '}}' }} for accessing the wiki, the share, the archive etc will expire soon on {{ '{{' }} expiration | datetimeformat('%e. %B %Y %X', 'Europe/Berlin') {{ '}}' }}.</p>
                                                 </p>
                                                 <p>
                                                     You can easily renew it using our self-service at <a href="https://my.rabe.ch" style="text-decoration: none; color:#2da6cb;">my.rabe.ch</a>.
@@ -284,11 +286,11 @@ foreman_hostgroup:
         - path: "/etc/systemd/system/ipa-epn.timer.d"
           state: directory
           mode: '0755'
-    - name: systemd_disabled_units
+    - name: systemd_enabled_units
       parameter_type: yaml
       value:
         - ipa-epn.timer
-    - name: systemd_stopped_units
+    - name: systemd_started_units
       parameter_type: yaml
       value:
         - ipa-epn.timer
