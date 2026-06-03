@@ -31,31 +31,31 @@ foreman_hostgroup:
             /usr/bin/sudo -u kanboard /usr/bin/podman pod restart kanboard
     - name: kanboard_db_password
       parameter_type: string
-      value: "{{ undef('variable kanboard_db_password needs to be set in host') }}"
+      value: "{{ '{{' }} undef('variable kanboard_db_password needs to be set in host') {{ '}}' }}"
     - name: kanboard_db_user
       parameter_type: string
-      value: "{{ undef('variable kanboard_db_user needs to be set in host') }}"
+      value: "{{ '{{' }} undef('variable kanboard_db_user needs to be set in host') {{ '}}' }}"
     - name: kanboard_ldap_password
       parameter_type: string
-      value: "{{ undef('variable kanboard_ldap_password needs to be set in host') }}"
+      value: "{{ '{{' }} undef('variable kanboard_ldap_password needs to be set in host') {{ '}}' }}"
     - name: kanboard_ldap_server
       parameter_type: string
-      value: "{{ undef('variable kanboard_ldap_server needs to be set in host') }}"
+      value: "{{ '{{' }} undef('variable kanboard_ldap_server needs to be set in host') {{ '}}' }}"
     - name: kanboard_ldap_username
       parameter_type: string
-      value: "{{ undef('variable kanboard_ldap_username needs to be set in host') }}"
+      value: "{{ '{{' }} undef('variable kanboard_ldap_username needs to be set in host') {{ '}}' }}"
     - name: kanboard_mail_smtp_hostname
       parameter_type: string
-      value: "{{ undef('variable kanboard_mail_smtp_hostname needs to be set in host') }}"
+      value: "{{ '{{' }} undef('variable kanboard_mail_smtp_hostname needs to be set in host') {{ '}}' }}"
     - name: kanboard_mail_smtp_password
       parameter_type: string
-      value: "{{ undef('variable kanboard_mail_smtp_password needs to be set in host') }}"
+      value: "{{ '{{' }} undef('variable kanboard_mail_smtp_password needs to be set in host') {{ '}}' }}"
     - name: kanboard_mail_smtp_username
       parameter_type: string
-      value: "{{ undef('variable kanboard_mail_smtp_username needs to be set in host') }}"
+      value: "{{ '{{' }} undef('variable kanboard_mail_smtp_username needs to be set in host') {{ '}}' }}"
     - name: kanboard_reverse_proxy_default_admin
       parameter_type: string
-      value: "{{ undef('variable kanboard_reverse_proxy_default_admin needs to be set in host') }}"
+      value: "{{ '{{' }} undef('variable kanboard_reverse_proxy_default_admin needs to be set in host') {{ '}}' }}"
     - name: kernel_settings_sysctl
       parameter_type: yaml
       value:
@@ -118,9 +118,9 @@ foreman_hostgroup:
                     - name: DB_DRIVER
                       value: postgres
                     - name: DB_USERNAME
-                      value: "{{ kanboard_db_user }}"
+                      value: "{{ '{{' }} kanboard_db_user {{ '}}' }}"
                     - name: DB_PASSWORD
-                      value: "{{ kanboard_db_password }}"
+                      value: "{{ '{{' }} kanboard_db_password {{ '}}' }}"
                     - name: DB_HOSTNAME
                       value: postgresql.service.int.rabe.ch
                     - name: DB_NAME
@@ -132,19 +132,19 @@ foreman_hostgroup:
                     - name: MAIL_TRANSPORT
                       value: smtp
                     - name: MAIL_SMTP_HOSTNAME
-                      value: "{{ kanboard_mail_smtp_hostname }}"
+                      value: "{{ '{{' }} kanboard_mail_smtp_hostname {{ '}}' }}"
                     - name: MAIL_SMTP_USERNAME
-                      value: "{{ kanboard_mail_smtp_username }}"
+                      value: "{{ '{{' }} kanboard_mail_smtp_username {{ '}}' }}"
                     - name: MAIL_SMTP_PASSWORD
-                      value: "{{ kanboard_mail_smtp_password }}"
+                      value: "{{ '{{' }} kanboard_mail_smtp_password {{ '}}' }}"
                     - name: LDAP_SERVER
-                      value: "{{ kanboard_ldap_server }}"
+                      value: "{{ '{{' }} kanboard_ldap_server {{ '}}' }}"
                     - name: LDAP_BIND_TYPE
                       value: proxy
                     - name: LDAP_USERNAME
-                      value: "{{ kanboard_ldap_username }}"
+                      value: "{{ '{{' }} kanboard_ldap_username {{ '}}' }}"
                     - name: LDAP_PASSWORD
-                      value: "{{ kanboard_ldap_password }}"
+                      value: "{{ '{{' }} kanboard_ldap_password {{ '}}' }}"
                     - name: LDAP_USER_BASE_DN
                       value: cn=users,cn=accounts,dc=int,dc=rabe,dc=ch
                     - name: LDAP_USER_FILTER
@@ -164,7 +164,7 @@ foreman_hostgroup:
                     - name: REVERSE_PROXY_AUTH
                       value: true
                     - name: REVERSE_PROXY_DEFAULT_ADMIN
-                      value: "{{ kanboard_reverse_proxy_default_admin }}"
+                      value: "{{ '{{' }} kanboard_reverse_proxy_default_admin {{ '}}' }}"
                     - name: REMEMBER_ME_AUTH
                       value: false
                     - name: ENABLE_URL_REWRITE
@@ -176,15 +176,15 @@ foreman_hostgroup:
               volumes:
                 - name: kanboard_data
                   hostPath:
-                    path: "/home/{{ podman_run_as_user }}/data"
+                    path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/data"
                     type: Directory
                 - name: kanboard_plugins
                   hostPath:
-                    path: "/home/{{ podman_run_as_user }}/plugins"
+                    path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins"
                     type: Directory
                 - name: kanboard_ssl
                   hostPath:
-                    path: "/home/{{ podman_run_as_user }}/ssl"
+                    path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/ssl"
                     type: Directory
                 - name: ca_certs
                   hostPath:
@@ -192,7 +192,7 @@ foreman_hostgroup:
                     type: File
                 - name: php_fpm_ini
                   hostPath:
-                    path: "/home/{{ podman_run_as_user }}/phpfpm_conf.d/z.ini"
+                    path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/phpfpm_conf.d/z.ini"
                     type: File
     - name: podman_run_as_group
       parameter_type: string
@@ -214,11 +214,11 @@ foreman_hostgroup:
     - name: radiorabe_copies
       parameter_type: yaml
       value:
-        - dest: "/home/{{ podman_run_as_user }}/phpfpm_conf.d/z.ini"
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/phpfpm_conf.d/z.ini"
           mode: "0644"
           content: display_errors = Off
-          owner: "{{ podman_run_as_user }}"
-          group: "{{ podman_run_as_group }}"
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
         # The creation of .gitconfig only works the very first time the Ansible
         # roles are executed
         - dest: "$HOME/.gitconfig"
@@ -229,67 +229,67 @@ foreman_hostgroup:
     - name: radiorabe_files
       parameter_type: yaml
       value:
-        - path: "/home/{{ podman_run_as_user }}/phpfpm_conf.d/"
+        - path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/phpfpm_conf.d/"
           state: directory
           mode: "0755"
-          owner: "{{ podman_run_as_user }}"
-          group: "{{ podman_run_as_group }}"
-        - path: "/home/{{ podman_run_as_user }}/plugins/"
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
+        - path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/"
           state: directory
           mode: "0755"
-          owner: "{{ podman_run_as_user }}"
-          group: "{{ podman_run_as_group }}"
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
           recurse: true
     - name: radiorabe_git_clone
       parameter_type: yaml
       value:
         - repo: https://codeberg.org/abu/Calendar.git
-          dest: "/home/{{ podman_run_as_user }}/plugins/Calendar"
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/Calendar"
           force: true
           single_branch: true
           version: refs/tags/v1.5.0
         - repo: https://github.com/creecros/Customizer.git
-          dest: "/home/{{ podman_run_as_user }}/plugins/Customizer"
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/Customizer"
           force: true
           single_branch: true
           version: refs/tags/1.14.2
         - repo: https://github.com/atcomputing/kanboard-ExtendedMail.git
-          dest: "/home/{{ podman_run_as_user }}/plugins/ExtendedMail"
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/ExtendedMail"
           force: true
           single_branch: true
           version: refs/tags/v0.8
         - repo: https://github.com/kanboard/plugin-gantt.git
-          dest: "/home/{{ podman_run_as_user }}/plugins/Gantt"
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/Gantt"
           force: true
           single_branch: true
           version: refs/tags/v1.0.6
         - repo: https://github.com/kenlog/HighlightCodeSyntax.git
-          dest: "/home/{{ podman_run_as_user }}/plugins/HighlightCodeSyntax"
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/HighlightCodeSyntax"
           force: true
           single_branch: true
           version: refs/tags/v1.0.3
         - repo: https://github.com/kanboard/plugin-oauth2.git
-          dest: "/home/{{ podman_run_as_user }}/plugins/OAuth2"
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/OAuth2"
           force: true
           single_branch: true
           version: refs/tags/v1.0.2
         - repo: https://github.com/radiorabe/kanboard-theme-rabe.git
-          dest: "/home/{{ podman_run_as_user }}/plugins/RaBe"
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/RaBe"
           force: true
           single_branch: true
           version: main
         - repo: https://github.com/creecros/SendEmailCreator.git
-          dest: "/home/{{ podman_run_as_user }}/plugins/SendEmailCreator"
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/SendEmailCreator"
           force: true
           single_branch: true
           version: refs/tags/1.2.6
         - repo: https://github.com/creecros/Task2pdf.git
-          dest: "/home/{{ podman_run_as_user }}/plugins/Task2pdf"
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/Task2pdf"
           force: true
           single_branch: true
           version: refs/tags/1.8.0
         - repo: https://github.com/imfx77/kanboard-plugin-Wysiwyg-MD-Editor.git
-          dest: "/home/{{ podman_run_as_user }}/plugins/WysiwygMDEditor"
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/WysiwygMDEditor"
           force: true
           single_branch: true
           version: refs/tags/v0.9.8
