@@ -160,7 +160,7 @@ foreman_hostgroup:
                                                     Liebe*r {{ '{{' }} first {{ '}}' }},
                                                 </p>
                                                 <p>
-                                                    Dein Passwort wird am  {{ '{{' }} expiration | datetimeformat('%e. %B %Y %X', 'Europe/Berlin') {{ '}}' }} ablaufen.
+                                                    Das Passwort für dein RaBe-Login {{ '{{' }} uid {{ '}}' }}, um auf das Wiki, den Share, das Archiv usw. zuzugreifen, wird am {{ '{{' }} expiration | datetimeformat('%e. %B %Y %X', 'Europe/Berlin') {{ '}}' }} ablaufen.
                                                 </p>
                                                 <p>
                                                     Du kannst es ganz einfach mit unserem Self-Service unter <a href="https://my.rabe.ch" style="text-decoration: none; color:#2da6cb;">my.rabe.ch</a> erneuern.
@@ -207,7 +207,7 @@ foreman_hostgroup:
                                                     Dear {{ '{{' }} first {{ '}}' }},
                                                 </p>
                                                 <p>
-                                                    Your password will expire soon on {{ '{{' }} expiration | datetimeformat('%e. %B %Y %X', 'Europe/Berlin') {{ '}}' }}.</p>
+                                                    The password for your RaBe login {{ '{{' }} uid {{ '}}' }} for accessing the wiki, the share, the archive etc will expire soon on {{ '{{' }} expiration | datetimeformat('%e. %B %Y %X', 'Europe/Berlin') {{ '}}' }}.</p>
                                                 </p>
                                                 <p>
                                                     You can easily renew it using our self-service at <a href="https://my.rabe.ch" style="text-decoration: none; color:#2da6cb;">my.rabe.ch</a>.
