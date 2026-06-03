@@ -31,31 +31,31 @@ foreman_hostgroup:
             /usr/bin/sudo -u kanboard /usr/bin/podman pod restart kanboard
     - name: kanboard_db_password
       parameter_type: string
-      value: "{{ '{{' }} undef('variable kanboard_db_password needs to be set in host') {{ '}}' }}
+      value: "{{ '{{' }} undef('variable kanboard_db_password needs to be set in host') {{ '}}' }}"
     - name: kanboard_db_user
       parameter_type: string
-      value: "{{ '{{' }} undef('variable kanboard_db_user needs to be set in host') {{ '}}' }}
+      value: "{{ '{{' }} undef('variable kanboard_db_user needs to be set in host') {{ '}}' }}"
     - name: kanboard_ldap_password
       parameter_type: string
-      value: "{{ '{{' }} undef('variable kanboard_ldap_password needs to be set in host') {{ '}}' }}
+      value: "{{ '{{' }} undef('variable kanboard_ldap_password needs to be set in host') {{ '}}' }}"
     - name: kanboard_ldap_server
       parameter_type: string
-      value: "{{ '{{' }} undef('variable kanboard_ldap_server needs to be set in host') {{ '}}' }}
+      value: "{{ '{{' }} undef('variable kanboard_ldap_server needs to be set in host') {{ '}}' }}"
     - name: kanboard_ldap_username
       parameter_type: string
-      value: "{{ '{{' }} undef('variable kanboard_ldap_username needs to be set in host') {{ '}}' }}
+      value: "{{ '{{' }} undef('variable kanboard_ldap_username needs to be set in host') {{ '}}' }}"
     - name: kanboard_mail_smtp_hostname
       parameter_type: string
-      value: "{{ '{{' }} undef('variable kanboard_mail_smtp_hostname needs to be set in host') {{ '}}' }}
+      value: "{{ '{{' }} undef('variable kanboard_mail_smtp_hostname needs to be set in host') {{ '}}' }}"
     - name: kanboard_mail_smtp_password
       parameter_type: string
-      value: "{{ '{{' }} undef('variable kanboard_mail_smtp_password needs to be set in host') {{ '}}' }}
+      value: "{{ '{{' }} undef('variable kanboard_mail_smtp_password needs to be set in host') {{ '}}' }}"
     - name: kanboard_mail_smtp_username
       parameter_type: string
-      value: "{{ '{{' }} undef('variable kanboard_mail_smtp_username needs to be set in host') {{ '}}' }}
+      value: "{{ '{{' }} undef('variable kanboard_mail_smtp_username needs to be set in host') {{ '}}' }}"
     - name: kanboard_reverse_proxy_default_admin
       parameter_type: string
-      value: "{{ '{{' }} undef('variable kanboard_reverse_proxy_default_admin needs to be set in host') {{ '}}' }}
+      value: "{{ '{{' }} undef('variable kanboard_reverse_proxy_default_admin needs to be set in host') {{ '}}' }}"
     - name: kernel_settings_sysctl
       parameter_type: yaml
       value:
@@ -118,9 +118,9 @@ foreman_hostgroup:
                     - name: DB_DRIVER
                       value: postgres
                     - name: DB_USERNAME
-                      value: "{{ '{{' }} kanboard_db_user {{ '}}' }}
+                      value: "{{ '{{' }} kanboard_db_user {{ '}}' }}"
                     - name: DB_PASSWORD
-                      value: "{{ '{{' }} kanboard_db_password {{ '}}' }}
+                      value: "{{ '{{' }} kanboard_db_password {{ '}}' }}"
                     - name: DB_HOSTNAME
                       value: postgresql.service.int.rabe.ch
                     - name: DB_NAME
@@ -132,19 +132,19 @@ foreman_hostgroup:
                     - name: MAIL_TRANSPORT
                       value: smtp
                     - name: MAIL_SMTP_HOSTNAME
-                      value: "{{ '{{' }} kanboard_mail_smtp_hostname {{ '}}' }}
+                      value: "{{ '{{' }} kanboard_mail_smtp_hostname {{ '}}' }}"
                     - name: MAIL_SMTP_USERNAME
-                      value: "{{ '{{' }} kanboard_mail_smtp_username {{ '}}' }}
+                      value: "{{ '{{' }} kanboard_mail_smtp_username {{ '}}' }}"
                     - name: MAIL_SMTP_PASSWORD
-                      value: "{{ '{{' }} kanboard_mail_smtp_password {{ '}}' }}
+                      value: "{{ '{{' }} kanboard_mail_smtp_password {{ '}}' }}"
                     - name: LDAP_SERVER
-                      value: "{{ '{{' }} kanboard_ldap_server {{ '}}' }}
+                      value: "{{ '{{' }} kanboard_ldap_server {{ '}}' }}"
                     - name: LDAP_BIND_TYPE
                       value: proxy
                     - name: LDAP_USERNAME
-                      value: "{{ '{{' }} kanboard_ldap_username {{ '}}' }}
+                      value: "{{ '{{' }} kanboard_ldap_username {{ '}}' }}"
                     - name: LDAP_PASSWORD
-                      value: "{{ '{{' }} kanboard_ldap_password {{ '}}' }}
+                      value: "{{ '{{' }} kanboard_ldap_password {{ '}}' }}"
                     - name: LDAP_USER_BASE_DN
                       value: cn=users,cn=accounts,dc=int,dc=rabe,dc=ch
                     - name: LDAP_USER_FILTER
@@ -164,7 +164,7 @@ foreman_hostgroup:
                     - name: REVERSE_PROXY_AUTH
                       value: true
                     - name: REVERSE_PROXY_DEFAULT_ADMIN
-                      value: "{{ '{{' }} kanboard_reverse_proxy_default_admin {{ '}}' }}
+                      value: "{{ '{{' }} kanboard_reverse_proxy_default_admin {{ '}}' }}"
                     - name: REMEMBER_ME_AUTH
                       value: false
                     - name: ENABLE_URL_REWRITE
@@ -217,8 +217,8 @@ foreman_hostgroup:
         - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/phpfpm_conf.d/z.ini"
           mode: "0644"
           content: display_errors = Off
-          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}
-          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
         # The creation of .gitconfig only works the very first time the Ansible
         # roles are executed
         - dest: "$HOME/.gitconfig"
@@ -232,13 +232,13 @@ foreman_hostgroup:
         - path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/phpfpm_conf.d/"
           state: directory
           mode: "0755"
-          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}
-          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
         - path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/"
           state: directory
           mode: "0755"
-          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}
-          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
           recurse: true
     - name: radiorabe_git_clone
       parameter_type: yaml
