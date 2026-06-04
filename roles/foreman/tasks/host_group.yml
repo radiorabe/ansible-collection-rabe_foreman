@@ -8,7 +8,7 @@
     server_url: "{{ foreman_server_url }}"
     username: "{{ foreman_username }}"
     password: "{{ foreman_password }}"
-    validate_certs: "{{ foreman_validate_certs }}"
+    validate_certs: "{{ foreman_validate_certs | default(true) }}"
     name: "{{ foreman_hostgroup.name }}"
     description: "{{ foreman_hostgroup.description | default(omit) }}"
     parent: "{{ foreman_hostgroup.parent | default(omit) }}"
