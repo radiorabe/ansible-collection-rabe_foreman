@@ -16,6 +16,8 @@
     - role::rabe_foreman.hosts:installation_mediums
 - name: "RaBe Foreman Hosts Templates: Create Partition Tables"
   ansible.builtin.import_tasks: partition_tables.yml
+  # disable until we implement the role, either in upstream or in radiorabe.foreman
+  when: false
   tags:
     - role::rabe_foreman.hosts
     - role::rabe_foreman.hosts:partition_tables
