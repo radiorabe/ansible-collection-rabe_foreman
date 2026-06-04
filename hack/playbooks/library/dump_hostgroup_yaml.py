@@ -49,23 +49,24 @@ def _to_plain(value):
     return value
 
 
-def _to_yaml_node(value):
-    if isinstance(value, dict):
-        out = CommentedMap()
-        for key, val in value.items():
-            out[key] = _to_yaml_node(val)
-        return out
-    if isinstance(value, list):
-        out = CommentedSeq()
-        for item in value:
-            out.append(_to_yaml_node(item))
-        return out
-    if isinstance(value, str):
-        if "\n" in value:
-            return LiteralScalarString(value)
-        if "{{" in value or "{%" in value:
-            return DoubleQuotedScalarString(value)
-    return value
+def _escape_jinja_string(value):
+    unwrapped = _unwrap_escaped_jinja_string(value)
+    if unwrapped is not None:
+        value = unwrapped
+
+    def replacer(match):
+        token = match.group(0)
+        if token == "{{":
+            return "{{ '{{' }}"
+        if token == "}}":
+            return "{{ '}}' }}"
+        if token == "{%":
+            return "{{ '{%' }}"
+        if token == "%}":
+            return "{{ '%}' }}"
+        return token
+
+    return re.sub(r"(\{\{|\}\}|\{\%|\%\})", replacer, value)
 
 
 def _is_jinja_string(value):
@@ -91,6 +92,25 @@ def _unwrap_escaped_jinja_string(value):
         return body
 
     return None
+
+
+def _to_yaml_node(value):
+    if isinstance(value, dict):
+        out = CommentedMap()
+        for key, val in value.items():
+            out[key] = _to_yaml_node(val)
+        return out
+    if isinstance(value, list):
+        out = CommentedSeq()
+        for item in value:
+            out.append(_to_yaml_node(item))
+        return out
+    if isinstance(value, str):
+        if "{{" in value or "{%" in value:
+            return DoubleQuotedScalarString(_escape_jinja_string(value))
+        if "\n" in value:
+            return LiteralScalarString(value)
+    return value
 
 
 def _merge_value_preserving_existing_jinja(existing_value, new_value):

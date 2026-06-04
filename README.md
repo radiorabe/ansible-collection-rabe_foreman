@@ -83,8 +83,8 @@ parameters:
     parameter_type: yaml
     value:
       - dns:
-          - "{{ '{{ ansible_host }}' }}"
-        principal: "HTTP/{{ '{{ ansible_host }}' }}@INT.RABE.CH"
+          - "{{ '{{' }} ansible_host {{ '}}' }}"
+        principal: "HTTP/{{ '{{' }} ansible_host {{ '}}' }}@INT.RABE.CH"
 ```
 
 Use plain Jinja2 when resolving the value while applying the hostgroup is acceptable
@@ -92,17 +92,9 @@ or desired:
 
 ```yaml
 parameters:
-  - name: example_secret
+  - name: example
     parameter_type: string
-    value: "{{ undef('variable example_secret needs to be set in host') }}"
-  - name: example_yaml_config
-    parameter_type: yaml
-    value:
-      secret: "{{ example_secret }}"
-  - name: example_b64_config
-    parameter_type: yaml
-    value:
-      secret: "{{ example_secret | ansible.builtin.b64encode }}"
+    value: "{{ radiorabe_base_mail_noreply }}"
 ```
 
 If the nested value must also stay as a template inside Foreman, escape the whole
@@ -113,7 +105,7 @@ parameters:
   - name: example_runtime_yaml_config
     parameter_type: yaml
     value:
-      secret: "{{ '{{ example_secret }}' }}"
+      secret: "{{ '{{' }} example_secret {{ '}}' }}"
   - name: example_runtime_b64_config
     parameter_type: yaml
     value:
