@@ -14,6 +14,7 @@ foreman_hostgroup:
     - radiorabe.common.git_clone
     - radiorabe.common.files
     - redhat.rhel_system_roles.podman
+    - radiorabe.podman.zabbix_monitoring
   parameters:
     - name: certificate_requests
       parameter_type: yaml
@@ -310,3 +311,6 @@ foreman_hostgroup:
       parameter_type: yaml
       value:
         - /etc/certmonger/post-scripts/
+    - name: zabbix_monitoring_podman_user
+      parameter_type: string
+      value: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
