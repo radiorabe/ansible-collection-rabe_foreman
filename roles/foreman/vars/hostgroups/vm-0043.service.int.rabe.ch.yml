@@ -28,7 +28,6 @@ foreman_hostgroup:
         - studiomail.rabe.ch
         - wiki.rabe.ch
         - supersaas-me.rabe.ch
-        - board-new.rabe.ch
     - name: certbot_remote_hosts
       parameter_type: yaml
       value:

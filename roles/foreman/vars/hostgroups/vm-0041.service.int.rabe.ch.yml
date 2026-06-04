@@ -85,38 +85,16 @@ foreman_hostgroup:
     - name: podman_kube_specs
       parameter_type: yaml
       value:
-        - state: started
-          kube_file_content:
+        - kube_file_content:
             apiVersion: v1
             kind: Pod
             metadata:
               name: kanboard
             spec:
               containers:
-                - name: kanboard
-                  restart: always
-                  image: quay.io/kanboard/kanboard:v1.2.51
-                  ports:
-                    - containerPort: 80
-                      hostPort: 80
-                    - containerPort: 443
-                      hostPort: 443
-                  volumeMounts:
-                    - mountPath: /var/www/app/data:Z
-                      name: kanboard_data
-                    - mountPath: /var/www/app/plugins:Z
-                      name: kanboard_plugins
-                    - mountPath: /etc/nginx/ssl:ro,Z
-                      name: kanboard_ssl
-                    - mountPath: /etc/ssl/certs/ca-certificates.crt:ro
-                      name: ca_certs
-                    - mountPath: /etc/php84/conf.d/z.ini:ro,Z
-                      name: php_fpm_ini
-                  env:
-                    - name: TRUSTED_PROXY_NETWORKS
-                      value: 127.0.0.1/32,::1/128
+                - env:
                     - name: DEBUG
-                      value: true
+                      value: false
                     - name: LOG_DRIVER
                       value: system
                     - name: DB_DRIVER
@@ -128,7 +106,7 @@ foreman_hostgroup:
                     - name: DB_HOSTNAME
                       value: postgresql.service.int.rabe.ch
                     - name: DB_NAME
-                      value: kanboard-new
+                      value: kanboard
                     - name: PLUGIN_INSTALLER
                       value: true
                     - name: MAIL_FROM
@@ -162,7 +140,7 @@ foreman_hostgroup:
                     - name: LDAP_GROUP_BASE_DN
                       value: cn=groups,cn=accounts,dc=int,dc=rabe,dc=ch
                     - name: LDAP_GROUP_FILTER
-                      value: "(&(objectClass=groupofnames)(cn=%s*))"
+                      value: (&(objectClass=groupofnames)(cn=%s*))
                     - name: TRUSTED_PROXY_NETWORKS
                       value: 10.88.0.0/16
                     - name: REVERSE_PROXY_AUTH
@@ -177,27 +155,47 @@ foreman_hostgroup:
                       value: true
                     - name: DISABLE_LOGOUT
                       value: true
+                  image: quay.io/kanboard/kanboard:v1.2.51
+                  name: kanboard
+                  ports:
+                    - containerPort: 80
+                      hostPort: 80
+                    - containerPort: 443
+                      hostPort: 443
+                  restart: always
+                  volumeMounts:
+                    - mountPath: /var/www/app/data:Z
+                      name: kanboard_data
+                    - mountPath: /var/www/app/plugins:Z
+                      name: kanboard_plugins
+                    - mountPath: /etc/nginx/ssl:ro,Z
+                      name: kanboard_ssl
+                    - mountPath: /etc/ssl/certs/ca-certificates.crt:ro
+                      name: ca_certs
+                    - mountPath: /etc/php84/conf.d/z.ini:ro,Z
+                      name: php_fpm_ini
               volumes:
-                - name: kanboard_data
-                  hostPath:
+                - hostPath:
                     path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/data"
                     type: Directory
-                - name: kanboard_plugins
-                  hostPath:
+                  name: kanboard_data
+                - hostPath:
                     path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins"
                     type: Directory
-                - name: kanboard_ssl
-                  hostPath:
+                  name: kanboard_plugins
+                - hostPath:
                     path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/ssl"
                     type: Directory
-                - name: ca_certs
-                  hostPath:
+                  name: kanboard_ssl
+                - hostPath:
                     path: /etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
                     type: File
-                - name: php_fpm_ini
-                  hostPath:
+                  name: ca_certs
+                - hostPath:
                     path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/phpfpm_conf.d/z.ini"
                     type: File
+                  name: php_fpm_ini
+          state: started
     - name: podman_run_as_group
       parameter_type: string
       value: kanboard
@@ -218,83 +216,81 @@ foreman_hostgroup:
     - name: radiorabe_copies
       parameter_type: yaml
       value:
-        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/phpfpm_conf.d/z.ini"
-          mode: "0644"
-          content: display_errors = Off
-          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+        - content: display_errors = Off
+          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/phpfpm_conf.d/z.ini"
           group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
-        # The creation of .gitconfig only works the very first time the Ansible
-        # roles are executed
-        - dest: "$HOME/.gitconfig"
-          mode: "0644"
-          content: |-
+          mode: '0644'
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+        - content: |-
             [safe]
               directory = /home/kanboard/plugins/*
+          dest: $HOME/.gitconfig
+          mode: '0644'
     - name: radiorabe_files
       parameter_type: yaml
       value:
-        - path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/phpfpm_conf.d/"
-          state: directory
-          mode: "0755"
+        - group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
+          mode: '0755'
           owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
-          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
-        - path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/"
+          path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/phpfpm_conf.d/"
           state: directory
-          mode: "0755"
+        - group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
+          mode: '0755'
           owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
-          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
+          path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/"
           recurse: true
+          state: directory
     - name: radiorabe_git_clone
       parameter_type: yaml
       value:
-        - repo: https://codeberg.org/abu/Calendar.git
-          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/Calendar"
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/Calendar"
           force: true
+          repo: https://codeberg.org/abu/Calendar.git
           single_branch: true
           version: refs/tags/v1.5.0
-        - repo: https://github.com/creecros/Customizer.git
-          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/Customizer"
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/Customizer"
           force: true
+          repo: https://github.com/creecros/Customizer.git
           single_branch: true
           version: refs/tags/1.14.2
-        - repo: https://github.com/atcomputing/kanboard-ExtendedMail.git
-          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/ExtendedMail"
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/ExtendedMail"
           force: true
+          repo: https://github.com/atcomputing/kanboard-ExtendedMail.git
           single_branch: true
           version: refs/tags/v0.8
-        - repo: https://github.com/kanboard/plugin-gantt.git
-          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/Gantt"
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/Gantt"
           force: true
+          repo: https://github.com/kanboard/plugin-gantt.git
           single_branch: true
           version: refs/tags/v1.0.6
-        - repo: https://github.com/kenlog/HighlightCodeSyntax.git
-          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/HighlightCodeSyntax"
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/HighlightCodeSyntax"
           force: true
+          repo: https://github.com/kenlog/HighlightCodeSyntax.git
           single_branch: true
           version: refs/tags/v1.0.3
-        - repo: https://github.com/kanboard/plugin-oauth2.git
-          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/OAuth2"
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/OAuth2"
           force: true
+          repo: https://github.com/kanboard/plugin-oauth2.git
           single_branch: true
           version: refs/tags/v1.0.2
-        - repo: https://github.com/radiorabe/kanboard-theme-rabe.git
-          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/RaBe"
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/RaBe"
           force: true
+          repo: https://github.com/radiorabe/kanboard-theme-rabe.git
           single_branch: true
           version: main
-        - repo: https://github.com/creecros/SendEmailCreator.git
-          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/SendEmailCreator"
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/SendEmailCreator"
           force: true
+          repo: https://github.com/creecros/SendEmailCreator.git
           single_branch: true
           version: refs/tags/1.2.6
-        - repo: https://github.com/creecros/Task2pdf.git
-          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/Task2pdf"
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/Task2pdf"
           force: true
+          repo: https://github.com/creecros/Task2pdf.git
           single_branch: true
           version: refs/tags/1.8.0
-        - repo: https://github.com/imfx77/kanboard-plugin-Wysiwyg-MD-Editor.git
-          dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/WysiwygMDEditor"
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/plugins/WysiwygMDEditor"
           force: true
+          repo: https://github.com/imfx77/kanboard-plugin-Wysiwyg-MD-Editor.git
           single_branch: true
           version: refs/tags/v0.9.8
     - name: selinux_booleans
