@@ -66,7 +66,7 @@ foreman_hostgroup:
                   image: ghcr.io/radiorabe/httpd:0.6.2
                   env:
                     - name: PODMAN_HOST
-                      value: "{{ '{{ ansible_host }}' }}"
+                      value: "{{ '{{' }} ansible_host {{ '}}' }}"
                   ports:
                     - containerPort: 8080
                       hostPort: 8080
@@ -84,19 +84,19 @@ foreman_hostgroup:
               volumes:
                 - name: local_httpd_configs
                   hostPath:
-                    path: /home/revproxy/httpd/conf.d/local_configs
+                    path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/conf.d/local_configs"
                 - name: local_modsec_rules
                   hostPath:
-                    path: /home/revproxy/httpd/modsecurity.d/local_rules
+                    path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/modsecurity.d/local_rules"
                 - name: local_letsencrypt_certs
                   hostPath:
-                    path: /home/revproxy/httpd/rabe_certs
+                    path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/rabe_certs"
     - name: podman_run_as_group
       parameter_type: string
-      value: revproxy
+      value: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
     - name: podman_run_as_user
       parameter_type: string
-      value: revproxy
+      value: "{{ '{{' }} local_user_username {{ '}}' }}"
     - name: podman_selinux_ports
       parameter_type: yaml
       value:
@@ -117,7 +117,7 @@ foreman_hostgroup:
     - name: radiorabe_git_clone
       parameter_type: yaml
       value:
-        - repo: "https://{{ radiorabe_git_clone_pat }}@github.com/radiorabe/reverse-proxy-configuration.git"
+        - repo: "https://{{ '{{' }} radiorabe_git_clone_pat {{ '}}' }}@github.com/radiorabe/reverse-proxy-configuration.git"
           dest: /tmp/reverse-proxy-configuration
           separate_git_dir: /tmp/reverse-proxy-configuration-git
           single_branch: true
@@ -127,14 +127,14 @@ foreman_hostgroup:
       value: true
     - name: radiorabe_git_clone_pat
       parameter_type: string
-      value: "{{ undef('variable radiorabe_git_clone_pat needs to be set in host') }}"
+      value: "{{ '{{' }} undef('variable radiorabe_git_clone_pat needs to be set in host') {{ '}}' }}"
     - name: radiorabe_git_clone_remote_dest
       parameter_type: string
-      value: /home/revproxy
+      value: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}"
     - name: radiorabe_files
       parameter_type: yaml
       value:
-        - path: "/home/revproxy"
+        - path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}"
           recurse: true
-          owner: revproxy
-          group: revproxy
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
