@@ -49,6 +49,20 @@ class ParameterMergingTest(unittest.TestCase):
             "{{ '{{ ansible_host }}' }}",
         )
 
+    def test_escapes_jinja_expressions_for_dumping(self):
+        escaped = MODULE._to_plain(MODULE._to_yaml_node("{{ example_var }}"))
+        self.assertEqual(
+            escaped,
+            "{{ '{{' }} example_var {{ '}}' }}",
+        )
+
+    def test_escapes_jinja_tag_strings_for_dumping(self):
+        escaped = MODULE._to_plain(MODULE._to_yaml_node("{% if foo %}"))
+        self.assertEqual(
+            escaped,
+            "{{ '{%' }} if foo {{ '%}' }}",
+        )
+
     def test_updates_non_template_parameter_values(self):
         yaml = MODULE._yaml_loader()
         existing = yaml.load(
@@ -97,7 +111,7 @@ class ParameterMergingTest(unittest.TestCase):
 
         self.assertEqual(
             MODULE._to_plain(merged)[0]["value"],
-            "{{ different_secret }}",
+            "{{ '{{' }} different_secret {{ '}}' }}",
         )
 
 
