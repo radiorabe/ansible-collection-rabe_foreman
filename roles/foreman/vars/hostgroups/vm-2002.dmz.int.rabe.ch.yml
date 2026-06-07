@@ -69,7 +69,7 @@ foreman_hostgroup:
                 - env:
                     - name: PODMAN_HOST
                       value: "{{ '{{' }} ansible_host {{ '}}' }}"
-                  image: ghcr.io/radiorabe/httpd:0.6.2
+                  image: ghcr.io/radiorabe/httpd:0.6.7@sha256:905ed132d1bdb9c32d2424203df79d215076a660c111f566490c84a56138f37d
                   name: revproxy
                   ports:
                     - containerPort: 8080
@@ -146,3 +146,6 @@ foreman_hostgroup:
     - name: zabbix_monitoring_podman_user
       parameter_type: string
       value: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+    - name: podman_prune_images
+      parameter_type: boolean
+      value: true
