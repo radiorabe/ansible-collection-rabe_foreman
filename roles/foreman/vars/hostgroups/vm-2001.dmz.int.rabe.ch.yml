@@ -6,6 +6,10 @@ foreman_hostgroup:
   organization: RaBe
   locations:
     - Sulgenrain
+  domain: dmz.int.rabe.ch
+  subnet: dmz
+  lifecycle_environment: Dev
+  compute_resource: server-008.dmz-admin.int.rabe.ch
   ansible_roles:
     - radiorabe.common.local_user
     - radiorabe.common.git_clone
@@ -55,19 +59,18 @@ foreman_hostgroup:
     - name: podman_kube_specs
       parameter_type: yaml
       value:
-        - state: started
-          kube_file_content:
+        - kube_file_content:
             apiVersion: v1
             kind: Pod
             metadata:
               name: revproxy
             spec:
               containers:
-                - name: revproxy
-                  image: ghcr.io/radiorabe/httpd:0.6.2
-                  env:
+                - env:
                     - name: PODMAN_HOST
                       value: "{{ '{{' }} ansible_host {{ '}}' }}"
+                  image: ghcr.io/radiorabe/httpd:0.6.2
+                  name: revproxy
                   ports:
                     - containerPort: 8080
                       hostPort: 8080
@@ -83,15 +86,16 @@ foreman_hostgroup:
                     - mountPath: /etc/pki/tls/private/rabe_certs:Z
                       name: local_letsencrypt_certs
               volumes:
-                - name: local_httpd_configs
-                  hostPath:
+                - hostPath:
                     path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/conf.d/local_configs"
-                - name: local_modsec_rules
-                  hostPath:
+                  name: local_httpd_configs
+                - hostPath:
                     path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/modsecurity.d/local_rules"
-                - name: local_letsencrypt_certs
-                  hostPath:
+                  name: local_modsec_rules
+                - hostPath:
                     path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/rabe_certs"
+                  name: local_letsencrypt_certs
+          state: started
     - name: podman_run_as_group
       parameter_type: string
       value: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
@@ -118,8 +122,8 @@ foreman_hostgroup:
     - name: radiorabe_git_clone
       parameter_type: yaml
       value:
-        - repo: "https://{{ '{{' }} radiorabe_git_clone_pat {{ '}}' }}@github.com/radiorabe/reverse-proxy-configuration.git"
-          dest: /tmp/reverse-proxy-configuration
+        - dest: /tmp/reverse-proxy-configuration
+          repo: "https://{{ '{{' }} radiorabe_git_clone_pat {{ '}}' }}@github.com/radiorabe/reverse-proxy-configuration.git"
           separate_git_dir: /tmp/reverse-proxy-configuration-git
           single_branch: true
           version: main
@@ -135,10 +139,10 @@ foreman_hostgroup:
     - name: radiorabe_files
       parameter_type: yaml
       value:
-        - path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}"
-          recurse: true
+        - group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
           owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
-          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
+          path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          recurse: true
     - name: zabbix_monitoring_podman_user
       parameter_type: string
       value: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
