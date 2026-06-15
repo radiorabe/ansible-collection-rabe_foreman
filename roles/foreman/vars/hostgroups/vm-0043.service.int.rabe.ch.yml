@@ -18,6 +18,7 @@ foreman_hostgroup:
       value:
         - archiv.rabe.ch
         - default.rabe.ch,sso.rabe.ch
+        - sso.rabe.ch
         - dmz-rev-proxy.ewb.rabe.ch
         - dmz-rev-proxy.upc.rabe.ch
         - intranet.rabe.ch
