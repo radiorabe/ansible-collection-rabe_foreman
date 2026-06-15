@@ -85,6 +85,8 @@ foreman_hostgroup:
                       name: local_modsec_rules
                     - mountPath: /etc/pki/tls/private/rabe_certs:Z
                       name: local_letsencrypt_certs
+                    - mountPath: /var/lib/httpd:Z
+                      name: state
               volumes:
                 - hostPath:
                     path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/conf.d/local_configs"
@@ -95,6 +97,8 @@ foreman_hostgroup:
                 - hostPath:
                     path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/rabe_certs"
                   name: local_letsencrypt_certs
+                - name: state
+                  emptyDir: {}
           state: started
     - name: podman_run_as_group
       parameter_type: string
@@ -146,6 +150,3 @@ foreman_hostgroup:
     - name: zabbix_monitoring_podman_user
       parameter_type: string
       value: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
-    - name: podman_prune_images
-      parameter_type: boolean
-      value: true
