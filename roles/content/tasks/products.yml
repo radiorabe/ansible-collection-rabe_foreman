@@ -241,38 +241,16 @@
             download_policy: on_demand
             auto_enabled: false
       # All of our distros should have access to foreman client tooling.
-      # Foreman 3.11
-      - name: Foreman Client 3.11 EL7
-        label: foremanclient311el7
-        state: absent
-      - name: Foreman Client 3.11 EL8
-        label: foremanclient311el8
-        state: absent
-      - name: Foreman Client 3.11 EL9
-        label: foremanclient311el9
-        state: absent
       # Foreman 3.12
       - name: Foreman Client 3.12 EL7
         label: foremanclient312el7
-        repositories:
-          - name: Foreman Client 3.12 EL7 x86_64
-            content_type: yum
-            label: foreman321el7_client
-            url: https://yum.theforeman.org/client/3.12/el7/x86_64/
-            download_policy: on_demand
-            auto_enabled: true
+        state: absent
       - name: Foreman Client 3.12 EL8
         label: foremanclient312el8
         state: absent
       - name: Foreman Client 3.12 EL9
         label: foremanclient312el9
-        repositories:
-          - name: Foreman Client 3.12 EL9 x86_64
-            content_type: yum
-            label: foreman312el9_client
-            url: https://yum.theforeman.org/client/3.12/el9/x86_64/
-            download_policy: on_demand
-            auto_enabled: true
+        state: absent
       # Foreman 3.13 (EL7 exclusive)
       - name: Foreman Client 3.13 EL7
         label: foremanclient313el7
