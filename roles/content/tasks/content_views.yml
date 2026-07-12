@@ -85,10 +85,6 @@
             product: Extra Packages for Enterprise Linux 9
           - name: Zabbix 7.0 Official Repository - EL9 - x86_64
             product: Zabbix 7.0 EL9
-          # TODO: move unsupported repo to 7.0 product and update here once done
-          # this is most likely a multi-step change
-          - name: Zabbix Official Repository (non-supported) - EL9 - x86_64
-            product: Zabbix 6.4 EL9
           - name: Trivy for EL9 (x84_64)
             product: Trivy
       - name: AlmaLinux 10 x86_64
