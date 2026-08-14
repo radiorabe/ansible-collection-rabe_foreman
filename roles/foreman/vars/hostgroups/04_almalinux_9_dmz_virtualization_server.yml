@@ -8,10 +8,11 @@ foreman_hostgroup:
     - Sulgenrain
   domain: dmz-admin.int.rabe.ch
   subnet: dmz-admin
+  lifecycle_environment: Dev
   ansible_roles:
-    - redhat.rhel_system_roles.network
     - radiorabe.foreman_libvirt.libvirt
     - radiorabe.common.download_file
+    - redhat.rhel_system_roles.network
     - redhat.rhel_system_roles.bootloader
   parameters:
     - name: bootloader_settings
