@@ -208,10 +208,6 @@ foreman_hostgroup:
           setype: http_port_t
         - ports: 443
           setype: http_port_t
-    - name: rabe_backup_include_paths
-      parameter_type: yaml
-      value:
-        - /home/kanboard
     - name: radiorabe_copies
       parameter_type: yaml
       value:
