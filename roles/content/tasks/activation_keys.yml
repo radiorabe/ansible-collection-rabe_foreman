@@ -27,7 +27,7 @@
           - label: RaBe_alma9_alma9_resilientstorage
             override: disabled
           - label: RaBe_epel9_epel9
-            override: disabled
+            override: enabled
           - label: RaBe_alma9_alma9_ha
             override: disabled
           - label: RaBe_alma9_alma9_plus

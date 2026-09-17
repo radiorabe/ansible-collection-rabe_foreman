@@ -13,3 +13,12 @@ foreman_hostgroup:
     - name: kt_activation_keys
       parameter_type: string
       value: AlmaLinux 9
+    - name: packages_packages
+      parameter_type: yaml
+      value:
+        - fzf
+        - htop
+        - kitty-terminfo
+        - ncdu
+        - ripgrep
+        - yq
