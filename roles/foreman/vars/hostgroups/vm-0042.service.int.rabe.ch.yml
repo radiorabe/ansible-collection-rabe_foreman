@@ -1,0 +1,263 @@
+---
+foreman_hostgroup:
+  name: vm-0042.service.int.rabe.ch
+  description: AlmaLinux 9 VM for NetBox IPAM
+  parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
+  organization: RaBe
+  locations:
+    - Sulgenrain
+  ansible_roles:
+    - radiorabe.common.selinux_modules
+    - redhat.rhel_system_roles.certificate
+    - radiorabe.common.local_user
+    - redhat.rhel_system_roles.kernel_settings
+    - radiorabe.common.files
+    - redhat.rhel_system_roles.podman
+    - radiorabe.podman.zabbix_monitoring
+  parameters:
+    - name: certificate_requests
+      parameter_type: yaml
+      value:
+        - name: netbox
+          dns:
+            - netbox.service.int.rabe.ch
+          ca: ipa
+          principal: HTTP/netbox.service.int.rabe.ch@INT.RABE.CH
+          key_size: 4096
+          run_after: |
+            /usr/bin/cat /etc/pki/tls/certs/netbox.* /etc/ipa/ca.crt \
+            /etc/pki/tls/private/netbox.* > ./bundle.pem
+            cd /home/netbox
+            /usr/bin/sudo -u netbox /usr/bin/podman cp bundle.pem \
+              netbox-netbox:/tmp/bundle.pem \
+              && \
+              /usr/bin/podman exec -ti -- netbox-netbox \
+                /usr/bin/curl -X PUT \
+                  --data-binary @/tmp/bundle.pem \
+                  --unix-socket /opt/unit/unit.sock \
+                  http://localhost/certificates/netbox_bundle
+    - name: netbox_db_password
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable netbox_db_password needs to be set in host') {{ '}}' }}"
+    - name: netbox_db_user
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable netbox_db_user needs to be set in host') {{ '}}' }}"
+    - name: netbox_secret_key
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable netbox_secret_key needs to be set in host') {{ '}}' }}"
+    - name: kernel_settings_sysctl
+      parameter_type: yaml
+      value:
+        - name: net.ipv4.ip_unprivileged_port_start
+          value: 80
+    - name: local_user_username
+      parameter_type: string
+      value: netbox
+    - name: podman_containers_conf
+      parameter_type: yaml
+      value:
+        containers:
+          log_driver: k8s-file
+          log_size_max: 1073741824
+    - name: podman_create_host_directories
+      parameter_type: boolean
+      value: true
+    - name: podman_firewall
+      parameter_type: yaml
+      value:
+        - service:
+            - http
+            - https
+          state: enabled
+    - name: podman_kube_specs
+      parameter_type: yaml
+      value:
+        - state: started
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: netbox
+          spec:
+            containers:
+              - name: redis
+                image: docker.io/valkey/valkey:9-alpine
+              - name: netbox
+                image: ghcr.io/radiorabe/netbox:0.1.0
+                ports:
+                  - hostIP: 127.0.0.1
+                    hostPort: 80
+                    containerPort: 8080
+                  - hostIP: 127.0.0.1
+                    hostPort: 443
+                    containerPort: 8443
+                env:
+                  - name: DB_HOST
+                    value: "postgresql.service.int.rabe.ch"
+                  - name: DB_NAME
+                    value: "{{ '{{' }} netbox_db_name {{ '}}' }}"
+                  - name: DB_USER
+                    value: "{{ '{{' }} netbox_db_user {{ '}}' }}"
+                  - name: DB_PASSWORD
+                    value: "{{ '{{' }} netbox_db_password {{ '}}' }}"
+                  - name: SECRET_KEY
+                    value: "{{ '{{' }} netbox_secret_key {{ '}}' }}"
+                  - name: REDIS_HOST
+                    value: 127.0.0.1
+                  - name: REDIS_DATABASE
+                    value: 0
+                  - name: REDIS_CACHE_HOST
+                    value: 127.0.0.1
+                  - name: REDIS_CACHE_DATABASE
+                    value: 1
+                livenessProbe:
+                  httpGet:
+                    path: "/login/"
+                    port: 8080
+                  initialDelaySeconds: 90
+                  periodSeconds: 15
+                  timeoutSeconds: 3
+                volumeMounts:
+                  - name: netbox_nginx_unit_config
+                    mountPath: "/etc/unit/nginx-unit.json:Z"
+                  - name: netbox_media
+                    mountPath: "/etc/netbox/media:Z"
+              - name: netbox-worker
+                image: ghcr.io/radiorabe/netbox:0.1.0
+                command:
+                  - "/opt/netbox/venv/bin/python"
+                  - "/opt/netbox/netbox/manage.py"
+                  - rqworker
+                  - high
+                  - default
+                  - low
+                env:
+                  - name: DB_HOST
+                    value: "postgresql.service.int.rabe.ch"
+                  - name: DB_NAME
+                    value: "{{ '{{' }} netbox_db_name {{ '}}' }}"
+                  - name: DB_USER
+                    value: "{{ '{{' }} netbox_db_user {{ '}}' }}"
+                  - name: DB_PASSWORD
+                    value: "{{ '{{' }} netbox_db_password {{ '}}' }}"
+                  - name: SECRET_KEY
+                    value: "{{ '{{' }} netbox_secret_key {{ '}}' }}"
+                  - name: REDIS_HOST
+                    value: 127.0.0.1
+                  - name: REDIS_DATABASE
+                    value: 0
+                  - name: REDIS_CACHE_HOST
+                    value: 127.0.0.1
+                  - name: REDIS_CACHE_DATABASE
+                    value: 1
+                volumeMounts:
+                  - name: netbox_media
+                    mountPath: "/etc/netbox/media:Z"
+                  - name: netbox_nginx_unit_config
+                    mountPath: "/etc/unit/nginx-unit.json:Z"
+            volumes:
+              - name: netbox_media
+                hostPath:
+                  path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/media"
+                  type: Directory
+              - name: netbox_nginx_unit_config
+                hostPath:
+                  path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/nginx-unit.json"
+                  type: File
+    - name: podman_run_as_group
+      parameter_type: string
+      value: netbox
+    - name: podman_run_as_user
+      parameter_type: string
+      value: netbox
+    - name: podman_selinux_ports
+      parameter_type: yaml
+      value:
+        - ports: 80
+          setype: http_port_t
+        - ports: 443
+          setype: http_port_t
+    - name: radiorabe_copies
+      parameter_type: yaml
+      value:
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/nginx-unit.json"
+          mode: "0755"
+          content: |-
+            {
+              "listeners": {
+                "*:8080": {
+                  "pass": "routes/redirect_to_https"
+                },
+                "*:8443": {
+                  "pass": "routes/netbox_routes",
+                  "tls": {
+                    "certificate": "netbox_bundle"
+                  }
+                }
+              },
+
+              "routes": {
+                "redirect_to_https": [
+                  {
+                    "action": {
+                      "return": 301,
+                      "location": "https://netbox.service.int.rabe.ch"
+                    }
+                  }
+                ],
+                "netbox_routes": [
+                  {
+                    "match": {
+                      "uri": "/static/*"
+                    },
+                    "action": {
+                      "share": "/opt/netbox/netbox"
+                    }
+                  },
+                  {
+                    "action": {
+                      "pass": "applications/netbox"
+                    }
+                  }
+                ]
+              },
+
+              "applications": {
+                "netbox": {
+                  "type": "python 3",
+                  "path": "/opt/netbox/netbox/",
+                  "module": "netbox.wsgi",
+                  "home": "/opt/netbox/venv",
+                  "processes": {
+                    "max": 4,
+                    "spare": 1,
+                    "idle_timeout": 120
+                  }
+                }
+              },
+
+              "access_log": "/dev/stdout"
+            }
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
+    - name: radiorabe_files
+      parameter_type: yaml
+      value:
+        - path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/media/"
+          state: directory
+          mode: "0755"
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
+    - name: selinux_fcontexts
+      parameter_type: yaml
+      value:
+        - target: /etc/certmonger/post-scripts(/.*)?
+          setype: certmonger_unconfined_exec_t
+          ftype: f
+          state: present
+    - name: selinux_restore_dirs
+      parameter_type: yaml
+      value:
+        - /etc/certmonger/post-scripts/
+    - name: zabbix_monitoring_podman_user
+      parameter_type: string
+      value: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
