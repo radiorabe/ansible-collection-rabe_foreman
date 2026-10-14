@@ -82,7 +82,7 @@ foreman_hostgroup:
               - name: redis
                 image: docker.io/valkey/valkey:9-alpine
               - name: netbox
-                image: ghcr.io/radiorabe/netbox:0.1.0
+                image: ghcr.io/radiorabe/netbox-v3.1.7:0.1.1@sha256-49f90beddab7e4c972ed3cd0a15b332504bd56adca8128abb78e7aa05444f5d6
                 ports:
                   - hostIP: 127.0.0.1
                     hostPort: 80
@@ -122,7 +122,7 @@ foreman_hostgroup:
                   - name: netbox_media
                     mountPath: "/etc/netbox/media:Z"
               - name: netbox-worker
-                image: ghcr.io/radiorabe/netbox:0.1.0
+                image: ghcr.io/radiorabe/netbox-v3.1.7:0.1.1@sha256-49f90beddab7e4c972ed3cd0a15b332504bd56adca8128abb78e7aa05444f5d6
                 command:
                   - "/opt/netbox/venv/bin/python"
                   - "/opt/netbox/netbox/manage.py"
