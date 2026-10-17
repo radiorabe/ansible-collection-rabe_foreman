@@ -1,4 +1,3 @@
----
 foreman_hostgroup:
   name: vm-0042.service.int.rabe.ch
   description: AlmaLinux 9 VM for NetBox IPAM
@@ -18,33 +17,22 @@ foreman_hostgroup:
     - name: certificate_requests
       parameter_type: yaml
       value:
-        - name: netbox
+        - name: vm-0042.service.int.rabe.ch
           dns:
+            - vm-0042.service.int.rabe.ch
             - netbox.service.int.rabe.ch
           ca: ipa
-          principal: HTTP/netbox.service.int.rabe.ch@INT.RABE.CH
+          principal: HTTP/vm-0042.service.int.rabe.ch@INT.RABE.CH
           key_size: 4096
           run_after: |
-            /usr/bin/cat /etc/pki/tls/certs/netbox.* /etc/ipa/ca.crt \
-            /etc/pki/tls/private/netbox.* > ./bundle.pem
-            cd /home/netbox
-            /usr/bin/sudo -u netbox /usr/bin/podman cp bundle.pem \
-              netbox-netbox:/tmp/bundle.pem \
-              && \
-              /usr/bin/podman exec -ti -- netbox-netbox \
-                /usr/bin/curl -X PUT \
-                  --data-binary @/tmp/bundle.pem \
-                  --unix-socket /opt/unit/unit.sock \
-                  http://localhost/certificates/netbox_bundle
-    - name: netbox_db_password
-      parameter_type: string
-      value: "{{ '{{' }} undef('variable netbox_db_password needs to be set in host') {{ '}}' }}"
-    - name: netbox_db_user
-      parameter_type: string
-      value: "{{ '{{' }} undef('variable netbox_db_user needs to be set in host') {{ '}}' }}"
-    - name: netbox_secret_key
-      parameter_type: string
-      value: "{{ '{{' }} undef('variable netbox_secret_key needs to be set in host') {{ '}}' }}"
+            /usr/bin/cat \
+              /etc/pki/tls/certs/vm-0042.service.int.rabe.ch.crt \
+              /etc/ipa/ca.crt \
+              /etc/pki/tls/private/vm-0042.service.int.rabe.ch.key \
+              > /home/{{ '{{' }} podman_run_as_user {{ '}}' }}/bundle.pem
+            /usr/bin/chown \
+              {{ '{{' }} podman_run_as_user {{ '}}' }}:{{ '{{' }} podman_run_as_group {{ '}}' }} \
+              /home/{{ '{{' }} podman_run_as_user {{ '}}' }}/bundle.pem
     - name: kernel_settings_sysctl
       parameter_type: yaml
       value:
@@ -53,6 +41,31 @@ foreman_hostgroup:
     - name: local_user_username
       parameter_type: string
       value: netbox
+    - name: netbox_db_host
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable netbox_db_host needs to be set in host') {{ '}}' }}"
+    - name: netbox_db_name
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable netbox_db_name needs to be set in host') {{ '}}' }}"
+    - name: netbox_db_password
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable netbox_db_password needs to be set in host') {{ '}}' }}"
+    - name: netbox_db_user
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable netbox_db_user needs to be set in host') {{ '}}' }}"
+    - name: netbox_oidc_access_token_url
+      value: "{{ '{{' }} undef('variable netbox_oidc_access_token_url needs to be set in host') {{ '}}' }}"
+    - name: netbox_oidc_authorization_url
+      value: "{{ '{{' }} undef('variable netbox_oidc_authorization_url needs to be set in host') {{ '}}' }}"
+    - name: netbox_oidc_client_id
+      value: "{{ '{{' }} undef('variable netbox_oidc_client_id needs to be set in host') {{ '}}' }}"
+    - name: netbox_oidc_client_secret
+      value: "{{ '{{' }} undef('variable netbox_oidc_client_secret needs to be set in host') {{ '}}' }}"
+    - name: netbox_oidc_public_key
+      value: "{{ '{{' }} undef('variable netbox_oidc_public_key needs to be set in host') {{ '}}' }}"
+    - name: netbox_secret_key
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable netbox_secret_key needs to be set in host') {{ '}}' }}"
     - name: podman_containers_conf
       parameter_type: yaml
       value:
@@ -73,96 +86,174 @@ foreman_hostgroup:
       parameter_type: yaml
       value:
         - state: started
-          apiVersion: v1
-          kind: Pod
-          metadata:
-            name: netbox
-          spec:
-            containers:
-              - name: redis
-                image: docker.io/valkey/valkey:9-alpine
-              - name: netbox
-                image: ghcr.io/radiorabe/netbox-v3.1.7:0.1.1@sha256-49f90beddab7e4c972ed3cd0a15b332504bd56adca8128abb78e7aa05444f5d6
-                ports:
-                  - hostIP: 127.0.0.1
-                    hostPort: 80
-                    containerPort: 8080
-                  - hostIP: 127.0.0.1
-                    hostPort: 443
-                    containerPort: 8443
-                env:
-                  - name: DB_HOST
-                    value: "postgresql.service.int.rabe.ch"
-                  - name: DB_NAME
-                    value: "{{ '{{' }} netbox_db_name {{ '}}' }}"
-                  - name: DB_USER
-                    value: "{{ '{{' }} netbox_db_user {{ '}}' }}"
-                  - name: DB_PASSWORD
-                    value: "{{ '{{' }} netbox_db_password {{ '}}' }}"
-                  - name: SECRET_KEY
-                    value: "{{ '{{' }} netbox_secret_key {{ '}}' }}"
-                  - name: REDIS_HOST
-                    value: 127.0.0.1
-                  - name: REDIS_DATABASE
-                    value: 0
-                  - name: REDIS_CACHE_HOST
-                    value: 127.0.0.1
-                  - name: REDIS_CACHE_DATABASE
-                    value: 1
-                livenessProbe:
-                  httpGet:
-                    path: "/login/"
-                    port: 8080
-                  initialDelaySeconds: 90
-                  periodSeconds: 15
-                  timeoutSeconds: 3
-                volumeMounts:
-                  - name: netbox_nginx_unit_config
-                    mountPath: "/etc/unit/nginx-unit.json:Z"
-                  - name: netbox_media
-                    mountPath: "/etc/netbox/media:Z"
-              - name: netbox-worker
-                image: ghcr.io/radiorabe/netbox-v3.1.7:0.1.1@sha256-49f90beddab7e4c972ed3cd0a15b332504bd56adca8128abb78e7aa05444f5d6
-                command:
-                  - "/opt/netbox/venv/bin/python"
-                  - "/opt/netbox/netbox/manage.py"
-                  - rqworker
-                  - high
-                  - default
-                  - low
-                env:
-                  - name: DB_HOST
-                    value: "postgresql.service.int.rabe.ch"
-                  - name: DB_NAME
-                    value: "{{ '{{' }} netbox_db_name {{ '}}' }}"
-                  - name: DB_USER
-                    value: "{{ '{{' }} netbox_db_user {{ '}}' }}"
-                  - name: DB_PASSWORD
-                    value: "{{ '{{' }} netbox_db_password {{ '}}' }}"
-                  - name: SECRET_KEY
-                    value: "{{ '{{' }} netbox_secret_key {{ '}}' }}"
-                  - name: REDIS_HOST
-                    value: 127.0.0.1
-                  - name: REDIS_DATABASE
-                    value: 0
-                  - name: REDIS_CACHE_HOST
-                    value: 127.0.0.1
-                  - name: REDIS_CACHE_DATABASE
-                    value: 1
-                volumeMounts:
-                  - name: netbox_media
-                    mountPath: "/etc/netbox/media:Z"
-                  - name: netbox_nginx_unit_config
-                    mountPath: "/etc/unit/nginx-unit.json:Z"
-            volumes:
-              - name: netbox_media
-                hostPath:
-                  path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/media"
-                  type: Directory
-              - name: netbox_nginx_unit_config
-                hostPath:
-                  path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/nginx-unit.json"
-                  type: File
+          kube_file_content:
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              name: netbox
+            spec:
+              containers:
+                - name: redis
+                  image: docker.io/valkey/valkey:9-alpine
+                - name: netbox
+                  image: ghcr.io/radiorabe/netbox-v3.1.7:0.1.1@sha256-49f90beddab7e4c972ed3cd0a15b332504bd56adca8128abb78e7aa05444f5d6
+                  ports:
+                    - hostPort: 80
+                      containerPort: 8080
+                    - hostPort: 443
+                      containerPort: 8443
+                  env:
+                    - name: DB_HOST
+                      value: "{{ '{{' }} netbox_db_host {{ '}}' }}"
+                    - name: DB_NAME
+                      value: "{{ '{{' }} netbox_db_name {{ '}}' }}"
+                    - name: DB_USER
+                      value: "{{ '{{' }} netbox_db_user {{ '}}' }}"
+                    - name: DB_PASSWORD
+                      value: "{{ '{{' }} netbox_db_password {{ '}}' }}"
+                    - name: SECRET_KEY
+                      value: "{{ '{{' }} netbox_secret_key {{ '}}' }}"
+                    - name: REDIS_HOST
+                      value: 127.0.0.1
+                    - name: REDIS_DATABASE
+                      value: 0
+                    - name: REDIS_CACHE_HOST
+                      value: 127.0.0.1
+                    - name: REDIS_CACHE_DATABASE
+                      value: 1
+                    - name: ALLOWED_HOSTS
+                      value: vm-0042.service.int.rabe.ch netbox.service.int.rabe.ch
+                    - name: CSRF_TRUSTED_ORIGINS
+                      value: https://vm-0042.service.int.rabe.ch https://netbox.service.int.rabe.ch
+                    - name: EXEMPT_VIEW_PERMISSIONS
+                      value: "*"
+                    - name: LOGIN_REQUIRED
+                      value: 'False'
+                    - name: REMOTE_AUTH_ENABLED
+                      value: 'True'
+                    - name: REMOTE_AUTH_BACKEND
+                      value: social_core.backends.keycloak.KeycloakOAuth2
+                    - name: SOCIAL_AUTH_KEYCLOAK_KEY
+                      value: "{{ netbox_oidc_client_id }}"
+                    - name: SOCIAL_AUTH_KEYCLOAK_SECRET
+                      value: "{{ netbox_oidc_client_secret }}"
+                    - name: SOCIAL_AUTH_KEYCLOAK_PUBLIC_KEY
+                      value: "{{ netbox_oidc_public_key }}"
+                    - name: SOCIAL_AUTH_KEYCLOAK_AUTHORIZATION_URL
+                      value: "{{ netbox_oidc_authorization_url }}"
+                    - name: SOCIAL_AUTH_KEYCLOAK_ACCESS_TOKEN_URL
+                      value: "{{ netbox_oidc_access_token_url }}"
+                    - name: SOCIAL_AUTH_REDIRECT_IS_HTTPS
+                      value: 'True'
+                  livenessProbe:
+                    httpGet:
+                      path: "/login/"
+                      port: 8080
+                    initialDelaySeconds: 90
+                    periodSeconds: 15
+                    timeoutSeconds: 3
+                  volumeMounts:
+                    - name: netbox_media
+                      mountPath: "/etc/netbox/media:Z"
+                    - name: netbox_config
+                      mountPath: "/etc/netbox/config/extra.py:ro,Z"
+                    - name: netbox_nginx_unit_dir
+                      mountPath: /opt/unit
+                - name: netbox-worker
+                  image: ghcr.io/radiorabe/netbox-v3.1.7:0.1.1@sha256-49f90beddab7e4c972ed3cd0a15b332504bd56adca8128abb78e7aa05444f5d6
+                  command:
+                    - "/opt/netbox/venv/bin/python"
+                    - "/opt/netbox/netbox/manage.py"
+                    - rqworker
+                    - high
+                    - default
+                    - low
+                  env:
+                    - name: DB_HOST
+                      value: "{{ '{{' }} netbox_db_host {{ '}}' }}"
+                    - name: DB_NAME
+                      value: "{{ '{{' }} netbox_db_name {{ '}}' }}"
+                    - name: DB_USER
+                      value: "{{ '{{' }} netbox_db_user {{ '}}' }}"
+                    - name: DB_PASSWORD
+                      value: "{{ '{{' }} netbox_db_password {{ '}}' }}"
+                    - name: SECRET_KEY
+                      value: "{{ '{{' }} netbox_secret_key {{ '}}' }}"
+                    - name: REDIS_HOST
+                      value: 127.0.0.1
+                    - name: REDIS_DATABASE
+                      value: 0
+                    - name: REDIS_CACHE_HOST
+                      value: 127.0.0.1
+                    - name: REDIS_CACHE_DATABASE
+                      value: 1
+                  volumeMounts:
+                    - name: netbox_media
+                      mountPath: "/etc/netbox/media:Z"
+                    - name: netbox_config
+                      mountPath: "/etc/netbox/config/extra.py:ro,Z"
+                - name: unit-config
+                  image: ghcr.io/radiorabe/netbox-v3.1.7:0.1.1@sha256-49f90beddab7e4c972ed3cd0a15b332504bd56adca8128abb78e7aa05444f5d6
+                  command:
+                    - sh
+                    - -c
+                    - |
+                      set -eux
+                      # wait for unti socket to appear
+                      until [ -S /opt/unit/unit.sock ]; do sleep 1; done
+                      # allow netbox to apply default config
+                      sleep 10
+                      # check if any certificates are already present
+                      if curl --fail --silent --unix-socket /opt/unit/unit.sock http://localhost/certificates | grep -E '^\{\}' >/dev/Null; then
+                        # upload certificate bundle
+                        curl \
+                          --fail \
+                          --silent \
+                          --request PUT \
+                          --data-binary @/tmp/bundle.pem \
+                          --unix-socket /opt/unit/unit.sock \
+                          http://localhost/certificates/netbox_bundle
+                      fi
+                      # update config
+                      curl \
+                        --fail \
+                        --silent \
+                        --request PUT \
+                        --data-binary @/tmp/nginx-unit.json \
+                        --unix-socket /opt/unit/unit.sock \
+                        http://localhost/config
+                      # a restartPolicy: OnFailure would be nicer, but this is
+                      # only supported on pod level in podman kube play
+                      sleep infinity
+                  volumeMounts:
+                    - name: netbox_nginx_unit_dir
+                      mountPath: "/opt/unit"
+                    - name: netbox_nginx_unit_config
+                      mountPath: "/tmp/nginx-unit.json:ro,Z"
+                    - name: netbox_bundle
+                      mountPath: "/tmp/bundle.pem:ro,Z"
+              volumes:
+                - name: netbox_media
+                  hostPath:
+                    path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/media"
+                    type: Directory
+                - name: netbox_config
+                  hostPath:
+                    path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/extra.py"
+                    type: File
+                - name: netbox_nginx_unit_dir
+                  emptyDir: {}
+                - name: netbox_nginx_unit_config
+                  hostPath:
+                    path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/nginx-unit.json"
+                    type: File
+                - name: netbox_bundle
+                  hostPath:
+                    path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/bundle.pem"
+                    type: File
+    - name: podman_prune_images
+      parameter_type: boolean
+      value: true
     - name: podman_run_as_group
       parameter_type: string
       value: netbox
@@ -176,11 +267,28 @@ foreman_hostgroup:
           setype: http_port_t
         - ports: 443
           setype: http_port_t
+    - name: rabe_backup_include_paths
+      parameter_type: yaml
+      value:
+        - "/home/{{ podman_run_as_user }}"
     - name: radiorabe_copies
       parameter_type: yaml
       value:
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/extra.py"
+          mode: "0644"
+          content: |
+            # /etc/netbox/config/extra.py  (loaded automatically by netbox-docker's config loader)
+            from os import environ
+            SOCIAL_AUTH_KEYCLOAK_ACCESS_TOKEN_URL  = environ.get('SOCIAL_AUTH_KEYCLOAK_ACCESS_TOKEN_URL')
+            SOCIAL_AUTH_KEYCLOAK_AUTHORIZATION_URL = environ.get('SOCIAL_AUTH_KEYCLOAK_AUTHORIZATION_URL')
+            SOCIAL_AUTH_KEYCLOAK_KEY               = environ.get('SOCIAL_AUTH_KEYCLOAK_KEY')
+            SOCIAL_AUTH_KEYCLOAK_PUBLIC_KEY        = environ.get('SOCIAL_AUTH_KEYCLOAK_PUBLIC_KEY')
+            SOCIAL_AUTH_KEYCLOAK_SECRET            = environ.get('SOCIAL_AUTH_KEYCLOAK_SECRET')
+            SOCIAL_AUTH_REDIRECT_IS_HTTPS          = environ.get('SOCIAL_AUTH_REDIRECT_IS_HTTPS')
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
         - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/nginx-unit.json"
-          mode: "0755"
+          mode: "0644"
           content: |-
             {
               "listeners": {
@@ -237,14 +345,6 @@ foreman_hostgroup:
 
               "access_log": "/dev/stdout"
             }
-          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
-          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
-    - name: radiorabe_files
-      parameter_type: yaml
-      value:
-        - path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/media/"
-          state: directory
-          mode: "0755"
           owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
           group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
     - name: selinux_fcontexts
