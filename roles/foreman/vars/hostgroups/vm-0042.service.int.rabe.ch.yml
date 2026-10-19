@@ -270,7 +270,7 @@ foreman_hostgroup:
     - name: rabe_backup_include_paths
       parameter_type: yaml
       value:
-        - "/home/{{ podman_run_as_user }}"
+        - "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}"
     - name: radiorabe_copies
       parameter_type: yaml
       value:
