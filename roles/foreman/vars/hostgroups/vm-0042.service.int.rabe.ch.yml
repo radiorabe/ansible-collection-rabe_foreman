@@ -7,11 +7,11 @@ foreman_hostgroup:
     - Sulgenrain
   ansible_roles:
     - radiorabe.common.selinux_modules
-    - redhat.rhel_system_roles.certificate
     - radiorabe.common.local_user
     - redhat.rhel_system_roles.kernel_settings
     - radiorabe.common.files
     - redhat.rhel_system_roles.podman
+    - redhat.rhel_system_roles.certificate
     - radiorabe.podman.zabbix_monitoring
   parameters:
     - name: certificate_requests
@@ -25,6 +25,8 @@ foreman_hostgroup:
           principal: HTTP/vm-0042.service.int.rabe.ch@INT.RABE.CH
           key_size: 4096
           run_after: |
+            set -eux
+            # concatenate server certificate, ca certificate and private key
             /usr/bin/cat \
               /etc/pki/tls/certs/vm-0042.service.int.rabe.ch.crt \
               /etc/ipa/ca.crt \
@@ -33,6 +35,48 @@ foreman_hostgroup:
             /usr/bin/chown \
               {{ '{{' }} podman_run_as_user {{ '}}' }}:{{ '{{' }} podman_run_as_group {{ '}}' }} \
               /home/{{ '{{' }} podman_run_as_user {{ '}}' }}/bundle.pem
+            cd /home/{{ '{{' }} podman_run_as_user {{ '}}' }}
+            # copy bundle into container
+            /usr/bin/sudo --user {{ '{{' }} podman_run_as_user {{ '}}' }} \
+              /usr/bin/podman cp \
+                /home/{{ '{{' }} podman_run_as_user {{ '}}' }}/bundle.pem \
+                netbox-netbox:/tmp/bundle.pem
+            # reconfigure NGINX unit
+            /usr/bin/sudo --user {{ '{{' }} podman_run_as_user {{ '}}' }} \
+              /usr/bin/podman exec netbox-netbox \
+                /bin/sh -c '
+                  set -eux
+                  # wait for socket to appear
+                  until [ -S /opt/unit/unit.sock ]; do sleep 1; done
+                  # delete SSL listener to unblock SSL bundle
+                  /usr/bin/curl \
+                    --silent \
+                    --request DELETE \
+                    --unix-socket /opt/unit/unit.sock \
+                    "http://localhost/config/listeners/*:8443"
+                  # delete SSL bundle (otherwise the new one cannot be uploaded)
+                  /usr/bin/curl \
+                    --silent \
+                    --request DELETE \
+                    --unix-socket /opt/unit/unit.sock \
+                    http://localhost/certificates/netbox_bundle
+                  # upload new SSL bundle
+                  /usr/bin/curl \
+                    --fail \
+                    --silent \
+                    --request PUT \
+                    --data-binary @/tmp/bundle.pem \
+                    --unix-socket /opt/unit/unit.sock \
+                    http://localhost/certificates/netbox_bundle
+                  # reapply configuration
+                  /usr/bin/curl \
+                    --fail \
+                    --silent \
+                    --request PUT \
+                    --data-binary @/etc/unit/nginx-unit.json \
+                    --unix-socket /opt/unit/unit.sock \
+                    http://localhost/config
+                '
     - name: kernel_settings_sysctl
       parameter_type: yaml
       value:
@@ -157,8 +201,8 @@ foreman_hostgroup:
                       mountPath: "/etc/netbox/media:Z"
                     - name: netbox_config
                       mountPath: "/etc/netbox/config/extra.py:ro,Z"
-                    - name: netbox_nginx_unit_dir
-                      mountPath: /opt/unit
+                    - name: netbox_nginx_unit_config
+                      mountPath: "/etc/unit/nginx-unit.json:Z"
                 - name: netbox-worker
                   image: ghcr.io/radiorabe/netbox-v3.1.7:0.1.1@sha256-49f90beddab7e4c972ed3cd0a15b332504bd56adca8128abb78e7aa05444f5d6
                   command:
@@ -192,46 +236,6 @@ foreman_hostgroup:
                       mountPath: "/etc/netbox/media:Z"
                     - name: netbox_config
                       mountPath: "/etc/netbox/config/extra.py:ro,Z"
-                - name: unit-config
-                  image: ghcr.io/radiorabe/netbox-v3.1.7:0.1.1@sha256-49f90beddab7e4c972ed3cd0a15b332504bd56adca8128abb78e7aa05444f5d6
-                  command:
-                    - sh
-                    - -c
-                    - |
-                      set -eux
-                      # wait for unti socket to appear
-                      until [ -S /opt/unit/unit.sock ]; do sleep 1; done
-                      # allow netbox to apply default config
-                      sleep 10
-                      # check if any certificates are already present
-                      if curl --fail --silent --unix-socket /opt/unit/unit.sock http://localhost/certificates | grep -E '^\{\}' >/dev/Null; then
-                        # upload certificate bundle
-                        curl \
-                          --fail \
-                          --silent \
-                          --request PUT \
-                          --data-binary @/tmp/bundle.pem \
-                          --unix-socket /opt/unit/unit.sock \
-                          http://localhost/certificates/netbox_bundle
-                      fi
-                      # update config
-                      curl \
-                        --fail \
-                        --silent \
-                        --request PUT \
-                        --data-binary @/tmp/nginx-unit.json \
-                        --unix-socket /opt/unit/unit.sock \
-                        http://localhost/config
-                      # a restartPolicy: OnFailure would be nicer, but this is
-                      # only supported on pod level in podman kube play
-                      sleep infinity
-                  volumeMounts:
-                    - name: netbox_nginx_unit_dir
-                      mountPath: "/opt/unit"
-                    - name: netbox_nginx_unit_config
-                      mountPath: "/tmp/nginx-unit.json:ro,Z"
-                    - name: netbox_bundle
-                      mountPath: "/tmp/bundle.pem:ro,Z"
               volumes:
                 - name: netbox_media
                   hostPath:
@@ -241,15 +245,9 @@ foreman_hostgroup:
                   hostPath:
                     path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/extra.py"
                     type: File
-                - name: netbox_nginx_unit_dir
-                  emptyDir: {}
                 - name: netbox_nginx_unit_config
                   hostPath:
                     path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/nginx-unit.json"
-                    type: File
-                - name: netbox_bundle
-                  hostPath:
-                    path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/bundle.pem"
                     type: File
     - name: podman_prune_images
       parameter_type: boolean
