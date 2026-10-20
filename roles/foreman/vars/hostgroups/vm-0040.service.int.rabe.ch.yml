@@ -1,0 +1,256 @@
+---
+foreman_hostgroup:
+  name: vm-0040.service.int.rabe.ch
+  description: Zabbix 7.0
+  parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
+  organization: RaBe
+  locations:
+    - Sulgenrain
+  ansible_roles:
+    - theforeman.foreman_scap_client
+    - redhat.rhel_system_roles.kernel_settings
+    - radiorabe.rabe_foreman.network
+    - redhat.rhel_system_roles.sshd
+    - redhat.rhel_system_roles.certificate
+    - redhat.rhel_system_roles.postgresql
+    - community.zabbix.zabbix_server
+    - community.zabbix.zabbix_javagateway
+    - radiorabe.common.files
+    - community.zabbix.zabbix_web
+    - radiorabe.rabe_zabbix.agent
+  parameters:
+    - name: certificate_requests
+      parameter_type: yaml
+      value:
+        - name: zabbix-server
+          dns: vm-0040.service.int.rabe.ch
+          principal: zabbix/vm-0040.service.int.rabe.ch@INT.RABE.CH
+          ca: ipa
+          owner: root
+          group: zabbix
+        - name: zabbix-web
+          dns: vm-0040.service.int.rabe.ch
+          principal: HTTP/vm-0040.service.int.rabe.ch@INT.RABE.CH
+          ca: ipa
+          owner: root
+          group: zabbix
+    - name: cockpit_certificates
+      parameter_type: yaml
+      value:
+        - name: monger-cockpit
+          dns:
+            - vm-0040.service.int.rabe.ch
+          ca: ipa
+          principal: HTTP/vm-0040.service.int.rabe.ch@INT.RABE.CH
+          group: cockpit-ws
+    - name: cockpit_packages
+      parameter_type: yaml
+      value:
+        - cockpit
+        - cockpit-networkmanager
+        - cockpit-packagekit
+        - cockpit-selinux
+        - cockpit-storaged
+    - name: firewall
+      parameter_type: yaml
+      value:
+        - service: zabbix_active
+          short: Zabbix Server Active
+          description: Zabbix Server Active where agents send their data to.
+          port: 10051/tcp
+          state: present
+          permanent: true
+        - zone: service
+          state: present
+          permanent: true
+          immediate: true
+        - zone: service
+          interface: enp1s0
+          state: present
+          permanent: true
+          immediate: true
+        - zone: service
+          service:
+            - cockpit
+            - ssh
+            - http
+            - https
+            - zabbix_active
+          state: enabled
+          permanent: true
+          immediate: true
+        - set_default_zone: service
+          permanent: true
+          immediate: true
+    - name: logging_flows
+      parameter_type: yaml
+      value:
+        - name: flow0
+          inputs:
+            - system_input
+          outputs:
+            - files_output
+    - name: logging_inputs
+      parameter_type: yaml
+      value:
+        - name: system_input
+          type: basics
+    - name: logging_outputs
+      parameter_type: yaml
+      value:
+        - name: files_output
+          type: files
+    - name: postgresql_certificates
+      parameter_type: yaml
+      value:
+        - name: postgresql-server
+          dns:
+            - vm-0040.service.int.rabe.ch
+          ca: ipa
+          principal: postgres/vm-0040.service.int.rabe.ch@INT.RABE.CH
+          owner: root
+          group: postgres
+          mode: '0600'
+    - name: postgresql_pg_hba_conf
+      parameter_type: yaml
+      value:
+        - type: hostssl
+          database: all
+          user: all
+          auth_method: md5
+          address: 127.0.0.1/32
+    - name: postgresql_server_conf
+      parameter_type: yaml
+      value:
+        huge_pages: try
+    - name: postgresql_ssl_enable
+      parameter_type: boolean
+      value: true
+    - name: rabe_zabbix_auth_key
+      parameter_type: string
+      value: "{{ undef('variable rabe_zabbix_auth_key needs to be set in host') }}"
+    - name: rabe_zabbix_smtp_authentication_password
+      parameter_type: string
+      value: "{{ undef('variable rabe_zabbix_smtp_authentication_password needs to be set in host') }}"
+    - name: rabe_zabbix_smtp_from
+      parameter_type: string
+      value: smtp-submit@rabe.ch
+    - name: radiorabe_copies
+      parameter_type: yaml
+      value:
+        - content: |
+            # Managed by foreman
+            Listen 443 https
+          dest: /etc/httpd/conf.d/ssl.conf
+    - name: selinux_allow_httpd_can_connect_ldap
+      parameter_type: boolean
+      value: true
+    - name: selinux_allow_zabbix_can_network
+      parameter_type: boolean
+      value: true
+    - name: zabbix_agent2
+      parameter_type: boolean
+      value: true
+    - name: zabbix_agent_plugins
+      parameter_type: yaml
+      value:
+        - name: PostgreSQL.Default
+          options:
+            - parameter: User
+              value: zabbix
+            - parameter: Password
+              value: "{{ zabbix_server_dbpassword }}"
+            - parameter: TLSConnect
+              value: required
+    - name: zabbix_apache_custom_includes
+      parameter_type: yaml
+      value:
+        - |-
+          <Location "/server-status">
+              SetHandler server-status
+              Require host vm-0040.service.int.rabe.ch
+          </Location>
+    - name: zabbix_api_server_url
+      parameter_type: string
+      value: vm-0040.service.int.rabe.ch
+    - name: zabbix_javagateway_disable_repo
+      parameter_type: array
+      value: []
+    - name: zabbix_javagateway_listenip
+      parameter_type: string
+      value: 127.0.0.1
+    - name: zabbix_repo_yum
+      parameter_type: json
+      value: []
+    - name: zabbix_server_database
+      parameter_type: string
+      value: pgsql
+    - name: zabbix_server_database_creation
+      parameter_type: boolean
+      value: false
+    - name: zabbix_server_dbencryption
+      parameter_type: boolean
+      value: true
+    - name: zabbix_server_dbhost
+      parameter_type: string
+      value: 127.0.0.1
+    - name: zabbix_server_dbpassword
+      parameter_type: string
+      value: "{{ undef('variable zabbix_server_dbpassword needs to be set in host') }}"
+    - name: zabbix_server_dbport
+      parameter_type: string
+      value: '5432'
+    - name: zabbix_server_dbtlsconnect
+      parameter_type: string
+      value: required
+    - name: zabbix_server_javagateway
+      parameter_type: string
+      value: 127.0.0.1
+    - name: zabbix_server_pgsql_login_host
+      parameter_type: string
+      value: 127.0.0.1
+    - name: zabbix_server_pgsql_login_password
+      parameter_type: string
+      value: "{{ undef('variable zabbix_server_pgsql_login_password needs to be set in host') }}"
+    - name: zabbix_server_startipmipollers
+      parameter_type: string
+      value: '1'
+    - name: zabbix_server_startjavapollers
+      parameter_type: integer
+      value: 1
+    - name: zabbix_server_startsnmptrapper
+      parameter_type: integer
+      value: 1
+    - name: zabbix_server_tlscafile
+      parameter_type: string
+      value: /etc/ipa/ca.crt
+    - name: zabbix_server_tlscertfile
+      parameter_type: string
+      value: /etc/pki/tls/certs/zabbix-server.crt
+    - name: zabbix_server_tlskeyfile
+      parameter_type: string
+      value: /etc/pki/tls/private/zabbix-server.key
+    - name: zabbix_server_valuecachesize
+      parameter_type: string
+      value: 80M
+    - name: zabbix_server_version
+      parameter_type: string
+      value: '7.0'
+    - name: zabbix_timezone
+      parameter_type: string
+      value: Europe/Zurich
+    - name: zabbix_web_redirect
+      parameter_type: boolean
+      value: true
+    - name: zabbix_web_tls
+      parameter_type: boolean
+      value: true
+    - name: zabbix_web_tls_crt
+      parameter_type: string
+      value: /etc/pki/tls/certs/zabbix-web.crt
+    - name: zabbix_web_tls_key
+      parameter_type: string
+      value: /etc/pki/tls/private/zabbix-web.key
+    - name: zabbix_web_version
+      parameter_type: string
+      value: '7.0'
