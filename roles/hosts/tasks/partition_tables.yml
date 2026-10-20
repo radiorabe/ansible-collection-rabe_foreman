@@ -1,16 +1,16 @@
+---
 - name: "RaBe Foreman Hosts Templates: Create Partition Tables"
   ansible.builtin.include_role:
-    name: theforeman.foreman.partition_tables
+    name: radiorabe.foreman.partition_tables
   vars:
     foreman_partition_tables:
       - name: RaBe Standard VM Disk Layout
-        description: RaBe standard disk layout for all virtual machines.
-        os_family: RedHat
-        state: present
+        os_family: Redhat
         locked: true
         layout: |
           <%#
             name: RaBe Standard VM Disk Layout
+            description: RaBe standard disk layout for all virtual machines.
           %>
           # Clear all partitions and create a new GPT disklabel on /dev/sda and /dev/sdb
           clearpart --all --initlabel --drives=sda,sdb --disklabel=gpt
