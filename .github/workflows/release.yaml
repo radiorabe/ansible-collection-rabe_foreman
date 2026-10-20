@@ -7,6 +7,6 @@ on:
 
 jobs:
   call-workflow:
-    uses: radiorabe/actions/.github/workflows/release-ansible-collection.yaml@5dafb461cea1f8b296d89297dc6de7bd0891f0d2 # v0.44.2
+    uses: radiorabe/actions/.github/workflows/release-ansible-collection.yaml@6373540d4ab86c4ce044b6a67e96aecddf22c7c9 # v0.45.1
     secrets:
       GALAXY_API_KEY: ${{ secrets.GALAXY_API_KEY }}
