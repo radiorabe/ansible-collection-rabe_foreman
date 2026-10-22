@@ -85,7 +85,7 @@ foreman_hostgroup:
               containers:
                 - name: kanboard
                   restart: always
-                  image: quay.io/kanboard/kanboard:v1.2.51
+                  image: quay.io/kanboard/kanboard:v1.2.56@sha256:871435323da40b359baa64e41a58ba1c2ab14869c8e412d507cf7c3c3aeaf006
                   ports:
                     - containerPort: 80
                       hostPort: 80
