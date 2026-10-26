@@ -1,0 +1,223 @@
+---
+foreman_hostgroup:
+  name: vm-0029.service.int.rabe.ch
+  description: AlmaLinux 9 VM for ownCloud
+  parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
+  organization: RaBe
+  locations:
+    - Sulgenrain
+  ansible_roles:
+    - radiorabe.common.selinux_modules
+    - redhat.rhel_system_roles.certificate
+    - radiorabe.common.local_user
+    - redhat.rhel_system_roles.kernel_settings
+    - radiorabe.common.files
+    - redhat.rhel_system_roles.podman
+    - radiorabe.podman.zabbix_monitoring
+  parameters:
+    - name: certificate_requests
+      parameter_type: yaml
+      value:
+        - name: owncloud
+          dns:
+            - owncloud.service.int.rabe.ch
+          ca: ipa
+          principal: HTTP/owncloud.service.int.rabe.ch@INT.RABE.CH
+          key_size: 4096
+          run_after: |
+            /usr/bin/cp /etc/pki/tls/*/owncloud.* /home/owncloud/ssl/
+            /usr/bin/chown owncloud: /home/owncloud/ssl/*
+            cd /home/owncloud
+            /usr/bin/sudo -u owncloud /usr/bin/podman pod restart owncloud
+    - name: radiorabe_files
+      parameter_type: yaml
+      value:
+        - path: /home/owncloud/owncloud/
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
+          mode: '0755'
+          state: directory
+          recurse: true
+    - name: owncloud_db_password
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable owncloud_db_password needs to be set in host') {{ '}}' }}"
+    - name: owncloud_db_user
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable owncloud_db_user needs to be set in host') {{ '}}' }}"
+    - name: owncloud_mail_smtp_hostname
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable owncloud_mail_smtp_hostname needs to be set in host') {{ '}}' }}"
+    - name: owncloud_mail_smtp_password
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable owncloud_mail_smtp_password needs to be set in host') {{ '}}' }}"
+    - name: owncloud_mail_smtp_username
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable owncloud_mail_smtp_username needs to be set in host') {{ '}}' }}"
+    - name: owncloud_oidc_client_id
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable owncloud_oidc_client_id needs to be set in host') {{ '}}' }}"
+    - name: owncloud_oidc_client_secret
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable owncloud_oidc_client_secret needs to be set in host') {{ '}}' }}"
+    - name: kernel_settings_sysctl
+      parameter_type: yaml
+      value:
+        - name: net.ipv4.ip_unprivileged_port_start
+          value: 80
+    - name: local_user_username
+      parameter_type: string
+      value: owncloud
+    - name: podman_containers_conf
+      parameter_type: yaml
+      value:
+        containers:
+          log_driver: k8s-file
+          log_size_max: 1073741824
+    - name: podman_create_host_directories
+      parameter_type: boolean
+      value: true
+    - name: podman_firewall
+      parameter_type: yaml
+      value:
+        - service:
+            - http
+            - https
+          state: enabled
+    - name: podman_kube_specs
+      parameter_type: yaml
+      value:
+        - state: started
+          kube_file_content:
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              name: owncloud
+            spec:
+              containers:
+                - name: redis
+                  image: docker.io/valkey/valkey:9-alpine
+                  restart: always
+                - name: owncloud
+                  restart: always
+                  image: owncloud/server:10.16.0
+                  ports:
+                    - containerPort: 80
+                      hostPort: 80
+                    - containerPort: 443
+                      hostPort: 443
+                  volumeMounts:
+                    - mountPath: /mnt/data:Z
+                      name: owncloud_data
+                  env:
+                    - name: OWNCLOUD_ADMIN_USERNAME
+                      value: "admin"
+                    - name: OWNCLOUD_ADMIN_PASSWORD
+                      value: "admin"
+                    - name: OWNCLOUD_TRUSTED_DOMAINS
+                      value: "vm-0029.service.int.rabe.ch,vm-0028.service.int.rabe.ch,share.rabe.ch,onlyoffice.rabe.ch"
+                    - name: OWNCLOUD_TRUSTED_PROXIES
+                      value: "10.133.36.23,10.133.0.2,10.133.0.3"
+                    - name: OWNCLOUD_OVERWRITE_CLI_URL
+                      value: "https://vm-0029.service.int.rabe.ch"
+                    - name: OWNCLOUD_HTACCESS_REWRITE_BASE
+                      value: "/"
+                    - name: HTTP_PORT
+                      value: "80"
+                    - name: OWNCLOUD_DEFAULT_LANGUAGE
+                      value: "de"
+                    - name: OWNCLOUD_LOST_PASSWORD_LINK
+                      value: "https://my.rabe.ch/auth/forgotpw"
+                    - name: OWNCLOUD_DB_TYPE
+                      value: "pgsql"
+                    - name: OWNCLOUD_DB_NAME
+                      value: "{{ '{{' }} owncloud_db_name {{ '}}' }}"
+                    - name: OWNCLOUD_DB_HOST
+                      value: "{{ '{{' }} owncloud_db_host {{ '}}' }}"
+                    - name: OWNCLOUD_DB_TABLE_PREFIX
+                      value: "oc_"
+                    - name: OWNCLOUD_DB_USERNAME
+                      value: "{{ '{{' }} owncloud_db_username {{ '}}' }}"
+                    - name: OWNCLOUD_DB_PASSWORD
+                      value: "{{ '{{' }} owncloud_db_password {{ '}}' }}"
+                    - name: OWNCLOUD_REDIS_ENABLED
+                      value: "true"
+                    - name: OWNCLOUD_REDIS_HOST
+                      value: "redis"
+                    - name: OWNCLOUD_MAIL_DOMAIN
+                      value: "rabe.ch"
+                    - name: OWNCLOUD_MAIL_FROM_ADDRESS
+                      value: "noreply"
+                    - name: OWNCLOUD_MAIL_SMTPMODE
+                      value: "smtp"
+                    - name: OWNCLOUD_MAIL_SMTPSECURE
+                      value: "ssl"
+                    - name: OWNCLOUD_MAIL_SMTPAUTHTYPE
+                      value: "PLAIN"
+                    - name: OWNCLOUD_MAIL_SMTPAUTH
+                      value: "1"
+                    - name: OWNCLOUD_MAIL_SMTPHOST
+                      value: "{{ '{{' }} owncloud_mail_smtp_host {{ '}}' }}"
+                    - name: OWNCLOUD_MAIL_SMTPPORT
+                      value: "465"
+                    - name: OWNCLOUD_MAIL_SMTPNAME
+                      value: "{{ '{{' }} owncloud_mail_smtp_name {{ '}}' }}"
+                    - name: OWNCLOUD_MAIL_SMTPPASSWORD
+                      value: "{{ '{{' }} owncloud_mail_smtp_password {{ '}}' }}"
+                    - name: OWNCLOUD_HTTP_COOKIE_SAMESITE
+                      value: "None"
+                    - name: OWNCLOUD_OIDC_PROVIDER_URL
+                      value: "https://sso.rabe.ch/auth/realms/rabe"
+                    - name: OWNCLOUD_OIDC_CLIENT_ID
+                      value: "{{ '{{' }} owncloud_oidc_client_id {{ '}}' }}"
+                    - name: OWNCLOUD_OIDC_CLIENT_SECRET
+                      value: "{{ '{{' }} owncloud_oidc_client_secret {{ '}}' }}"
+                    - name: OWNCLOUD_OIDC_AUTO_REDIRECT_ON_LOGIN_PAGE
+                      value: "true"
+                    - name: OWNCLOUD_OIDC_MODE
+                      value: "userid"
+                    - name: OWNCLOUD_OIDC_SEARCH_ATTRIBUTE
+                      value: "unixUID"
+                    - name: OWNCLOUD_OIDC_POST_LOGOUT_REDIRECT_URI
+                      value: "https://www.rabe.ch"
+                    - name: OWNCLOUD_SOCIAL_LOGIN_AUTO_REDIRECT
+                      value: "true"
+                    - name: OWNCLOUD_SINGLE_LOGOUT_REDIRECT_URL
+                      value: "https://sso.rabe.ch/auth/realms/rabe/protocol/openid-connect/logout?redirect_uri=https%3A%2F%2Frabe.ch"
+              volumes:
+                - name: owncloud_data
+                  hostPath:
+                    path: "/srv/tier2-owncloud-users-01"
+                    type: Directory
+    - name: podman_run_as_group
+      parameter_type: string
+      value: owncloud
+    - name: podman_run_as_user
+      parameter_type: string
+      value: owncloud
+    - name: podman_selinux_ports
+      parameter_type: yaml
+      value:
+        - ports: 80
+          setype: http_port_t
+        - ports: 443
+          setype: http_port_t
+    - name: selinux_booleans
+      parameter_type: yaml
+      value:
+        - name: container_read_certs
+          state: true
+          persistent: true
+    - name: selinux_fcontexts
+      parameter_type: yaml
+      value:
+        - target: /etc/certmonger/post-scripts(/.*)?
+          setype: certmonger_unconfined_exec_t
+          ftype: f
+          state: present
+    - name: selinux_restore_dirs
+      parameter_type: yaml
+      value:
+        - /etc/certmonger/post-scripts/
+    - name: zabbix_monitoring_podman_user
+      parameter_type: string
+      value: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
