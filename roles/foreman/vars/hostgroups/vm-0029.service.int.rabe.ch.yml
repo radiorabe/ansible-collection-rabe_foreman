@@ -99,7 +99,7 @@ foreman_hostgroup:
                   restart: always
                 - name: owncloud
                   restart: always
-                  image: owncloud/server:10.16.0
+                  image: docker.io/owncloud/server:10.16.0
                   ports:
                     - containerPort: 80
                       hostPort: 80
