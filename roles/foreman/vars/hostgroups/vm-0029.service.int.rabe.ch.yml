@@ -347,6 +347,13 @@ foreman_hostgroup:
                 # Add additional service specific configuration below.
                 #
 
+                # Turn off modsecurity for this virtual host, as it may
+                # interfere with ownCloud functionality. Modsecurity is
+                # enabled in the reverse proxy so this is only for the
+                # backend container.
+                # see https://httpd.apache.org/docs/current/mod/mod_security2.html
+                SecRuleEngine Off
+
                 #
                 # ----- END Custom configuration section -----
                 #
