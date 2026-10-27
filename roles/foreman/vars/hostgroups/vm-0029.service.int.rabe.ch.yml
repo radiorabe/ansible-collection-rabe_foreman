@@ -24,11 +24,8 @@ foreman_hostgroup:
           ca: ipa
           principal: HTTP/owncloud.service.int.rabe.ch@INT.RABE.CH
           key_size: 4096
-          run_after: |
-            /usr/bin/cp /etc/pki/tls/*/owncloud.* /home/owncloud/ssl/
-            /usr/bin/chown owncloud: /home/owncloud/ssl/*
-            cd /home/owncloud
-            /usr/bin/sudo -u owncloud /usr/bin/podman pod restart owncloud
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
     - name: radiorabe_files
       parameter_type: yaml
       value:
@@ -73,6 +70,8 @@ foreman_hostgroup:
         containers:
           log_driver: k8s-file
           log_size_max: 1073741824
+        network:
+          default_rootless_network_cmd: pasta
     - name: podman_create_host_directories
       parameter_type: boolean
       value: true
@@ -94,15 +93,35 @@ foreman_hostgroup:
               name: owncloud
             spec:
               containers:
+                - name: httpd
+                  image: ghcr.io/radiorabe/httpd:0.6.7@sha256:905ed132d1bdb9c32d2424203df79d215076a660c111f566490c84a56138f37d
+                  ports:
+                    - containerPort: 8081
+                      hostPort: 80
+                    - containerPort: 8444
+                      hostPort: 443
+                  volumeMounts:
+                    - mountPath: /etc/pki/tls/certs/server.crt:ro
+                      name: httpd_tls_cert
+                    - mountPath: /etc/pki/tls/private/server.key:ro
+                      name: httpd_tls_key
+                    - mountPath: /etc/httpd/conf.d/local_configs:Z
+                      name: local_httpd_configs
+                  # Temporary workaround to fix the issue with httpd image not
+                  # starting due to port conflicts. This will be removed once
+                  # the upstream image is fixed.
+                  command: ["/bin/sh", "-c"]
+                  args:
+                    - |
+                      sed -i s/8080/8081/ /etc/httpd/conf/httpd.conf
+                      sed -i s/8443/8444/ /etc/httpd/conf.d/ssl.conf
+                      /usr/bin/run-httpd
                 - name: redis
                   image: docker.io/valkey/valkey:9-alpine
                   restart: always
                 - name: owncloud
                   restart: always
                   image: docker.io/owncloud/server:10.16.0
-                  ports:
-                    - containerPort: 8080
-                      hostPort: 80
                   volumeMounts:
                     - mountPath: /mnt/data:Z
                       name: owncloud_data
@@ -119,8 +138,6 @@ foreman_hostgroup:
                       value: "https://vm-0029.service.int.rabe.ch"
                     - name: OWNCLOUD_HTACCESS_REWRITE_BASE
                       value: "/"
-                    - name: HTTP_PORT
-                      value: "8080"
                     - name: OWNCLOUD_DEFAULT_LANGUAGE
                       value: "de"
                     - name: OWNCLOUD_LOST_PASSWORD_LINK
@@ -186,6 +203,17 @@ foreman_hostgroup:
                   hostPath:
                     path: "/srv/tier2-owncloud-users-01"
                     type: Directory
+                - name: httpd_tls_cert
+                  hostPath:
+                    path: /etc/pki/tls/certs/vm-0029.crt
+                    type: File
+                - name: httpd_tls_key
+                  hostPath:
+                    path: /etc/pki/tls/private/vm-0029.key
+                    type: File
+                - name: local_httpd_configs
+                  hostPath:
+                    path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/conf.d/local_configs"
     - name: podman_run_as_group
       parameter_type: string
       value: owncloud
@@ -219,3 +247,128 @@ foreman_hostgroup:
     - name: zabbix_monitoring_podman_user
       parameter_type: string
       value: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+    - name: radiorabe_copies
+      parameter_type: yaml
+      value:
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/conf.d/local_configs/vhost_vm-0029.service.int.rabe.ch.conf"
+          mode: "0755"
+          content: |-
+            # This is the template we use at RaBe for VirtualHost configurations
+            # -----------------------------------------------------------------------------
+            # The aim is to have consistent configurations across the domains we serve
+            # through the reverse proxies. There is a mandatory section "RaBe standard
+            # section" which has to be the same in all configurations apart from domain
+            # specifics. A second part "Custom configuration section" contains the
+            # individual web service configuration. There is no individual web service
+            # configuration section in VirtualHost for port 8080. We do not serve any
+            # service unencrypted.
+            #
+            # 2025-09-02: initial version
+            # HTTP & HTTPS virtual host vm-0029.service.int.rabe.ch
+            #
+            # This virtual host is used for OwnCloud service. It is configured to use
+            # SSL/TLS with a certificate issued by the internal CA. The configuration
+            # includes proxy settings to forward requests to the backend OwnCloud
+            # container, as well as security headers to enhance privacy and security.
+            #
+            # See also:
+            # * https://wiki.rabe.ch/vm-0029
+            #
+            <VirtualHost *:8444>
+                #
+                # ----- BEGIN RaBe standard section -----
+                # Only adjust domain specifics marked with <<<>>> in this section.
+                #
+
+                # Set the DNS server name for this virtualhost
+                # see https://httpd.apache.org/docs/2.4/mod/core.html#servername
+                # and https://httpd.apache.org/docs/2.4/mod/core.html#serveralias
+                #
+                ServerName vm-0029.service.int.rabe.ch
+                # ServerAlias <<<2ndsite/subdomain>>>.rabe.ch
+
+                # SSL/TLS certificate configuration
+                # see https://httpd.apache.org/docs/2.4/mod/mod_ssl.html
+                #
+                SSLEngine On
+
+                # Cipher Suite available for negotiation in SSL proxy handshake
+                # see https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslproxyciphersuite
+                # By default, RHEL cryptographic policiy SYSTEM is set.
+                # More details at https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/security_hardening/using-the-system-wide-cryptographic-policies_security-hardening#system-wide-crypto-policies_using-the-system-wide-cryptographic-policies
+                #
+                # SSLCipherSuite PROFILE=SYSTEM
+
+                # Server PEM-encoded X.509 certificate data files
+                # see https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslcertificatefile
+                #
+                SSLCertificateFile /etc/pki/tls/certs/server.crt
+                SSLCertificateKeyFile /etc/pki/tls/private/server.key
+                SSLCACertificatePath /etc/pki/tls/certs/
+                #SSLCertificateChainFile /etc/pki/tls/private/rabe_certs/board.rabe.ch/chain.pem
+
+                # Enable SSL/TLS requests forwarding to backend server
+                # see https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslproxyengine
+                #
+                SSLProxyEngine On
+                SSLProxyCACertificateFile /etc/ssl/certs/ca-bundle.crt
+
+                # Cipher Suite available for negotiation in SSL handshake
+                # see https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslciphersuite
+                # By default, RHEL cryptographic policiy SYSTEM is set.
+                # More details at https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/security_hardening/using-the-system-wide-cryptographic-policies_security-hardening#system-wide-crypto-policies_using-the-system-wide-cryptographic-policies
+                #
+                # SSLProxyCipherSuite PROFILE=SYSTEM
+
+                # Enable SSL/TLS certificate verification of the remote server
+                # see https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslproxyverify
+                #
+                SSLProxyVerify require
+
+                # Proxying to backend server configuration
+                # see https://httpd.apache.org/docs/2.4/mod/mod_proxy.html
+                #
+                ProxyAddHeaders On
+                ProxyPass / http://owncloud:8080/
+                ProxyPassReverse / http://owncloud:8080/
+
+                # Remove some headers giving away product information from response
+                # see https://httpd.apache.org/docs/current/mod/mod_headers.html
+                #
+                Header unset Server
+                Header unset X-Powered-By
+
+                #
+                # ----- END RaBe standard section -----
+                #
+
+                #
+                # ----- BEGIN Custom configuration section -----
+                # Add additional service specific configuration below.
+                #
+
+                #
+                # ----- END Custom configuration section -----
+                #
+            </VirtualHost>
+
+            <VirtualHost *:8081>
+                #
+                # ----- BEGIN RaBe standard section -----
+                # Only adjust domain specifics marked with <<<>>> in this section.
+                #
+
+                # Set the DNS server name for this virtualhost
+                # see https://httpd.apache.org/docs/2.4/mod/core.html#servername
+                # and https://httpd.apache.org/docs/2.4/mod/core.html#serveralias
+                #
+                ServerName vm-0029.service.int.rabe.ch
+                # ServerAlias <<<2ndsite/subdomain>>>.rabe.ch
+
+                # HTTP to HTTPS redirect
+                # see https://httpd.apache.org/docs/current/mod/mod_rewrite.html
+                #
+                RewriteEngine On
+                RewriteCond %{HTTPS} off
+                RewriteRule (.*) https://%{SERVER_NAME}$1 [R,L]
+            </VirtualHost>
