@@ -250,13 +250,15 @@ foreman_hostgroup:
       value:
         - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/owncloud/config/oidc.config.php"
           mode: "0755"
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
           content: |-
             <?php
             $CONFIG = [
                     'openid-connect' => [
                             'provider-url' => 'https://sso.rabe.ch/auth/realms/rabe',
-                            'client-id' => '{{ owncloud_oidc_client_id }}',
-                            'client-secret' => '{{ owncloud_oidc_client_secret }}',
+                            'client-id' => '{{ '{{' }} owncloud_oidc_client_id {{ '}}' }}',
+                            'client-secret' => '{{ '{{' }} owncloud_oidc_client_secret {{ '}}' }}',
                             'autoRedirectOnLoginPage' => true,
                             'mode' => 'userid',
                             'search-attribute' => 'unixUID',
@@ -293,6 +295,8 @@ foreman_hostgroup:
             ];
         - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/conf.d/local_configs/vhost_vm-0029.service.int.rabe.ch.conf"
           mode: "0755"
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
           content: |-
             # This is the template we use at RaBe for VirtualHost configurations
             # -----------------------------------------------------------------------------
