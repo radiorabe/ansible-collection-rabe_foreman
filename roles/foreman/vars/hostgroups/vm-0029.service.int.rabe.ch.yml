@@ -155,28 +155,28 @@ foreman_hostgroup:
                     - name: OWNCLOUD_DB_PASSWORD
                       value: "{{ '{{' }} owncloud_db_password {{ '}}' }}"
                     - name: OWNCLOUD_REDIS_ENABLED
-                      value: "true"
+                      value: true
                     - name: OWNCLOUD_REDIS_HOST
                       value: "redis"
                     - name: OWNCLOUD_MAIL_DOMAIN
                       value: "rabe.ch"
                     - name: OWNCLOUD_MAIL_FROM_ADDRESS
                       value: "noreply"
-                    - name: OWNCLOUD_MAIL_SMTPMODE
+                    - name: OWNCLOUD_MAIL_SMTP_MODE
                       value: "smtp"
-                    - name: OWNCLOUD_MAIL_SMTPSECURE
+                    - name: OWNCLOUD_MAIL_SMTP_SECURE
                       value: "ssl"
-                    - name: OWNCLOUD_MAIL_SMTPAUTHTYPE
+                    - name: OWNCLOUD_MAIL_SMTP_AUTH_TYPE
                       value: "PLAIN"
-                    - name: OWNCLOUD_MAIL_SMTPAUTH
-                      value: "1"
-                    - name: OWNCLOUD_MAIL_SMTPHOST
+                    - name: OWNCLOUD_MAIL_SMTP_AUTH
+                      value: true
+                    - name: OWNCLOUD_MAIL_SMTP_HOST
                       value: "{{ '{{' }} owncloud_mail_smtp_host {{ '}}' }}"
-                    - name: OWNCLOUD_MAIL_SMTPPORT
+                    - name: OWNCLOUD_MAIL_SMTP_PORT
                       value: "465"
-                    - name: OWNCLOUD_MAIL_SMTPNAME
+                    - name: OWNCLOUD_MAIL_SMTP_NAME
                       value: "{{ '{{' }} owncloud_mail_smtp_name {{ '}}' }}"
-                    - name: OWNCLOUD_MAIL_SMTPPASSWORD
+                    - name: OWNCLOUD_MAIL_SMTP_PASSWORD
                       value: "{{ '{{' }} owncloud_mail_smtp_password {{ '}}' }}"
                     - name: OWNCLOUD_HTTP_COOKIE_SAMESITE
                       value: "None"
@@ -187,15 +187,13 @@ foreman_hostgroup:
                     - name: OWNCLOUD_OIDC_CLIENT_SECRET
                       value: "{{ '{{' }} owncloud_oidc_client_secret {{ '}}' }}"
                     - name: OWNCLOUD_OIDC_AUTO_REDIRECT_ON_LOGIN_PAGE
-                      value: "true"
+                      value: true
                     - name: OWNCLOUD_OIDC_MODE
                       value: "userid"
                     - name: OWNCLOUD_OIDC_SEARCH_ATTRIBUTE
                       value: "unixUID"
                     - name: OWNCLOUD_OIDC_POST_LOGOUT_REDIRECT_URI
                       value: "https://www.rabe.ch"
-                    - name: OWNCLOUD_SOCIAL_LOGIN_AUTO_REDIRECT
-                      value: "true"
                     - name: OWNCLOUD_SINGLE_LOGOUT_REDIRECT_URL
                       value: "https://sso.rabe.ch/auth/realms/rabe/protocol/openid-connect/logout?redirect_uri=https%3A%2F%2Frabe.ch"
               volumes:
@@ -250,6 +248,49 @@ foreman_hostgroup:
     - name: radiorabe_copies
       parameter_type: yaml
       value:
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/owncloud/config/oidc.config.php"
+          mode: "0755"
+          content: |-
+            <?php
+            $CONFIG = [
+                    'openid-connect' => [
+                            'provider-url' => 'https://sso.rabe.ch/auth/realms/rabe',
+                            'client-id' => '{{ owncloud_oidc_client_id }}',
+                            'client-secret' => '{{ owncloud_oidc_client_secret }}',
+                            'autoRedirectOnLoginPage' => true,
+                            'mode' => 'userid',
+                            'search-attribute' => 'unixUID',
+                            'post_logout_redirect_uri' => 'https://www.rabe.ch',
+                            'auto-provision' => [
+                                    'enabled' => true,
+                                      // documentation about standard claims:
+                                      // https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
+                                      // only relevant in userid mode, defines the claim which holds the email of the user
+                                    'email-claim' => 'email',
+                                      // defines the claim which holds the display name of the user
+                                    //'display-name-claim' => 'given_name',
+                                    'display-name-claim' => 'displayName',
+                                      // defines the claim which holds the picture of the user - must be a URL
+                                    'picture-claim' => 'picture',
+                                    'groups-claim' => 'groups',
+                                      // defines a list of groups to which the newly created user will be added automatically
+                                    // 'groups' => ['admin', 'guests', 'employees'],
+                                      // sets a claim which is defined at the IDP.
+                                      // the IDP will return a single value or an array like:
+                                      // "allowed_applications": ["erp", "owncloud"],
+                                    // 'provisioning-claim' => 'nextcloudEnabled',
+                                      // defines the matching case for the provisioning. the attribute can only be a
+                                      // single value in case no match is found against the IDP response,
+                                      // no provisioning will be made, "User not found" will be returned
+                                    // 'provisioning-attribute' => 'TRUE',
+                                      // auto-update user account info with current information provided by the
+                                      // OpenID Connect provider account attributes that will be updated
+                                      // can be specified in `attributes` config option
+                                    'update' => ['enabled' => true],
+                                      // enable the user info auto-update mode
+                            ],
+                    ],
+            ];
         - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/conf.d/local_configs/vhost_vm-0029.service.int.rabe.ch.conf"
           mode: "0755"
           content: |-
