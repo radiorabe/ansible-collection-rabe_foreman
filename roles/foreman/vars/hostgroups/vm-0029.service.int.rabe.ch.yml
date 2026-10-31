@@ -12,7 +12,9 @@ foreman_hostgroup:
     - radiorabe.common.local_user
     - redhat.rhel_system_roles.kernel_settings
     - radiorabe.common.files
+    - radiorabe.common.download_file
     - redhat.rhel_system_roles.podman
+    - redhat.rhel_system_roles.systemd
     - radiorabe.podman.zabbix_monitoring
   parameters:
     - name: certificate_requests
@@ -35,6 +37,12 @@ foreman_hostgroup:
           mode: '0755'
           state: directory
           recurse: true
+        - path: "/etc/populate_group_shares/"
+          state: directory
+          mode: "0600"
+        - path: "/usr/local/libexec/populate_group_shares/"
+          state: directory
+          mode: "0750"
     - name: owncloud_db_password
       parameter_type: string
       value: "{{ '{{' }} undef('variable owncloud_db_password needs to be set in host') {{ '}}' }}"
@@ -56,6 +64,24 @@ foreman_hostgroup:
     - name: owncloud_oidc_client_secret
       parameter_type: string
       value: "{{ '{{' }} undef('variable owncloud_oidc_client_secret needs to be set in host') {{ '}}' }}"
+    - name: populate_group_shares_ipa_server
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable populate_group_shares_ipa_server needs to be set in host') {{ '}}' }}"
+    - name: populate_group_shares_ldap_user
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable populate_group_shares_ldap_user needs to be set in host') {{ '}}' }}"
+    - name: populate_group_shares_ldap_password
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable populate_group_shares_ldap_password needs to be set in host') {{ '}}' }}"
+    - name: populate_group_shares_nc_federated_server
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable populate_group_shares_nc_federated_server needs to be set in host') {{ '}}' }}"
+    - name: populate_group_shares_nc_federated_user
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable populate_group_shares_nc_federated_user needs to be set in host') {{ '}}' }}"
+    - name: populate_group_shares_nc_federated_password
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable populate_group_shares_nc_federated_password needs to be set in host') {{ '}}' }}"
     - name: kernel_settings_sysctl
       parameter_type: yaml
       value:
@@ -258,6 +284,12 @@ foreman_hostgroup:
     - name: zabbix_monitoring_podman_user
       parameter_type: string
       value: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+    - name: download_file_url
+      parameter_type: string
+      value: https://raw.githubusercontent.com/radiorabe/freeipa-extending-ldap-schema-and-ui/refs/heads/master/tools/script/populate_group_shares.py
+    - name: download_file_destination
+      parameter_type: string
+      value: /usr/local/libexec/populate_group_shares/
     - name: radiorabe_copies
       parameter_type: yaml
       value:
@@ -438,3 +470,54 @@ foreman_hostgroup:
                 RewriteCond %{HTTPS} off
                 RewriteRule (.*) https://%{SERVER_NAME}$1 [R,L]
             </VirtualHost>
+        - dest: "/etc/populate_group_shares/creds.py"
+          mode: "0600"
+          content: |-
+            # user for ldap queries. Needs to be able to read nextcloudEnabled and nextcloudQuota attributes.
+            ldapuser = '{{ '{{' }} populate_group_shares_nc_federated_user {{ '}}' }}'
+            ldappw = '{{ '{{' }} populate_group_shares_nc_federated_password {{ '}}' }}'
+        - dest: "/etc/populate_group_shares/ldapcreds.py"
+          mode: "0600"
+          content: |-
+            # owncloud admin user credentials
+            username = '{{ '{{' }} populate_group_shares_ipa_user {{ '}}' }}'
+            password = '{{ '{{' }} populate_group_shares_ipa_password {{ '}}' }}'
+    - name: systemd_enabled_units
+      parameter_type: yaml
+      value:
+        - populate_group_shares.timer
+    - name: systemd_started_units
+      parameter_type: yaml
+      value:
+        - populate_group_shares.timer
+    - name: systemd_unit_files
+      parameter_type: yaml
+      value:
+        - item: populate_group_shares.timer
+          file_content: |
+            [Unit]
+            Description=Create/Sync shares for nextcloud enabled LDAP groups to nextcloud/owncloud every 5 minutes
+
+            [Timer]
+            OnBootSec=5min
+            OnUnitActiveSec=5min
+            Unit=populate_group_shares.service
+
+            [Install]
+            WantedBy=timers.target
+          state: present
+        - item: populate_group_shares.service
+          file_content: |
+            # /etc/systemd/system/populate_group_shares.service
+            [Unit]
+            Description=Create/Sync shares for nextcloud/owncloud enabled LDAP groups to owncloud
+
+            [Service]
+            Environment="REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-bundle.crt"
+            Environment="IPA_SERVER={{ '{{' }} populate_group_shares_ipa_server {{ '}}' }}"
+            Environment="NC_FEDERATED_SERVER={{ '{{' }} populate_group_shares_nc_federated_server {{ '}}' }}""
+            ExecStart=/usr/bin/python /usr/local/libexec/populate_group_shares/populate_group_shares.py
+
+            [Install]
+            WantedBy=basic.target
+          state: present
