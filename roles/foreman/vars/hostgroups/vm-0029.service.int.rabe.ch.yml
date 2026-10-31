@@ -122,9 +122,16 @@ foreman_hostgroup:
                 - name: owncloud
                   restart: always
                   image: docker.io/owncloud/server:10.16.0
+                  command: ["/bin/sh", "-c"]
+                  args:
+                    - |
+                      update-ca-certificates
+                      /usr/bin/owncloud server
                   volumeMounts:
                     - mountPath: /mnt/data:Z
                       name: owncloud_data
+                    - mountPath: /usr/local/share/ca-certificates/ca-bundle.crt:ro
+                      name: rabe_ca_certificates
                   env:
                     - name: OWNCLOUD_ADMIN_USERNAME
                       value: "admin"
@@ -194,6 +201,8 @@ foreman_hostgroup:
                       value: "unixUID"
                     - name: OWNCLOUD_OIDC_POST_LOGOUT_REDIRECT_URI
                       value: "https://www.rabe.ch"
+                    - name: OWNCLOUD_OVERWRITE_PROTOCOL
+                      value: HTTPS
                     - name: OWNCLOUD_SINGLE_LOGOUT_REDIRECT_URL
                       value: "https://sso.rabe.ch/auth/realms/rabe/protocol/openid-connect/logout?redirect_uri=https%3A%2F%2Frabe.ch"
               volumes:
@@ -212,6 +221,10 @@ foreman_hostgroup:
                 - name: local_httpd_configs
                   hostPath:
                     path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/conf.d/local_configs"
+                - name: rabe_ca_certificates
+                  hostPath:
+                    path: /etc/pki/tls/certs/ca-bundle.crt
+                    type: File
     - name: podman_run_as_group
       parameter_type: string
       value: owncloud
@@ -248,6 +261,7 @@ foreman_hostgroup:
     - name: radiorabe_copies
       parameter_type: yaml
       value:
+      # path needs adjustment or must be mounted when attaching gluster
         - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/owncloud/config/oidc.config.php"
           mode: "0755"
           owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
