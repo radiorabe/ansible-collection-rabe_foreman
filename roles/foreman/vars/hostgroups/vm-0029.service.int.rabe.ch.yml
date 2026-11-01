@@ -87,6 +87,8 @@ foreman_hostgroup:
       value:
         - name: net.ipv4.ip_unprivileged_port_start
           value: 80
+        - name: vm.overcommit_memory
+          value: 1
     - name: local_user_username
       parameter_type: string
       value: owncloud
@@ -154,7 +156,7 @@ foreman_hostgroup:
                       update-ca-certificates
                       /usr/bin/owncloud server
                   volumeMounts:
-                    - mountPath: /mnt/data:Z
+                    - mountPath: /mnt/data:rw,z
                       name: owncloud_data
                     - mountPath: /usr/local/share/ca-certificates/ca-bundle.crt:ro
                       name: rabe_ca_certificates
@@ -165,12 +167,6 @@ foreman_hostgroup:
                       value: "admin"
                     - name: OWNCLOUD_TRUSTED_DOMAINS
                       value: "vm-0029.service.int.rabe.ch,vm-0028.service.int.rabe.ch,share.rabe.ch,onlyoffice.rabe.ch"
-                    - name: OWNCLOUD_TRUSTED_PROXIES
-                      value: "10.133.36.23,10.133.0.2,10.133.0.3"
-                    - name: OWNCLOUD_OVERWRITE_CLI_URL
-                      value: "https://vm-0029.service.int.rabe.ch"
-                    - name: OWNCLOUD_HTACCESS_REWRITE_BASE
-                      value: "/"
                     - name: OWNCLOUD_DEFAULT_LANGUAGE
                       value: "de"
                     - name: OWNCLOUD_LOST_PASSWORD_LINK
@@ -188,7 +184,7 @@ foreman_hostgroup:
                     - name: OWNCLOUD_DB_PASSWORD
                       value: "{{ '{{' }} owncloud_db_password {{ '}}' }}"
                     - name: OWNCLOUD_REDIS_ENABLED
-                      value: true
+                      value: "true"
                     - name: OWNCLOUD_REDIS_HOST
                       value: "redis"
                     - name: OWNCLOUD_MAIL_DOMAIN
@@ -202,7 +198,7 @@ foreman_hostgroup:
                     - name: OWNCLOUD_MAIL_SMTP_AUTH_TYPE
                       value: "PLAIN"
                     - name: OWNCLOUD_MAIL_SMTP_AUTH
-                      value: true
+                      value: "true"
                     - name: OWNCLOUD_MAIL_SMTP_HOST
                       value: "{{ '{{' }} owncloud_mail_smtp_host {{ '}}' }}"
                     - name: OWNCLOUD_MAIL_SMTP_PORT
@@ -211,26 +207,6 @@ foreman_hostgroup:
                       value: "{{ '{{' }} owncloud_mail_smtp_name {{ '}}' }}"
                     - name: OWNCLOUD_MAIL_SMTP_PASSWORD
                       value: "{{ '{{' }} owncloud_mail_smtp_password {{ '}}' }}"
-                    - name: OWNCLOUD_HTTP_COOKIE_SAMESITE
-                      value: "None"
-                    - name: OWNCLOUD_OIDC_PROVIDER_URL
-                      value: "https://sso.rabe.ch/auth/realms/rabe"
-                    - name: OWNCLOUD_OIDC_CLIENT_ID
-                      value: "{{ '{{' }} owncloud_oidc_client_id {{ '}}' }}"
-                    - name: OWNCLOUD_OIDC_CLIENT_SECRET
-                      value: "{{ '{{' }} owncloud_oidc_client_secret {{ '}}' }}"
-                    - name: OWNCLOUD_OIDC_AUTO_REDIRECT_ON_LOGIN_PAGE
-                      value: true
-                    - name: OWNCLOUD_OIDC_MODE
-                      value: "userid"
-                    - name: OWNCLOUD_OIDC_SEARCH_ATTRIBUTE
-                      value: "unixUID"
-                    - name: OWNCLOUD_OIDC_POST_LOGOUT_REDIRECT_URI
-                      value: "https://www.rabe.ch"
-                    - name: OWNCLOUD_OVERWRITE_PROTOCOL
-                      value: HTTPS
-                    - name: OWNCLOUD_SINGLE_LOGOUT_REDIRECT_URL
-                      value: "https://sso.rabe.ch/auth/realms/rabe/protocol/openid-connect/logout?redirect_uri=https%3A%2F%2Frabe.ch"
               volumes:
                 - name: owncloud_data
                   hostPath:
@@ -317,7 +293,7 @@ foreman_hostgroup:
                                     'email-claim' => 'email',
                                       // defines the claim which holds the display name of the user
                                     //'display-name-claim' => 'given_name',
-                                    'display-name-claim' => 'displayName',
+                                    'display-name-claim' => 'name',
                                       // defines the claim which holds the picture of the user - must be a URL
                                     'picture-claim' => 'picture',
                                     'groups-claim' => 'groups',
@@ -473,28 +449,31 @@ foreman_hostgroup:
         - dest: "/etc/populate_group_shares/creds.py"
           mode: "0600"
           content: |-
-            # user for ldap queries. Needs to be able to read nextcloudEnabled and nextcloudQuota attributes.
-            ldapuser = '{{ '{{' }} populate_group_shares_nc_federated_user {{ '}}' }}'
-            ldappw = '{{ '{{' }} populate_group_shares_nc_federated_password {{ '}}' }}'
+            # owncloud admin user credentials
+            username = '{{ '{{' }} populate_group_shares_nc_federated_user {{ '}}' }}'
+            password = '{{ '{{' }} populate_group_shares_nc_federated_password {{ '}}' }}'
         - dest: "/etc/populate_group_shares/ldapcreds.py"
           mode: "0600"
           content: |-
-            # owncloud admin user credentials
-            username = '{{ '{{' }} populate_group_shares_ipa_user {{ '}}' }}'
-            password = '{{ '{{' }} populate_group_shares_ipa_password {{ '}}' }}'
-    - name: systemd_enabled_units
-      parameter_type: yaml
-      value:
-        - populate_group_shares.timer
-    - name: systemd_started_units
-      parameter_type: yaml
-      value:
-        - populate_group_shares.timer
-    - name: systemd_unit_files
-      parameter_type: yaml
-      value:
-        - item: populate_group_shares.timer
-          file_content: |
+            # user for ldap queries. Needs to be able to read nextcloudEnabled and nextcloudQuota attributes.
+            ldapuser = '{{ '{{' }} populate_group_shares_ipa_user {{ '}}' }}'
+            ldappw = '{{ '{{' }} populate_group_shares_ipa_password {{ '}}' }}'
+        - dest: "/etc/systemd/system/populate_group_shares.service"
+          content: |-
+            # /etc/systemd/system/populate_group_shares.service
+            [Unit]
+            Description=Create/Sync shares for nextcloud/owncloud enabled LDAP groups to owncloud
+
+            [Service]
+            Environment="REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-bundle.crt"
+            Environment="IPA_SERVER={{ '{{' }} populate_group_shares_ipa_server {{ '}}' }}"
+            Environment="NC_FEDERATED_SERVER={{ '{{' }} populate_group_shares_nc_federated_server {{ '}}' }}"
+            ExecStart=/usr/bin/python /usr/local/libexec/populate_group_shares/populate_group_shares.py
+
+            [Install]
+            WantedBy=basic.target
+        - dest: "/etc/systemd/system/populate_group_shares.timer"
+          content: |-
             [Unit]
             Description=Create/Sync shares for nextcloud enabled LDAP groups to nextcloud/owncloud every 5 minutes
 
@@ -505,19 +484,44 @@ foreman_hostgroup:
 
             [Install]
             WantedBy=timers.target
-          state: present
-        - item: populate_group_shares.service
-          file_content: |
-            # /etc/systemd/system/populate_group_shares.service
-            [Unit]
-            Description=Create/Sync shares for nextcloud/owncloud enabled LDAP groups to owncloud
+    - name: systemd_enabled_units
+      parameter_type: yaml
+      value:
+        - populate_group_shares.timer
+    - name: systemd_started_units
+      parameter_type: yaml
+      value:
+        - populate_group_shares.timer
+    # The following should work with newer versions of systemd role instead of copying using radiorabe_copies
+    # Revisiting this again some time in the future
+    # - name: systemd_unit_files
+    #   parameter_type: yaml
+    #   value:
+    #     - item: populate_group_shares.timer
+    #       file_content: |
+    #         [Unit]
+    #         Description=Create/Sync shares for nextcloud enabled LDAP groups to nextcloud/owncloud every 5 minutes
 
-            [Service]
-            Environment="REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-bundle.crt"
-            Environment="IPA_SERVER={{ '{{' }} populate_group_shares_ipa_server {{ '}}' }}"
-            Environment="NC_FEDERATED_SERVER={{ '{{' }} populate_group_shares_nc_federated_server {{ '}}' }}""
-            ExecStart=/usr/bin/python /usr/local/libexec/populate_group_shares/populate_group_shares.py
+    #         [Timer]
+    #         OnBootSec=5min
+    #         OnUnitActiveSec=5min
+    #         Unit=populate_group_shares.service
 
-            [Install]
-            WantedBy=basic.target
-          state: present
+    #         [Install]
+    #         WantedBy=timers.target
+    #       state: present
+    #     - item: populate_group_shares.service
+    #       file_content: |
+    #         # /etc/systemd/system/populate_group_shares.service
+    #         [Unit]
+    #         Description=Create/Sync shares for nextcloud/owncloud enabled LDAP groups to owncloud
+
+    #         [Service]
+    #         Environment="REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-bundle.crt"
+    #         Environment="IPA_SERVER={{ '{{' }} populate_group_shares_ipa_server {{ '}}' }}"
+    #         Environment="NC_FEDERATED_SERVER={{ '{{' }} populate_group_shares_nc_federated_server {{ '}}' }}"
+    #         ExecStart=/usr/bin/python /usr/local/libexec/populate_group_shares/populate_group_shares.py
+
+    #         [Install]
+    #         WantedBy=basic.target
+    #       state: present
