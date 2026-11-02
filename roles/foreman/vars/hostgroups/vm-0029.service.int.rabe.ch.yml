@@ -11,6 +11,7 @@ foreman_hostgroup:
     - redhat.rhel_system_roles.certificate
     - radiorabe.common.local_user
     - redhat.rhel_system_roles.kernel_settings
+    - radiorabe.common.git_clone
     - radiorabe.common.files
     - radiorabe.common.download_file
     - redhat.rhel_system_roles.podman
@@ -43,6 +44,19 @@ foreman_hostgroup:
         - path: "/usr/local/libexec/populate_group_shares/"
           state: directory
           mode: "0750"
+        - path: "/srv/tier2-owncloud-users-01/apps/rabe"
+          recurse: true
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
+    - name: radiorabe_git_clone
+      parameter_type: yaml
+      value:
+        # requires git config --global --add safe.directory /srv/tier2-owncloud-users-01/apps/rabe
+        - repo: https://github.com/radiorabe/owncloud-theme-rabe.git
+          dest: /srv/tier2-owncloud-users-01/apps/rabe
+          single_branch: true
+          version: main
+          force: true
     - name: owncloud_db_password
       parameter_type: string
       value: "{{ '{{' }} undef('variable owncloud_db_password needs to be set in host') {{ '}}' }}"
@@ -262,6 +276,9 @@ foreman_hostgroup:
       value: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
     - name: download_file_url
       parameter_type: string
+      # requires
+      # dnf install -y python3-pip && \
+      # pip install -r https://raw.githubusercontent.com/radiorabe/freeipa-extending-ldap-schema-and-ui/refs/heads/master/tools/script/requirements.txt
       value: https://raw.githubusercontent.com/radiorabe/freeipa-extending-ldap-schema-and-ui/refs/heads/master/tools/script/populate_group_shares.py
     - name: download_file_destination
       parameter_type: string
