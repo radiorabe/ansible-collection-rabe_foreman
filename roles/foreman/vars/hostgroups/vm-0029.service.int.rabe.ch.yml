@@ -186,15 +186,15 @@ foreman_hostgroup:
                       name: ldap_to_owncloud_user_synchronization
                   env:
                     - name: OWNCLOUD_SKIP_CHOWN
-                      value: true
+                      value: "true"
                     - name: OWNCLOUD_SKIP_CHMOD
-                      value: true
+                      value: "true"
                     - name: OWNCLOUD_ENABLE_OIDC_REWRITE_URL
-                      value: true
+                      value: "true"
                     - name: OWNCLOUD_HTTP_COOKIE_SAMESITE
-                      value: None
+                      value: "None"
                     - name: OWNCLOUD_OVERWRITE_PROTOCOL
-                      value: https
+                      value: "https"
                     - name: OWNCLOUD_ADMIN_USERNAME
                       value: "admin1"
                     - name: OWNCLOUD_ADMIN_PASSWORD
