@@ -7,7 +7,6 @@ foreman_hostgroup:
   locations:
     - Sulgenrain
   ansible_roles:
-    - radiorabe.common.selinux_modules
     - redhat.rhel_system_roles.certificate
     - radiorabe.common.local_user
     - redhat.rhel_system_roles.kernel_settings
@@ -21,18 +20,30 @@ foreman_hostgroup:
     - name: certificate_requests
       parameter_type: yaml
       value:
-        - name: owncloud
+        - name: vm-0029
           dns:
-            - owncloud.service.int.rabe.ch
+            - vm-0029.service.int.rabe.ch
           ca: ipa
-          principal: HTTP/owncloud.service.int.rabe.ch@INT.RABE.CH
+          principal: HTTP/vm-0029.service.int.rabe.ch@INT.RABE.CH
           key_size: 4096
           owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
           group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
     - name: radiorabe_files
       parameter_type: yaml
       value:
-        - path: /home/owncloud/owncloud/
+        - path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/owncloud/etc/cron.d/"
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
+          mode: '0755'
+          state: directory
+          recurse: true
+        - path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/owncloud/etc/owncloud.d/"
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
+          mode: '0755'
+          state: directory
+          recurse: true
+        - path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/etc/httpd/conf.d/local_configs/"
           owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
           group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
           mode: '0755'
@@ -44,16 +55,16 @@ foreman_hostgroup:
         - path: "/usr/local/libexec/populate_group_shares/"
           state: directory
           mode: "0750"
-        - path: "/srv/tier2-owncloud-users-01/apps/rabe"
+        - path: "/srv/tier1-owncloud-users-02/data/apps/rabe"
           recurse: true
           owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
           group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
     - name: radiorabe_git_clone
       parameter_type: yaml
       value:
-        # requires git config --global --add safe.directory /srv/tier2-owncloud-users-01/apps/rabe
+        # requires git config --global --add safe.directory /srv/tier1-owncloud-users-02/data/apps/rabe
         - repo: https://github.com/radiorabe/owncloud-theme-rabe.git
-          dest: /srv/tier2-owncloud-users-01/apps/rabe
+          dest: /srv/tier1-owncloud-users-02/data/apps/rabe
           single_branch: true
           version: main
           force: true
@@ -171,7 +182,13 @@ foreman_hostgroup:
                       name: rabe_ca_certificates
                     - mountPath: /etc/owncloud.d/update-ca-certs.sh:ro,Z
                       name: update_ca_certs
+                    - mountPath: /etc/cron.d/ldap_to_owncloud_user_synchronization:ro,Z
+                      name: ldap_to_owncloud_user_synchronization
                   env:
+                    - name: OWNCLOUD_SKIP_CHOWN
+                      value: true
+                    - name: OWNCLOUD_SKIP_CHMOD
+                      value: true
                     - name: OWNCLOUD_ENABLE_OIDC_REWRITE_URL
                       value: true
                     - name: OWNCLOUD_HTTP_COOKIE_SAMESITE
@@ -248,7 +265,7 @@ foreman_hostgroup:
               volumes:
                 - name: owncloud_data
                   hostPath:
-                    path: "/srv/tier2-owncloud-users-01"
+                    path: "/srv/tier1-owncloud-users-02/data"
                     type: Directory
                 - name: httpd_tls_cert
                   hostPath:
@@ -260,15 +277,19 @@ foreman_hostgroup:
                     type: File
                 - name: local_httpd_configs
                   hostPath:
-                    path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/conf.d/local_configs"
+                    path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/etc/httpd/conf.d/local_configs"
                 - name: rabe_ca_certificates
                   hostPath:
                     path: /etc/pki/tls/certs/ca-bundle.crt
                     type: File
                 - hostPath:
-                    path: /home/{{ '{{' }} podman_run_as_user {{ '}}' }}/etc/owncloud.d/85-update-ca-certs.sh
+                    path: /home/{{ '{{' }} podman_run_as_user {{ '}}' }}/owncloud/etc/owncloud.d/85-update-ca-certs.sh
                     type: File
                   name: update_ca_certs
+                - hostPath:
+                    path: /home/{{ '{{' }} podman_run_as_user {{ '}}' }}/owncloud/etc/cron.d/ldap_to_owncloud_user_synchronization
+                    type: File
+                  name: ldap_to_owncloud_user_synchronization
     - name: podman_run_as_group
       parameter_type: string
       value: owncloud
@@ -317,7 +338,7 @@ foreman_hostgroup:
         # path needs adjustment or must be mounted when attaching gluster
         # apparently no longer needed with ownCloud 11.1.0. OIDC configuration
         # can now be set with OWNCLOUD_OPENID_CONNECT variable
-        # - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/owncloud/config/oidc.config.php"
+        # - dest: "/srv/tier1-owncloud-users-02/data/config/oidc.config.php"
         #   mode: "0755"
         #   owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
         #   group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
@@ -362,7 +383,22 @@ foreman_hostgroup:
         #                     ],
         #             ],
         #     ];
-        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/conf.d/local_configs/vhost_vm-0029.service.int.rabe.ch.conf"
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/owncloud/etc/owncloud.d/85-update-ca-certs.sh"
+          mode: "755"
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
+          content: |-
+            #!/bin/bash
+            # Update CA certificates in ownCloud container
+            update-ca-certificates
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/owncloud/etc/cron.d/ldap_to_owncloud_user_synchronization"
+          mode: "644"
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
+          content: |-
+            # Sync LDAP users to owncloud every 15 minutes and disable accounts which are no longer present in LDAP
+            */15 * * * * /usr/bin/occ user:sync --missing-account-action=disable "OCA\User_LDAP\User_Proxy"
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/etc/httpd/conf.d/local_configs/vhost_vm-0029.service.int.rabe.ch.conf"
           mode: "0755"
           owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
           group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
