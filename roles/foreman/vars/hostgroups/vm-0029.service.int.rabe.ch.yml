@@ -1,0 +1,636 @@
+---
+foreman_hostgroup:
+  name: vm-0029.service.int.rabe.ch
+  description: AlmaLinux 9 VM for ownCloud
+  parent: RaBe Core/RaBe Base/EL9/AlmaLinux 9/AlmaLinux 9 VMs
+  organization: RaBe
+  locations:
+    - Sulgenrain
+  ansible_roles:
+    - radiorabe.common.local_user
+    - redhat.rhel_system_roles.certificate
+    - redhat.rhel_system_roles.kernel_settings
+    - radiorabe.common.files
+    - radiorabe.common.git_clone
+    - radiorabe.common.download_file
+    - redhat.rhel_system_roles.podman
+    - redhat.rhel_system_roles.systemd
+    - radiorabe.podman.zabbix_monitoring
+  parameters:
+    - name: additional-packages
+      parameter_type: string
+      value: |-
+        python3-pip
+        python3-requests
+        python3-xmltodict
+        python3-ldap
+        glusterfs-fuse
+    - name: certificate_requests
+      parameter_type: yaml
+      value:
+        - name: vm-0029
+          dns:
+            - vm-0029.service.int.rabe.ch
+          ca: ipa
+          principal: HTTP/vm-0029.service.int.rabe.ch@INT.RABE.CH
+          key_size: 4096
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
+    - name: radiorabe_files
+      parameter_type: yaml
+      value:
+        - path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/owncloud/etc/owncloud.d/"
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
+          mode: '0755'
+          state: directory
+          recurse: true
+        - path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/etc/httpd/conf.d/local_configs/"
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
+          mode: '0755'
+          state: directory
+          recurse: true
+        - path: "/etc/populate_group_shares/"
+          state: directory
+          mode: "0600"
+        - path: "/usr/local/libexec/populate_group_shares/"
+          state: directory
+          mode: "0750"
+        - path: "/srv/tier1-owncloud-users-02/data/apps/rabe"
+          recurse: true
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
+    - name: radiorabe_git_clone
+      parameter_type: yaml
+      value:
+        # requires git config --global --add safe.directory /srv/tier1-owncloud-users-02/data/apps/rabe
+        - repo: https://github.com/radiorabe/owncloud-theme-rabe.git
+          dest: /srv/tier1-owncloud-users-02/data/apps/rabe
+          single_branch: true
+          version: main
+          force: true
+    - name: owncloud_db_password
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable owncloud_db_password needs to be set in host') {{ '}}' }}"
+    - name: owncloud_db_user
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable owncloud_db_user needs to be set in host') {{ '}}' }}"
+    - name: owncloud_mail_smtp_hostname
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable owncloud_mail_smtp_hostname needs to be set in host') {{ '}}' }}"
+    - name: owncloud_mail_smtp_password
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable owncloud_mail_smtp_password needs to be set in host') {{ '}}' }}"
+    - name: owncloud_mail_smtp_username
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable owncloud_mail_smtp_username needs to be set in host') {{ '}}' }}"
+    - name: owncloud_oidc_client_id
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable owncloud_oidc_client_id needs to be set in host') {{ '}}' }}"
+    - name: owncloud_oidc_client_secret
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable owncloud_oidc_client_secret needs to be set in host') {{ '}}' }}"
+    - name: populate_group_shares_ipa_server
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable populate_group_shares_ipa_server needs to be set in host') {{ '}}' }}"
+    - name: populate_group_shares_ldap_user
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable populate_group_shares_ldap_user needs to be set in host') {{ '}}' }}"
+    - name: populate_group_shares_ldap_password
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable populate_group_shares_ldap_password needs to be set in host') {{ '}}' }}"
+    - name: populate_group_shares_nc_federated_server
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable populate_group_shares_nc_federated_server needs to be set in host') {{ '}}' }}"
+    - name: populate_group_shares_nc_federated_user
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable populate_group_shares_nc_federated_user needs to be set in host') {{ '}}' }}"
+    - name: populate_group_shares_nc_federated_password
+      parameter_type: string
+      value: "{{ '{{' }} undef('variable populate_group_shares_nc_federated_password needs to be set in host') {{ '}}' }}"
+    - name: kernel_settings_sysctl
+      parameter_type: yaml
+      value:
+        - name: net.ipv4.ip_unprivileged_port_start
+          value: 80
+        - name: vm.overcommit_memory
+          value: 1
+    - name: local_user_username
+      parameter_type: string
+      value: owncloud
+    - name: podman_containers_conf
+      parameter_type: yaml
+      value:
+        containers:
+          log_driver: k8s-file
+          log_size_max: 1073741824
+        network:
+          default_rootless_network_cmd: pasta
+    - name: podman_create_host_directories
+      parameter_type: boolean
+      value: true
+    - name: podman_firewall
+      parameter_type: yaml
+      value:
+        - service:
+            - http
+            - https
+          state: enabled
+    - name: podman_kube_specs
+      parameter_type: yaml
+      value:
+        - state: started
+          kube_file_content:
+            apiVersion: v1
+            kind: Pod
+            metadata:
+              name: owncloud
+            spec:
+              containers:
+                - name: httpd
+                  image: ghcr.io/radiorabe/httpd:0.6.7@sha256:905ed132d1bdb9c32d2424203df79d215076a660c111f566490c84a56138f37d
+                  ports:
+                    - containerPort: 8081
+                      hostPort: 80
+                    - containerPort: 8444
+                      hostPort: 443
+                  volumeMounts:
+                    - mountPath: /etc/pki/tls/certs/server.crt:ro
+                      name: httpd_tls_cert
+                    - mountPath: /etc/pki/tls/private/server.key:ro
+                      name: httpd_tls_key
+                    - mountPath: /etc/httpd/conf.d/local_configs:Z
+                      name: local_httpd_configs
+                  # Temporary workaround to fix the issue with httpd image not
+                  # starting due to port conflicts. This will be removed once
+                  # the upstream image is fixed.
+                  command: ["/bin/sh", "-c"]
+                  args:
+                    - |
+                      sed -i s/8080/8081/ /etc/httpd/conf/httpd.conf
+                      sed -i s/8443/8444/ /etc/httpd/conf.d/ssl.conf
+                      /usr/bin/run-httpd
+                - name: redis
+                  image: docker.io/valkey/valkey:9-alpine
+                  restart: always
+                  livenessProbe:
+                    exec:
+                      command:
+                        - valkey-cli
+                        - ping
+                - name: owncloud
+                  restart: always
+                  livenessProbe:
+                    httpGet:
+                      path: "/login/"
+                      port: 8080
+                  image: docker.io/owncloud/server:11.1.0@sha256:60f13cb41959d9a4abc44535409d113107efb64b83764efbcc3530c12c4de98d
+                  volumeMounts:
+                    - mountPath: /mnt/data:rw,Z
+                      name: owncloud_data
+                    - mountPath: /usr/local/share/ca-certificates/ca-bundle.crt:ro
+                      name: rabe_ca_certificates
+                    - mountPath: /etc/owncloud.d/update-ca-certs.sh:ro,Z
+                      name: update_ca_certs
+                  env:
+                    - name: OWNCLOUD_SKIP_CHOWN
+                      value: "true"
+                    - name: OWNCLOUD_SKIP_CHMOD
+                      value: "true"
+                    - name: OWNCLOUD_ENABLE_OIDC_REWRITE_URL
+                      value: "true"
+                    - name: OWNCLOUD_HTTP_COOKIE_SAMESITE
+                      value: "None"
+                    - name: OWNCLOUD_OVERWRITE_PROTOCOL
+                      value: "https"
+                    - name: OWNCLOUD_ADMIN_USERNAME
+                      value: "admin1"
+                    - name: OWNCLOUD_ADMIN_PASSWORD
+                      value: "admin1"
+                    - name: OWNCLOUD_TRUSTED_DOMAINS
+                      value: "vm-0029.service.int.rabe.ch,vm-0028.service.int.rabe.ch,share.rabe.ch,onlyoffice.rabe.ch"
+                    - name: OWNCLOUD_DEFAULT_LANGUAGE
+                      value: "de"
+                    - name: OWNCLOUD_LOST_PASSWORD_LINK
+                      value: "https://my.rabe.ch/auth/forgotpw"
+                    - name: OWNCLOUD_DB_TYPE
+                      value: "pgsql"
+                    - name: OWNCLOUD_DB_NAME
+                      value: "{{ '{{' }} owncloud_db_name {{ '}}' }}"
+                    - name: OWNCLOUD_DB_HOST
+                      value: "{{ '{{' }} owncloud_db_host {{ '}}' }}"
+                    - name: OWNCLOUD_DB_TABLE_PREFIX
+                      value: "oc_"
+                    - name: OWNCLOUD_DB_USERNAME
+                      value: "{{ '{{' }} owncloud_db_username {{ '}}' }}"
+                    - name: OWNCLOUD_DB_PASSWORD
+                      value: "{{ '{{' }} owncloud_db_password {{ '}}' }}"
+                    - name: OWNCLOUD_REDIS_ENABLED
+                      value: "true"
+                    - name: OWNCLOUD_REDIS_HOST
+                      value: "redis"
+                    - name: OWNCLOUD_MAIL_DOMAIN
+                      value: "rabe.ch"
+                    - name: OWNCLOUD_MAIL_FROM_ADDRESS
+                      value: "noreply"
+                    - name: OWNCLOUD_MAIL_SMTP_MODE
+                      value: "smtp"
+                    - name: OWNCLOUD_MAIL_SMTP_SECURE
+                      value: "ssl"
+                    - name: OWNCLOUD_MAIL_SMTP_AUTH_TYPE
+                      value: "PLAIN"
+                    - name: OWNCLOUD_MAIL_SMTP_AUTH
+                      value: "true"
+                    - name: OWNCLOUD_MAIL_SMTP_HOST
+                      value: "{{ '{{' }} owncloud_mail_smtp_host {{ '}}' }}"
+                    - name: OWNCLOUD_MAIL_SMTP_PORT
+                      value: "465"
+                    - name: OWNCLOUD_MAIL_SMTP_NAME
+                      value: "{{ '{{' }} owncloud_mail_smtp_name {{ '}}' }}"
+                    - name: OWNCLOUD_MAIL_SMTP_PASSWORD
+                      value: "{{ '{{' }} owncloud_mail_smtp_password {{ '}}' }}"
+                    - name: OWNCLOUD_OPENID_CONNECT
+                      value: |-
+                        {{
+                          {
+                            'provider-url': 'https://sso.rabe.ch/auth/realms/rabe',
+                            'client-id': {% raw %}owncloud_oidc_client_id{% endraw %},
+                            'client-secret': {% raw %}owncloud_oidc_client_secret{% endraw %},
+                            'autoRedirectOnLoginPage': true,
+                            'mode': 'userid',
+                            'search-attribute': 'unixUID',
+                            'post_logout_redirect_uri': 'https://www.rabe.ch',
+                            'auto-provision': {
+                              'enabled': false
+                            }
+                          } | to_json
+                        }}
+              volumes:
+                - name: owncloud_data
+                  hostPath:
+                    path: "/srv/tier1-owncloud-users-02/data"
+                    type: Directory
+                - name: httpd_tls_cert
+                  hostPath:
+                    path: /etc/pki/tls/certs/vm-0029.crt
+                    type: File
+                - name: httpd_tls_key
+                  hostPath:
+                    path: /etc/pki/tls/private/vm-0029.key
+                    type: File
+                - name: local_httpd_configs
+                  hostPath:
+                    path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/etc/httpd/conf.d/local_configs"
+                - name: rabe_ca_certificates
+                  hostPath:
+                    path: /etc/pki/tls/certs/ca-bundle.crt
+                    type: File
+                - hostPath:
+                    path: /home/{{ '{{' }} podman_run_as_user {{ '}}' }}/owncloud/etc/owncloud.d/85-update-ca-certs.sh
+                    type: File
+                  name: update_ca_certs
+    - name: podman_run_as_group
+      parameter_type: string
+      value: owncloud
+    - name: podman_run_as_user
+      parameter_type: string
+      value: owncloud
+    - name: podman_selinux_ports
+      parameter_type: yaml
+      value:
+        - ports: 80
+          setype: http_port_t
+        - ports: 443
+          setype: http_port_t
+    - name: selinux_booleans
+      parameter_type: yaml
+      value:
+        - name: container_read_certs
+          state: true
+          persistent: true
+    - name: selinux_fcontexts
+      parameter_type: yaml
+      value:
+        - target: /etc/certmonger/post-scripts(/.*)?
+          setype: certmonger_unconfined_exec_t
+          ftype: f
+          state: present
+    - name: selinux_restore_dirs
+      parameter_type: yaml
+      value:
+        - /etc/certmonger/post-scripts/
+    - name: zabbix_monitoring_podman_user
+      parameter_type: string
+      value: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+    - name: download_file_url
+      parameter_type: string
+      # requires
+      # dnf install -y python3-pip && \
+      # pip install -r https://raw.githubusercontent.com/radiorabe/freeipa-extending-ldap-schema-and-ui/refs/heads/master/tools/script/requirements.txt
+      value: https://raw.githubusercontent.com/radiorabe/freeipa-extending-ldap-schema-and-ui/refs/heads/master/tools/script/populate_group_shares.py
+    - name: download_file_destination
+      parameter_type: string
+      value: /usr/local/libexec/populate_group_shares/
+    - name: radiorabe_copies
+      parameter_type: yaml
+      value:
+        # path needs adjustment or must be mounted when attaching gluster
+        # apparently no longer needed with ownCloud 11.1.0. OIDC configuration
+        # can now be set with OWNCLOUD_OPENID_CONNECT variable
+        # - dest: "/srv/tier1-owncloud-users-02/data/config/oidc.config.php"
+        #   mode: "0755"
+        #   owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+        #   group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
+        #   content: |-
+        #     <?php
+        #     $CONFIG = [
+        #             'openid-connect' => [
+        #                     'provider-url' => 'https://sso.rabe.ch/auth/realms/rabe',
+        #                     'client-id' => '{{ '{{' }} owncloud_oidc_client_id {{ '}}' }}',
+        #                     'client-secret' => '{{ '{{' }} owncloud_oidc_client_secret {{ '}}' }}',
+        #                     'autoRedirectOnLoginPage' => true,
+        #                     'mode' => 'userid',
+        #                     'search-attribute' => 'unixUID',
+        #                     'post_logout_redirect_uri' => 'https://www.rabe.ch',
+        #                     'auto-provision' => [
+        #                             'enabled' => true,
+        #                               // documentation about standard claims:
+        #                               // https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
+        #                               // only relevant in userid mode, defines the claim which holds the email of the user
+        #                             'email-claim' => 'email',
+        #                               // defines the claim which holds the display name of the user
+        #                             //'display-name-claim' => 'given_name',
+        #                             'display-name-claim' => 'name',
+        #                               // defines the claim which holds the picture of the user - must be a URL
+        #                             'picture-claim' => 'picture',
+        #                             'groups-claim' => 'groups',
+        #                               // defines a list of groups to which the newly created user will be added automatically
+        #                             // 'groups' => ['admin', 'guests', 'employees'],
+        #                               // sets a claim which is defined at the IDP.
+        #                               // the IDP will return a single value or an array like:
+        #                               // "allowed_applications": ["erp", "owncloud"],
+        #                             // 'provisioning-claim' => 'nextcloudEnabled',
+        #                               // defines the matching case for the provisioning. the attribute can only be a
+        #                               // single value in case no match is found against the IDP response,
+        #                               // no provisioning will be made, "User not found" will be returned
+        #                             // 'provisioning-attribute' => 'TRUE',
+        #                               // auto-update user account info with current information provided by the
+        #                               // OpenID Connect provider account attributes that will be updated
+        #                               // can be specified in `attributes` config option
+        #                             'update' => ['enabled' => true],
+        #                               // enable the user info auto-update mode
+        #                     ],
+        #             ],
+        #     ];
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/owncloud/etc/owncloud.d/85-update-ca-certs.sh"
+          mode: "755"
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
+          content: |-
+            #!/bin/bash
+            # Update CA certificates in ownCloud container
+            update-ca-certificates
+        - dest: "~/.gitconfig"
+          mode: "644"
+          owner: "{{ '{{' }} ansible_user {{ '}}' }}"
+          content: |-
+            [safe]
+                directory = /srv/tier1-owncloud-users-02/data/apps/rabe
+        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/etc/httpd/conf.d/local_configs/vhost_vm-0029.service.int.rabe.ch.conf"
+          mode: "0755"
+          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
+          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
+          content: |-
+            # This is the template we use at RaBe for VirtualHost configurations
+            # -----------------------------------------------------------------------------
+            # The aim is to have consistent configurations across the domains we serve
+            # through the reverse proxies. There is a mandatory section "RaBe standard
+            # section" which has to be the same in all configurations apart from domain
+            # specifics. A second part "Custom configuration section" contains the
+            # individual web service configuration. There is no individual web service
+            # configuration section in VirtualHost for port 8080. We do not serve any
+            # service unencrypted.
+            #
+            # 2025-09-02: initial version
+            # HTTP & HTTPS virtual host vm-0029.service.int.rabe.ch
+            #
+            # This virtual host is used for OwnCloud service. It is configured to use
+            # SSL/TLS with a certificate issued by the internal CA. The configuration
+            # includes proxy settings to forward requests to the backend OwnCloud
+            # container, as well as security headers to enhance privacy and security.
+            #
+            # See also:
+            # * https://wiki.rabe.ch/vm-0029
+            #
+            <VirtualHost *:8444>
+                #
+                # ----- BEGIN RaBe standard section -----
+                # Only adjust domain specifics marked with <<<>>> in this section.
+                #
+
+                # Set the DNS server name for this virtualhost
+                # see https://httpd.apache.org/docs/2.4/mod/core.html#servername
+                # and https://httpd.apache.org/docs/2.4/mod/core.html#serveralias
+                #
+                ServerName vm-0029.service.int.rabe.ch
+                # ServerAlias <<<2ndsite/subdomain>>>.rabe.ch
+
+                # SSL/TLS certificate configuration
+                # see https://httpd.apache.org/docs/2.4/mod/mod_ssl.html
+                #
+                SSLEngine On
+
+                # Cipher Suite available for negotiation in SSL proxy handshake
+                # see https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslproxyciphersuite
+                # By default, RHEL cryptographic policiy SYSTEM is set.
+                # More details at https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/security_hardening/using-the-system-wide-cryptographic-policies_security-hardening#system-wide-crypto-policies_using-the-system-wide-cryptographic-policies
+                #
+                # SSLCipherSuite PROFILE=SYSTEM
+
+                # Server PEM-encoded X.509 certificate data files
+                # see https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslcertificatefile
+                #
+                SSLCertificateFile /etc/pki/tls/certs/server.crt
+                SSLCertificateKeyFile /etc/pki/tls/private/server.key
+                SSLCACertificatePath /etc/pki/tls/certs/
+                #SSLCertificateChainFile /etc/pki/tls/private/rabe_certs/board.rabe.ch/chain.pem
+
+                # Enable SSL/TLS requests forwarding to backend server
+                # see https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslproxyengine
+                #
+                SSLProxyEngine On
+                SSLProxyCACertificateFile /etc/ssl/certs/ca-bundle.crt
+
+                # Cipher Suite available for negotiation in SSL handshake
+                # see https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslciphersuite
+                # By default, RHEL cryptographic policiy SYSTEM is set.
+                # More details at https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/security_hardening/using-the-system-wide-cryptographic-policies_security-hardening#system-wide-crypto-policies_using-the-system-wide-cryptographic-policies
+                #
+                # SSLProxyCipherSuite PROFILE=SYSTEM
+
+                # Enable SSL/TLS certificate verification of the remote server
+                # see https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslproxyverify
+                #
+                SSLProxyVerify require
+
+                # Proxying to backend server configuration
+                # see https://httpd.apache.org/docs/2.4/mod/mod_proxy.html
+                #
+                ProxyAddHeaders On
+                ProxyPass / http://owncloud:8080/
+                ProxyPassReverse / http://owncloud:8080/
+
+                # Remove some headers giving away product information from response
+                # see https://httpd.apache.org/docs/current/mod/mod_headers.html
+                #
+                Header unset Server
+                Header unset X-Powered-By
+
+                #
+                # ----- END RaBe standard section -----
+                #
+
+                #
+                # ----- BEGIN Custom configuration section -----
+                # Add additional service specific configuration below.
+                #
+
+                # Turn off modsecurity for this virtual host, as it may
+                # interfere with ownCloud functionality. Modsecurity is
+                # enabled in the reverse proxy so this is only for the
+                # backend container.
+                # see https://httpd.apache.org/docs/current/mod/mod_security2.html
+                SecRuleEngine Off
+
+                #
+                # ----- END Custom configuration section -----
+                #
+            </VirtualHost>
+
+            <VirtualHost *:8081>
+                #
+                # ----- BEGIN RaBe standard section -----
+                # Only adjust domain specifics marked with <<<>>> in this section.
+                #
+
+                # Set the DNS server name for this virtualhost
+                # see https://httpd.apache.org/docs/2.4/mod/core.html#servername
+                # and https://httpd.apache.org/docs/2.4/mod/core.html#serveralias
+                #
+                ServerName vm-0029.service.int.rabe.ch
+                # ServerAlias <<<2ndsite/subdomain>>>.rabe.ch
+
+                # HTTP to HTTPS redirect
+                # see https://httpd.apache.org/docs/current/mod/mod_rewrite.html
+                #
+                RewriteEngine On
+                RewriteCond %{HTTPS} off
+                RewriteRule (.*) https://%{SERVER_NAME}$1 [R,L]
+            </VirtualHost>
+        - dest: "/etc/populate_group_shares/creds.py"
+          mode: "0600"
+          content: |-
+            # owncloud admin user credentials
+            username = '{{ '{{' }} populate_group_shares_nc_federated_user {{ '}}' }}'
+            password = '{{ '{{' }} populate_group_shares_nc_federated_password {{ '}}' }}'
+        - dest: "/etc/populate_group_shares/ldapcreds.py"
+          mode: "0600"
+          content: |-
+            # user for ldap queries. Needs to be able to read nextcloudEnabled and nextcloudQuota attributes.
+            ldapuser = '{{ '{{' }} populate_group_shares_ipa_user {{ '}}' }}'
+            ldappw = '{{ '{{' }} populate_group_shares_ipa_password {{ '}}' }}'
+        - dest: "/etc/systemd/system/populate_group_shares.service"
+          content: |-
+            # /etc/systemd/system/populate_group_shares.service
+            [Unit]
+            Description=Create/Sync shares for nextcloud/owncloud enabled LDAP groups to owncloud
+
+            [Service]
+            Environment="REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-bundle.crt"
+            Environment="IPA_SERVER={{ '{{' }} populate_group_shares_ipa_server {{ '}}' }}"
+            Environment="NC_FEDERATED_SERVER={{ '{{' }} populate_group_shares_nc_federated_server {{ '}}' }}"
+            ExecStart=/usr/bin/python /usr/local/libexec/populate_group_shares/populate_group_shares.py
+
+            [Install]
+            WantedBy=basic.target
+        - dest: "/etc/systemd/system/populate_group_shares.timer"
+          content: |-
+            [Unit]
+            Description=Create/Sync shares for nextcloud enabled LDAP groups to nextcloud/owncloud every 5 minutes
+
+            [Timer]
+            OnBootSec=5min
+            OnUnitActiveSec=5min
+            Unit=populate_group_shares.service
+
+            [Install]
+            WantedBy=timers.target
+        - dest: "/etc/systemd/system/ldap_to_owncloud_user_synchronization.service"
+          content: |-
+            # /etc/systemd/system/ldap_to_owncloud_user_synchronization.service
+            [Unit]
+            Description=Sync LDAP users to owncloud and disable accounts which are no longer present in LDAP
+
+            [Service]
+            User={{ '{{' }} podman_run_as_user {{ '}}' }}
+            Group={{ '{{' }} podman_run_as_group {{ '}}' }}
+            ExecStart=/usr/bin/podman exec -ti owncloud-owncloud /usr/bin/occ user:sync --missing-account-action=disable ldap
+
+            [Install]
+            WantedBy=basic.target
+        - dest: "/etc/systemd/system/ldap_to_owncloud_user_synchronization.timer"
+          content: |-
+            [Unit]
+            Description=Sync LDAP users to owncloud every 15 minutes and disable accounts which are no longer present in LDAP
+
+            [Timer]
+            OnBootSec=15min
+            OnUnitActiveSec=15min
+            Unit=ldap_to_owncloud_user_synchronization.service
+
+            [Install]
+            WantedBy=timers.target
+    - name: systemd_enabled_units
+      parameter_type: yaml
+      value:
+        - populate_group_shares.timer
+        - ldap_to_owncloud_user_synchronization.timer
+    - name: systemd_started_units
+      parameter_type: yaml
+      value:
+        - populate_group_shares.timer
+        - ldap_to_owncloud_user_synchronization.timer
+    # The following should work with newer versions of systemd role instead of copying using radiorabe_copies
+    # Revisiting this again some time in the future
+    # - name: systemd_unit_files
+    #   parameter_type: yaml
+    #   value:
+    #     - item: populate_group_shares.timer
+    #       file_content: |
+    #         [Unit]
+    #         Description=Create/Sync shares for nextcloud enabled LDAP groups to nextcloud/owncloud every 5 minutes
+
+    #         [Timer]
+    #         OnBootSec=5min
+    #         OnUnitActiveSec=5min
+    #         Unit=populate_group_shares.service
+
+    #         [Install]
+    #         WantedBy=timers.target
+    #       state: present
+    #     - item: populate_group_shares.service
+    #       file_content: |
+    #         # /etc/systemd/system/populate_group_shares.service
+    #         [Unit]
+    #         Description=Create/Sync shares for nextcloud/owncloud enabled LDAP groups to owncloud
+
+    #         [Service]
+    #         Environment="REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-bundle.crt"
+    #         Environment="IPA_SERVER={{ '{{' }} populate_group_shares_ipa_server {{ '}}' }}"
+    #         Environment="NC_FEDERATED_SERVER={{ '{{' }} populate_group_shares_nc_federated_server {{ '}}' }}"
+    #         ExecStart=/usr/bin/python /usr/local/libexec/populate_group_shares/populate_group_shares.py
+
+    #         [Install]
+    #         WantedBy=basic.target
+    #       state: present
