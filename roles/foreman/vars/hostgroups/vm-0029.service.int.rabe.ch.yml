@@ -7,8 +7,8 @@ foreman_hostgroup:
   locations:
     - Sulgenrain
   ansible_roles:
-    - redhat.rhel_system_roles.certificate
     - radiorabe.common.local_user
+    - redhat.rhel_system_roles.certificate
     - redhat.rhel_system_roles.kernel_settings
     - radiorabe.common.files
     - radiorabe.common.git_clone
@@ -24,6 +24,7 @@ foreman_hostgroup:
         python3-requests
         python3-xmltodict
         python3-ldap
+        glusterfs-fuse
     - name: certificate_requests
       parameter_type: yaml
       value:
@@ -173,8 +174,17 @@ foreman_hostgroup:
                 - name: redis
                   image: docker.io/valkey/valkey:9-alpine
                   restart: always
+                  livenessProbe:
+                    exec:
+                      command:
+                        - valkey-cli
+                        - ping
                 - name: owncloud
                   restart: always
+                  livenessProbe:
+                    httpGet:
+                      path: "/login/"
+                      port: 8080
                   image: docker.io/owncloud/server:11.1.0@sha256:60f13cb41959d9a4abc44535409d113107efb64b83764efbcc3530c12c4de98d
                   volumeMounts:
                     - mountPath: /mnt/data:rw,Z
@@ -563,7 +573,9 @@ foreman_hostgroup:
             Description=Sync LDAP users to owncloud and disable accounts which are no longer present in LDAP
 
             [Service]
-            ExecStart=/usr/bin/podman exec -ti owncloud-owncloud /usr/bin/occ user:sync --missing-account-action=disable "OCA\User_LDAP\User_Proxy"
+            User={{ '{{' }} podman_run_as_user {{ '}}' }}
+            Group={{ '{{' }} podman_run_as_group {{ '}}' }}
+            ExecStart=/usr/bin/podman exec -ti owncloud-owncloud /usr/bin/occ user:sync --missing-account-action=disable ldap
 
             [Install]
             WantedBy=basic.target
