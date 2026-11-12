@@ -16,7 +16,6 @@ from ruamel.yaml.scalarstring import (
     LiteralScalarString,
 )
 
-
 # Hacker-only toggle: flip to True for alpha-sorted parameter output.
 # Default stays False to preserve existing behavior and file ordering.
 HACK_SORT_PARAMS_ALPHA = False
@@ -298,7 +297,7 @@ def _merge_parameter_seq(existing_seq, new_params):
                 )
 
             # Keep predictable key order inside each parameter item.
-            for key in param.keys():
+            for key in param:
                 if key in existing_item:
                     existing_item.move_to_end(key)
 
@@ -431,11 +430,11 @@ def run_module():
     merged_hostgroup = updates
 
     tail_keys = ["ansible_roles", "parameters"]
-    ordered_keys = [k for k in existing_hostgroup.keys() if k not in tail_keys]
+    ordered_keys = [k for k in existing_hostgroup if k not in tail_keys]
 
     # Preserve the established ordering for non-tail keys while allowing
     # newly introduced fields to appear before ansible_roles/parameters.
-    for key in updates.keys():
+    for key in updates:
         if key in tail_keys:
             continue
         if key not in ordered_keys:
@@ -473,7 +472,7 @@ def run_module():
                 continue
             fg[key] = _to_yaml_node(value)
 
-        for key in merged_ordered.keys():
+        for key in merged_ordered:
             if key in fg:
                 fg.move_to_end(key)
 
