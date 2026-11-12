@@ -38,12 +38,6 @@ foreman_hostgroup:
     - name: radiorabe_files
       parameter_type: yaml
       value:
-        - path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/owncloud/etc/cron.d/"
-          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
-          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
-          mode: '0755'
-          state: directory
-          recurse: true
         - path: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/owncloud/etc/owncloud.d/"
           owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
           group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
@@ -189,8 +183,6 @@ foreman_hostgroup:
                       name: rabe_ca_certificates
                     - mountPath: /etc/owncloud.d/update-ca-certs.sh:ro,Z
                       name: update_ca_certs
-                    - mountPath: /etc/cron.d/ldap_to_owncloud_user_synchronization:ro,Z
-                      name: ldap_to_owncloud_user_synchronization
                   env:
                     - name: OWNCLOUD_SKIP_CHOWN
                       value: "true"
@@ -288,10 +280,6 @@ foreman_hostgroup:
                     path: /home/{{ '{{' }} podman_run_as_user {{ '}}' }}/owncloud/etc/owncloud.d/85-update-ca-certs.sh
                     type: File
                   name: update_ca_certs
-                - hostPath:
-                    path: /home/{{ '{{' }} podman_run_as_user {{ '}}' }}/owncloud/etc/cron.d/ldap_to_owncloud_user_synchronization
-                    type: File
-                  name: ldap_to_owncloud_user_synchronization
     - name: podman_run_as_group
       parameter_type: string
       value: owncloud
@@ -399,13 +387,6 @@ foreman_hostgroup:
           content: |-
             [safe]
                 directory = /srv/tier1-owncloud-users-02/data/apps/rabe
-        - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/owncloud/etc/cron.d/ldap_to_owncloud_user_synchronization"
-          mode: "644"
-          owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
-          group: "{{ '{{' }} podman_run_as_group {{ '}}' }}"
-          content: |-
-            # Sync LDAP users to owncloud every 15 minutes and disable accounts which are no longer present in LDAP
-            */15 * * * * /usr/bin/occ user:sync --missing-account-action=disable "OCA\User_LDAP\User_Proxy"
         - dest: "/home/{{ '{{' }} podman_run_as_user {{ '}}' }}/httpd/etc/httpd/conf.d/local_configs/vhost_vm-0029.service.int.rabe.ch.conf"
           mode: "0755"
           owner: "{{ '{{' }} podman_run_as_user {{ '}}' }}"
@@ -575,14 +556,39 @@ foreman_hostgroup:
 
             [Install]
             WantedBy=timers.target
+        - dest: "/etc/systemd/system/ldap_to_owncloud_user_synchronization.service"
+          content: |-
+            # /etc/systemd/system/ldap_to_owncloud_user_synchronization.service
+            [Unit]
+            Description=Sync LDAP users to owncloud and disable accounts which are no longer present in LDAP
+
+            [Service]
+            ExecStart=/usr/bin/podman exec -ti owncloud-owncloud /usr/bin/occ user:sync --missing-account-action=disable "OCA\User_LDAP\User_Proxy"
+
+            [Install]
+            WantedBy=basic.target
+        - dest: "/etc/systemd/system/ldap_to_owncloud_user_synchronization.timer"
+          content: |-
+            [Unit]
+            Description=Sync LDAP users to owncloud every 15 minutes and disable accounts which are no longer present in LDAP
+
+            [Timer]
+            OnBootSec=15min
+            OnUnitActiveSec=15min
+            Unit=ldap_to_owncloud_user_synchronization.service
+
+            [Install]
+            WantedBy=timers.target
     - name: systemd_enabled_units
       parameter_type: yaml
       value:
         - populate_group_shares.timer
+        - ldap_to_owncloud_user_synchronization.timer
     - name: systemd_started_units
       parameter_type: yaml
       value:
         - populate_group_shares.timer
+        - ldap_to_owncloud_user_synchronization.timer
     # The following should work with newer versions of systemd role instead of copying using radiorabe_copies
     # Revisiting this again some time in the future
     # - name: systemd_unit_files
