@@ -85,6 +85,10 @@ foreman_hostgroup:
               containers:
                 - name: kanboard
                   restart: always
+                  livenessProbe:
+                    httpGet:
+                      path: /login/
+                      port: 80
                   image: quay.io/kanboard/kanboard:v1.2.57@sha256:637989624e5362af2b97bfb4be1936fb6b111ea7cbdffea0ae8bd3068dc84125
                   ports:
                     - containerPort: 80
