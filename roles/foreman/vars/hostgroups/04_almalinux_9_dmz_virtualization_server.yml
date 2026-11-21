@@ -11,7 +11,7 @@ foreman_hostgroup:
   ansible_roles:
     - redhat.rhel_system_roles.network
     - radiorabe.foreman_libvirt.libvirt
-    - radiorabe.common.download_file
+    - radiorabe.common.download_files
     - redhat.rhel_system_roles.bootloader
   parameters:
     - name: bootloader_settings
@@ -29,10 +29,10 @@ foreman_hostgroup:
               state: absent
             - name: quiet
               state: absent
-    - name: download_file_destination
+    - name: download_files_destination
       parameter_type: string
       value: /var/lib/libvirt/images/
-    - name: download_file_url
+    - name: download_files_url
       parameter_type: string
       value: https://foreman.service.int.rabe.ch/pulp/content/RaBe/Library/custom/AlmaLinux_OS_Generic_Cloud_Cloud-init_image/AlmaLinux_OS_Generic_Cloud_Cloud-init_image/AlmaLinux-9-GenericCloud-latest.x86_64.qcow2
     - name: remote_execution_ssh_keys
